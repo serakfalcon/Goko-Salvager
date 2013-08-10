@@ -780,10 +780,22 @@
 
 /*
  * Kingdom generator module
- *
- * TODO: Make sure we have the FS.Dominion.DeckBuilder object first.
  */
+
+// Wait (non-blocking) until Goko instantiatest the FS.Dominion.DeckBuilder 
+var loadKingdomGenerator;
 (function () {
+    "use strict";
+    setInterval(function () {
+        try {
+            if (typeof FS.Dominion.DeckBuilder !== 'undefined') {
+                loadKingdomGenerator();
+            }
+        } catch (e) { }
+    }, 100);
+}());
+
+loadKingdomGenerator = function () {
     "use strict";
 
     var hideKingdomGenerator = false;
@@ -1043,7 +1055,7 @@
         }
         for (c in window.GokoSalvager.types) {
             n = window.GokoSalvager.canonizeName(c);
-            if (setsComp.hasOwnElement(n)) {
+            if (setsComp.hasOwnProperty(n)) {
                 t = window.GokoSalvager.types[c].split('-');
                 for (i = 0; i < t.length; i += 1) {
                     if (sets[t[i]] === undefined) {
@@ -1171,7 +1183,7 @@
             hideKingdomGenerator = false;
         });
     };
-}());
+};
 
 /*
  * Auto kick module
