@@ -1,5 +1,7 @@
 # encoding: UTF-8
 
+require 'fileutils'
+
 namespace :safari do
 
   directory 'build/gokosalvager.safariextension'
@@ -12,7 +14,7 @@ namespace :safari do
 
   automatch_script_names.each do |f|
     file "build/gokosalvager.safariextension/#{f}" => ['build/gokosalvager.safariextension', "src/ext/#{f}"] do |t|
-      FileUtils.cp "src/ext/#{f}", t.name
+      cp "src/ext/#{f}", t.name
     end
   end
 
@@ -25,7 +27,7 @@ namespace :safari do
 
   ['Info.plist', 'Settings.plist'].each do |f|
     file "build/gokosalvager.safariextension/#{f}" => ['build/gokosalvager.safariextension', "safari/#{f}"] do |t|
-      FileUtils.cp("safari/#{f}", t.name)
+      cp("safari/#{f}", t.name)
     end
   end
 
@@ -35,12 +37,35 @@ namespace :safari do
   end
 
   file 'build/gokosalvager.safariextz' => ['safari:dev'] do |t, args|
-    sh "src/dev/createAndSign.sh"
+    create_and_sign
   end
 
   desc 'Create a signed .safariextz for Safari.'
   task :build => ['build/gokosalvager.safariextz'] do
     puts 'build/gokosalvager.safariextz created'
   end
+
+end
+
+# based on http://blog.streak.com/2013/01/how-to-build-safari-extension.html
+def create_and_sign
+  src = 'gokosalvager.safariextension'
+  target = 'gokosalvager.safariextz'
+
+  cert_dir = File.expand_path('~/.safari-certs')
+  size_file = File.join(cert_dir, 'size.txt')
+
+  mv File.join('build', src), src
+
+  sh "openssl dgst -sign #{cert_dir}/key.pem -binary < #{cert_dir}/key.pem | wc -c > #{size_file}"
+  sh "xar -czf #{target} --distribution #{src}"
+  sh "xar --sign -f #{target} --digestinfo-to-sign digest.dat --sig-size #{File.read(size_file).strip} --cert-loc #{cert_dir}/cert.der --cert-loc #{cert_dir}/cert01 --cert-loc #{cert_dir}/cert02"
+  sh "openssl rsautl -sign -inkey #{cert_dir}/key.pem -in digest.dat -out sig.dat"
+  sh "xar --inject-sig sig.dat -f #{target}"
+  rm_f ['sig.dat', 'digest.dat']
+  chmod 744, target
+
+  mv target, File.join('build', target)
+  mv src, File.join('build', src)
 
 end
