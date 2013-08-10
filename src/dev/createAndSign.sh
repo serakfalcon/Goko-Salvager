@@ -1,6 +1,10 @@
+# based on http://blog.streak.com/2013/01/how-to-build-safari-extension.html
+
 XAR=xar
 CERT_DIR=~/.safari-certs
 EXTENSION="gokosalvager"
+
+mv build/$EXTENSION.safariextension $EXTENSION.safariextension
 
 openssl dgst -sign $CERT_DIR/key.pem -binary < $CERT_DIR/key.pem | wc -c > $CERT_DIR/size.txt
 
@@ -10,3 +14,6 @@ openssl rsautl -sign -inkey $CERT_DIR/key.pem -in digest.dat -out sig.dat
 $XAR --inject-sig sig.dat -f $EXTENSION.safariextz
 rm -f sig.dat digest.dat
 chmod 744 $EXTENSION.safariextz
+
+mv $EXTENSION.safariextz build/$EXTENSION.safariextz
+mv $EXTENSION.safariextension build/$EXTENSION.safariextension
