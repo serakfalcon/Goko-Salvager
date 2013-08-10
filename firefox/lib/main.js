@@ -8,6 +8,8 @@ pageMod.PageMod({
               "http://beta.goko.com/Dominion/gameClient.html*",
               "https://beta.goko.com/Dominion/gameClient.html*"],
 
+    contentStyleFile: self.data('logviewer.js'),
+
     // - start (=when document element inserted)
     // - ready (=DOMContentLoaded)
     // - end (=onload event)

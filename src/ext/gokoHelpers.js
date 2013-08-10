@@ -1,7 +1,7 @@
 /*jslint browser: true, devel: true, indent: 4, maxlen: 80, es5: true */
 /*global jQuery, $, FS, WebSocket */
 
-var defineGokoHelperFunctions = function () {
+(function () {
     "use strict";   // JSLint setting
 
     var AM = window.AM = (window.AM || {});
@@ -42,9 +42,4 @@ var defineGokoHelperFunctions = function () {
                 tableIndex: null};
         this.getHelper('ZoneClassicHelper').createTable(opts);
     };
-};
-
-// Execute our code in Goko's JS context by appending it to the document
-var script = document.createElement('script');
-script.textContent = '(' + defineGokoHelperFunctions + ')();';
-document.body.appendChild(script);
+}());

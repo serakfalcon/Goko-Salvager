@@ -1,8 +1,8 @@
 /*jslint browser: true, devel: true, indent: 4, maxlen: 80, es5: true */
-/*global jQuery, $, FS, WebSocket */
+/*global jQuery, $, FS, WebSocket, Audio */
 
 // To be executed in Goko's namespace
-var loadAutomatchExtension = function () {
+(function () {
     "use strict";   // JSLint mode
 
     var AM, debug, initAutomatch, automatchInitStarted, addAutomatchButton,
@@ -15,7 +15,7 @@ var loadAutomatchExtension = function () {
         enableAutoAccept,
         disableAutoAccept,
         gameReady,
-        attemptAutomatchInit;
+        attemptAutomatchInit, testPop;
 
     // Automatch global namespace
     AM = window.AM = (window.AM || {});
@@ -23,8 +23,16 @@ var loadAutomatchExtension = function () {
     // Configuration
     AM.log_debugging_messages = false;
     AM.log_server_messages = false;
-    AM.server_url = 'wss://andrewiannaccone.com/automatch';
-    AM.wsMaxFails = 5;
+    AM.wsMaxFails = 100;
+
+    if (location.protocol === 'http:') {
+        AM.server_url = 'ws://andrewiannaccone.com/automatch';
+    } else if (location.protocol === 'https:') {
+        AM.server_url = 'wss://andrewiannaccone.com/automatch';
+    } else {
+        alert(location.protocol);
+        console.error('Unexpected protocol: ' + location.protocol);
+    }
 
     // Initial state
     automatchInitStarted = false;
@@ -378,6 +386,7 @@ var loadAutomatchExtension = function () {
         AM.state.seek = null;
         AM.state.offer = msg.offer;
         AM.showOfferPop(true);
+        new Audio('sounds/startTurn.ogg').play();
     };
 
     rescindOffer = function (msg) {
@@ -626,9 +635,4 @@ var loadAutomatchExtension = function () {
     };
 
     debug('Automatch script loaded.');
-};
-
-// Execute our code in Goko's JS context by appending it to gameClient.html
-var script = document.createElement('script');
-script.textContent = '(' + loadAutomatchExtension + ')();';
-document.body.appendChild(script);
+}());

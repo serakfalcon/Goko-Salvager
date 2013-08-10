@@ -1,7 +1,7 @@
 /*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true */
 /*global jQuery, $ */
 
-var loadAMGamePop = function () {
+(function () {
     "use strict";
 
     // Automatch global namespace
@@ -68,9 +68,4 @@ var loadAMGamePop = function () {
         }
         $('#gamepop').css('visibility', visible ? 'visible' : 'hidden');
     };
-};
-
-// Execute our code in Goko's JS context by appending it to the document
-var script = document.createElement('script');
-script.textContent = '(' + loadAMGamePop + ')();';
-document.body.appendChild(script);
+}());

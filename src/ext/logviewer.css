@@ -1,0 +1,88 @@
+.fs-launch-game-wrapper .header-bar .fs-rs-logout-row .fs-lg-settings-btn {
+  height: 30px;
+  line-height: 30px;
+  text-decoration: none;
+  text-align:center;
+  position:relative;
+  z-index: 1;
+  font-size: 13px;
+  font-weight: bold;
+  color: #5baacb;
+  cursor: pointer;
+  font-family: "TrajanPro", san-serif;
+}
+
+div.newlog {
+  font-size:12px;
+  font-family:Helvetica, Arial;
+}
+
+table {
+  margin: 1px 1px;
+}
+
+td {
+  padding: 1px 4px;
+}
+
+h1 {
+  margin: 0px 0px;
+  padding: 0px 5px;
+  font-size:14px;
+  background-color: lightgray;
+  border: 2px solid gray; 
+  border-radius: 5px;
+}
+
+*.p1 {
+  background-color: #CC33FF;
+  border-color: purple; 
+}
+
+*.p2 {
+  background-color: lightblue;
+  border-color: blue; 
+}
+
+*.p3 {
+  background-color: lightgreen;
+  border-color: green; 
+}
+
+*.p4 {
+background-color: yellow;
+border-color: orange; 
+}
+
+*.actionPhase {
+  background-color: rgb(240,240,240);
+}
+
+*.buyPhase {
+  background-color: rgb(253,225,100);
+}
+
+*.cleanUpPhase {
+  background-color: rgb(254,143,78);
+}
+
+span.phase {
+  display: inline-block;
+  width: 15px;
+  text-align: center;
+}
+
+span.player {
+  padding: 0px 3px;
+}
+
+span.indent {
+  padding-left: 20px;
+}
+
+vp-chip {
+  background-color:rgb(0,0,0);
+  border-radius: 4px;
+  padding: 0px 3px;
+  color:rgb(255,255,255);
+}

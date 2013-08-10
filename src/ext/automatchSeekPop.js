@@ -1,7 +1,7 @@
 /*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true */
 /*global jQuery, $ */
 
-var loadAMSeekPop = function () {
+(function () {
     "use strict"; // JSList mode
 
     // Automatch global namespace
@@ -223,9 +223,4 @@ var loadAMSeekPop = function () {
 
         $('#seekPop').css('visibility', visible ? 'visible' : 'hidden');
     };
-};
-
-// Execute our code in Goko's JS context by appending it to the document
-var script = document.createElement('script');
-script.textContent = '(' + loadAMSeekPop + ')();';
-document.body.appendChild(script);
+}());
