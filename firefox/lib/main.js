@@ -8,7 +8,7 @@ pageMod.PageMod({
               "http://beta.goko.com/Dominion/gameClient.html*",
               "https://beta.goko.com/Dominion/gameClient.html*"],
 
-    contentStyleFile: self.data('logviewer.js'),
+    contentStyleFile: self.data.url('logviewer.css'),
 
     // - start (=when document element inserted)
     // - ready (=DOMContentLoaded)
@@ -16,7 +16,8 @@ pageMod.PageMod({
     contentScriptWhen: "ready",
 
     // Run the extension scripts in the Firefox JS context
-    contentScriptFile: [ self.data.url("logviewer.js"),
+    contentScriptFile: [ self.data.url("set_parser.js"),
+                         self.data.url("logviewerplus.js"),
                          self.data.url("gokoHelpers.js"),
                          self.data.url("automatchSeekPop.js"),
                          self.data.url("automatchOfferPop.js"),

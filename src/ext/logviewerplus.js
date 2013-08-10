@@ -7,7 +7,9 @@
 (function () {
     "use strict";   // JSLint setting
 
-    var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, canonizeName;
+    window.GokoSalvager = (window.GokoSalvager || {});
+
+    var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, types;
 
     if (Dom.LogManager.prototype.old_addLog) {
         alert('More than one Dominion User Extension detected.'
@@ -168,7 +170,7 @@
         }";
     }
 
-    var types = {
+    window.GokoSalvager.types = {
         'Border Village': 'action',
         'Farming Village': 'action',
         'Mining Village': 'action',
@@ -416,13 +418,13 @@
     var fixnames = { 'JackOfAllTrades': 'Jack of All Trades' };
     function fixname(n) { return fixnames[n] || n; }
 
-    var cards = Object.keys(types);
+    var cards = Object.keys(window.GokoSalvager.types);
     var reg = new RegExp(cards.sort(function (a, b) {
         return b.length - a.length;
     }).join('|'), 'g');
     colorize = function (x) {
         return x.replace(reg, function (m) {
-            var t = types[m];
+            var t = window.GokoSalvager.types[m];
             return "<" + t + ">" + fixname(m) + "</" + t + ">";
         });
     };
@@ -452,7 +454,7 @@
         'Silk Road': function (d) {
             var c, s = 0;
             for (c in d) {
-                if (types[c].match(/victory/)) {
+                if (window.GokoSalvager.types[c].match(/victory/)) {
                     s += d[c];
                 }
             }
@@ -461,7 +463,7 @@
         'Vineyard': function (d) {
             var c, s = 0;
             for (c in d) {
-                if (types[c].match(/\baction/)) {
+                if (window.GokoSalvager.types[c].match(/\baction/)) {
                     s += d[c];
                 }
             }
@@ -538,14 +540,14 @@
         updateCards(dst_player, [card], 1);
     };
 
-    canonizeName = function (n) {
+    window.GokoSalvager.canonizeName = function (n) {
         return n.toLowerCase().replace(/\W+/g, '');
     };
 
     function decodeCard(name) {
         var i;
         var n = name.toLowerCase().replace(/\.\d+$/, '');
-        for (i in types) {
+        for (i in window.GokoSalvager.types) {
             if (canonizeName(i) === n) {
                 return i;
             }
@@ -1025,13 +1027,13 @@
     var sets = {};
 
     function buildSets() {
-        var c, i;
+        var c, i, t, n;
         sets.all = {};
         for (c in setNames) {
             sets[setNames[c]] = {};
         }
         for (c in setsComp) {
-            var t = setsComp[c];
+            t = setsComp[c];
             sets[c] = {};
             sets[c][c] = 1;
             sets.all[c] = 1;
@@ -1039,12 +1041,14 @@
                 sets[setNames[t[i]]][c] = 1;
             }
         }
-        for (c in types) {
-            var n = canonizeName(c);
-            if (n in setsComp) {
-                var t = types[c].split('-');
-                for (var i = 0; i <t.length; i++) {
-                    if (sets[t[i]] ==== undefined) sets[t[i]] = {};
+        for (c in window.GokoSalvager.types) {
+            n = window.GokoSalvager.canonizeName(c);
+            if (setsComp.hasOwnElement(n)) {
+                t = window.GokoSalvager.types[c].split('-');
+                for (i = 0; i < t.length; i += 1) {
+                    if (sets[t[i]] === undefined) {
+                        sets[t[i]] = {};
+                    }
                     sets[t[i]][n] = 1;
                 }
             }
@@ -1054,32 +1058,54 @@
 
     function myBuildCard(avail, except, set) {
         var sum = 0;
-        for (var c in set) if (avail[c] && !except[c]) sum += set[c];
-        if (!sum) return null;
+        var c;
+        for (c in set) {
+            if (avail[c] && !except[c]) {
+                sum += set[c];
+            }
+        }
+        if (!sum) {
+            return null;
+        }
         var rnd = Math.random() * sum;
-        for (var c in set) if (avail[c] && !except[c]) {
-            rnd -= set[c];
-            if (rnd < 0) return c;
+        for (c in set) {
+            if (avail[c] && !except[c]) {
+                rnd -= set[c];
+                if (rnd < 0) {
+                    return c;
+                }
+            }
         }
         return c;
     }
+
     function myBuildDeck(avail, s) {
+        var i, c;
         var chosen = {};
         var deck = new Array(11);
-        for (var i = 0; i < 11; i++) {
+        for (i = 0; i < 11; i += 1) {
             if (i === 10) {
-                if (!chosen.youngwitch) break;
-                for (var c in avail) if (!sets.cost2[c] && !sets.cost3[c]) chosen[c] = true;
+                if (!chosen.youngwitch) {
+                    break;
+                }
+                for (c in avail) {
+                    if (!sets.cost2[c] && !sets.cost3[c]) {
+                        chosen[c] = true;
+                    }
+                }
             }
             var cs = s[i < s.length ? i : s.length - 1];
             var card = myBuildCard(avail, chosen, cs);
-            if (!card) return null;
+            if (!card) {
+                return null;
+            }
             chosen[card] = true;
             deck[i] = avail[card];
         }
         return deck;
     }
-    var kingdomsel = function (val) {
+
+    var Kingdomsel = function (val) {
         this.sel = document.createElement('div');
         this.sel.setAttribute("style", "position:absolute;display:none;left:0px;top:0px;height:100%;width:100%;background:rgba(0,0,0,0.5);z-index:6000;");
         this.sel.setAttribute("class", "newlog");
@@ -1088,8 +1114,9 @@
         this.selform = document.getElementById('selform');
         this.selval = document.getElementById('selval');
         this.selval.value = 'All';
-    }
-    kingdomsel.prototype = {
+    };
+
+    Kingdomsel.prototype = {
         prompt: function (callback) {
             var self = this;
             this.sel.style.display = 'block';
@@ -1101,40 +1128,49 @@
                 return false;
             };
         }
-    }
+    };
 
     var myCachedCards;
-    var sel = new kingdomsel('All');
-    if(FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod) return;
+    var sel = new Kingdomsel('All');
+    if (FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod) {
+        return;
+    }
+
     FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod =
         FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod;
     FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
         myCachedCards = cachedCards;
         var ret = this._old_proRandomMethod(cachedCards, exceptCards, numberCards);
         return ret;
-    }
+    };
+
     FS.Dominion.DeckBuilder.Persistent.prototype._old_getRandomCards =
         FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards;
     FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards = function (opts, callback) {
-        this._old_getRandomCards(opts,function (x) {
-            if (options.generator && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
+        this._old_getRandomCards(opts, function (x) {
+            if (window.GokoSalvager.options.generator
+                    && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
                 sel.prompt(function (val) {
                     try {
                         var all = {};
-                        myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON()});
-                        var myret = myBuildDeck(all, set_parser.parse(val));
-                        if (myret) x = myret;
-                        else throw new Error('Cannot generate specified kingdom from the cards availiable');
-                    } catch(e) {alert(e)};
+                        myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
+                        var myret = myBuildDeck(all, window.GokoSalvager.set_parser.parse(val));
+                        if (myret) {
+                            x = myret;
+                        } else {
+                            throw new Error('Cannot generate specified kingdom from the cards availiable');
+                        }
+                    } catch (e) {
+                        alert(e);
+                    }
                     callback(x);
                 });
-            } else callback(x);
+            } else {
+                callback(x);
+            }
             hideKingdomGenerator = false;
         });
-    }
-
-    window.canonizeName = canonizeName;
-    window.sets = sets;
+    };
 }());
 
 /*
@@ -1149,45 +1185,58 @@
  *   - personal black list auto kick enabled by options.blacklist
  */
 (function () {
-    joinSound = document.createElement('div');
+    "use strict";
+
+    window.GokoSalvager = (window.GokoSalvager || {});
+
+    var joinSound = document.createElement('div');
     joinSound.innerHTML = '<audio id="_joinSound" style="display: none;" src="sounds/startTurn.ogg"></audio>';
     document.getElementById('viewport').appendChild(joinSound);
     FS.ZoneClassicHelper.prototype.old_onPlayerJoinTable =
         FS.ZoneClassicHelper.prototype.onPlayerJoinTable;
-    FS.ZoneClassicHelper.prototype.onPlayerJoinTable = function (t,tp) {
-        this.old_onPlayerJoinTable(t,tp);
+    FS.ZoneClassicHelper.prototype.onPlayerJoinTable = function (t, tp) {
+        this.old_onPlayerJoinTable(t, tp);
         var p = tp.get('player');
 
-        if (options.autokick && this.isLocalOwner(t)) {
+        if (window.GokoSalvager.options.autokick && this.isLocalOwner(t)) {
             var settings = JSON.parse(t.get("settings"));
             var pro = settings.ratingType === 'pro';
             var m = settings.name.toLowerCase().match(/\b(\d+)(\d{3}|k)\+/);
             var mr = null;
-            if (m) mr = parseInt(m[1],10) * 1000 + (m[2] === 'k' ? 0 : parseInt(m[2],10));
+            if (m) {
+                mr = parseInt(m[1], 10) * 1000 + (m[2] === 'k' ? 0 : parseInt(m[2], 10));
+            }
             var ratingHelper = this.meetingRoom.getHelper('RatingHelper');
             var self = this;
-            if (mr) ratingHelper.getRating({
-                playerId: p.get("playerId"),
-               $elPro: $(document.createElement('div')),
-               $elQuit: $(document.createElement('div'))
-            }, function (resp) {
-                if (!resp.data) return;
-                var r = pro ? resp.data.ratingPro : resp.data.rank;
-                if (r !== undefined && r < mr) self.meetingRoom.conn.bootTable({
-                    table: t.get('number'),
-                   playerAddress: p.get('playerAddress')
-                }); else document.getElementById('_joinSound').play();
-            });
+            if (mr) {
+                ratingHelper.getRating({
+                    playerId: p.get("playerId"),
+                    $elPro: $(document.createElement('div')),
+                    $elQuit: $(document.createElement('div'))
+                }, function (resp) {
+                    if (!resp.data) {
+                        return;
+                    }
+                    var r = pro ? resp.data.ratingPro : resp.data.rank;
+                    if (r !== undefined && r < mr) {
+                        self.meetingRoom.conn.bootTable({
+                            table: t.get('number'),
+                            playerAddress: p.get('playerAddress')
+                        });
+                    } else {
+                        document.getElementById('_joinSound').play();
+                    }
+                });
+            }
         }
 
-        if (options.blacklist.indexOf(tp.getName()) > -1 && this.isLocalOwner(t)) {
+        if (window.GokoSalvager.options.blacklist.indexOf(tp.getName()) > -1 && this.isLocalOwner(t)) {
             this.meetingRoom.conn.bootTable({
                 table: t.get('number'),
                 playerAddress: p.get('playerAddress')
             });
         }
-
-    }
+    };
 }());
 
 
@@ -1206,6 +1255,9 @@
  * - getRatingObject()
  */
 (function () {
+    "use strict";
+    var insertInPlace, getSortablePlayerObjectFromElement;
+
     FS.RatingHelper.prototype.old_getRating =
         FS.RatingHelper.prototype.getRating;
     FS.RatingHelper.prototype.getRating = function (opts, callback) {
@@ -1214,16 +1266,16 @@
             playerElement = opts.$el.closest('li')[0];
             newCallback = function (resp) {
                 callback(resp);
-                if (options.sortrating) {
+                if (window.GokoSalvager.options.sortrating) {
                     insertInPlace(playerElement);
                 }
-                if (options.blacklist.indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1 ) {
+                if (window.GokoSalvager.options.blacklist.indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
                     $(playerElement).hide();
                 } else {
                     $(playerElement).show();
                 }
             };
-            if (options.proranks) {
+            if (window.GokoSalvager.options.proranks) {
                 opts.$elPro = opts.$el;
                 opts.$elQuit = $(document.createElement('div'));
                 delete opts.$el;
@@ -1236,15 +1288,18 @@
         FS.ClassicRoomView.prototype.modifyDOM;
     FS.ClassicRoomView.prototype.modifyDOM = function () {
         var originalRating = this.meetingRoom.options.ratingSystemId;
-        if (options.proranks)
+        if (window.GokoSalvager.options.proranks) {
             this.meetingRoom.options.ratingSystemId = FS.MeetingRoomSetting.ratingSystemPro;
+        }
         FS.ClassicRoomView.prototype.old_modifyDOM.call(this);
         this.meetingRoom.options.ratingSystemId = originalRating;
     };
 
-    function insertInPlace(element) {
+    insertInPlace = function (element) {
         var list = element.parentNode;
-        if (!list) return; // Removed from the list before the ranking came
+        if (!list) {
+            return; // Removed from the list before the ranking came
+        }
         list.removeChild(element);
 
         var newEl = getSortablePlayerObjectFromElement(element),
@@ -1253,38 +1308,40 @@
             a = 0;
 
         while (a !== b) {
-            var c = Math.floor((a + b)/2);
+            var c = Math.floor((a + b) / 2);
             var compare = getSortablePlayerObjectFromElement(elements[c]);
 
             // sort first by rating, then alphabetically
-            if (compare.rating < newEl.rating || compare.rating ==== newEl.rating && compare.name > newEl.name) {
+            if (compare.rating < newEl.rating || (compare.rating === newEl.rating && compare.name > newEl.name)) {
                 b = c;
             } else {
                 a = c + 1;
             }
         }
-        list.insertBefore(element,elements[a] || null);
-    }
+        list.insertBefore(element, elements[a] || null);
+    };
 
-    function getSortablePlayerObjectFromElement(element) {
+    getSortablePlayerObjectFromElement = function (element) {
         var rankSpan = element.querySelector('.player-rank>span');
         return {
             name: element.querySelector('.fs-mtrm-player-name>strong').innerHTML,
-                rating: rankSpan ? parseInt(rankSpan.innerHTML,10) : -1
+            rating: rankSpan ? parseInt(rankSpan.innerHTML, 10) : -1
         };
-    }
+    };
 }());
 
 /*
  * Blacklist Module
  */
 (function () {
+    "use strict";
+
     FS.MeetingRoom.prototype.old_onRoomChat =
         FS.MeetingRoom.prototype.onRoomChat;
     FS.MeetingRoom.prototype.onRoomChat = function (resp) {
         var player = this.playerList.findByAddress(resp.data.playerAddress).getName();
 
-        if (options.blacklist.indexOf(player) > -1) {
+        if (window.GokoSalvager.options.blacklist.indexOf(player) > -1) {
             return;
         }
 
@@ -1302,10 +1359,10 @@
             players = this.model.getJoinedPlayers();
             _(players).each(function (player, index, list) {
                 name = player.getName();
-                if (options.blacklist.indexOf(name) > -1 && this.model && this.model.view && this.model.view.$el) {
+                if (window.GokoSalvager.options.blacklist.indexOf(name) > -1 && this.model && this.model.view && this.model.view.$el) {
                     blacklisted = true;
-                };
-                if (name ==== this.meetingRoom.getLocalPlayer().getName()) {
+                }
+                if (name === this.meetingRoom.getLocalPlayer().getName()) {
                     localPlayerJoined = true;
                 }
             }, this);
@@ -1328,11 +1385,12 @@
 // - options.alwaysStack
 //
 (function () {
+    "use strict";
     FS.Cards.CardStackPanel.prototype.old_addView =
         FS.Cards.CardStackPanel.prototype.addView;
     FS.Cards.CardStackPanel.prototype.addView = function (view, index) {
         var ret = this.old_addView(view, index);
-        if (options.alwaysStack && this.autoStackCards) {
+        if (window.GokoSalvager.options.alwaysStack && this.autoStackCards) {
             this.stackCards = true;
         }
         return ret;
@@ -1347,7 +1405,9 @@
  *   - Format of the main screen layout template: FS.Templates.LaunchScreen.MAIN
  * Internal dependencies: none
  */
-(function () { 
+(function () {
+    "use strict";
+
     var default_options = {
         version: 1,
         autokick: true,
@@ -1364,18 +1424,23 @@
     var options = {};
 
     // Need this to be global so that other blocks and scripts can use it
-    GokoSalvager = window.GokoSalvager = (window.GokoSalvager || {});
+    window.GokoSalvager = (window.GokoSalvager || {});
 
-    GokoSalvager.options_save = function () {
+    window.GokoSalvager.options_save = function () {
         localStorage.userOptions = JSON.stringify(options);
-    }
+    };
 
-    GokoSalvager.options_load = function () {
-        if (localStorage.userOptions)
-            options = JSON.parse(localStorage.userOptions);
-        for (var o in default_options)
-            if (!(o in options)) options[o] = default_options[o];
-    }
+    window.GokoSalvager.options_load = function () {
+        if (localStorage.userOptions) {
+            window.GokoSalvager.options = JSON.parse(localStorage.userOptions);
+        }
+        var o;
+        for (o in default_options) {
+            if (!(window.GokoSalvager.options.hasOwnProperty(o))) {
+                window.GokoSalvager.options[o] = default_options[o];
+            }
+        }
+    };
 
     function options_window() {
         var h;
@@ -1385,46 +1450,46 @@
         optwin.setAttribute("class", "newlog");
         optwin.setAttribute("id", "usersettings");
         h = '<div style="text-align:center;position:absolute;top:50%;left:50%;height:300px;margin-top:-150px;width:40%;margin-left:-20%;background:white;"><div style="margin-top:20px">';
-        h+= 'User extension settings:<br>';
-        h+= '<form style="margin:10px;text-align:left" id="optform">';
-        h+= '<input name="autokick" type="checkbox">Auto kick<br>';
-        h+= '<input name="generator" type="checkbox">Kingdom generator (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>)<br>';
-        h+= '<input name="proranks" type="checkbox">Show pro rankings in the lobby<br>';
-        h+= '<input name="sort-rating" type="checkbox">Sort players by rating<br>';
-        h+= '<input name="vp-enabled" id="vp-enabled" type="checkbox">Enable Victory point tracker<br>';
-        h+= '<span id="vp-always-on"><input name="vp-always-on" type="checkbox" style="margin-left:20px">always turn on (unless "#vpoff" in game title)<br></span>';
-        h+= '<span id="vp-always-off"><input name="vp-always-off" id="vp-always-off" type="checkbox" style="margin-left:20px">always turn off tracker for other extension users (unless "#vpon" in game title)<br></span>';
-        h+= '<input name="adventurevp" type="checkbox">Victory point tracker in Adventures<br>';
-        h+= '<input name="always-stack" type="checkbox">Always stack same-named cards in hand<br>';
-        h+= 'Personal Black List: (one player name per line)<br><textarea name="blacklist"></textarea><br>';
+        h += 'User extension settings:<br>';
+        h += '<form style="margin:10px;text-align:left" id="optform">';
+        h += '<input name="autokick" type="checkbox">Auto kick<br>';
+        h += '<input name="generator" type="checkbox">Kingdom generator (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>)<br>';
+        h += '<input name="proranks" type="checkbox">Show pro rankings in the lobby<br>';
+        h += '<input name="sort-rating" type="checkbox">Sort players by rating<br>';
+        h += '<input name="vp-enabled" id="vp-enabled" type="checkbox">Enable Victory point tracker<br>';
+        h += '<span id="vp-always-on"><input name="vp-always-on" type="checkbox" style="margin-left:20px">always turn on (unless "#vpoff" in game title)<br></span>';
+        h += '<span id="vp-always-off"><input name="vp-always-off" id="vp-always-off" type="checkbox" style="margin-left:20px">always turn off tracker for other extension users (unless "#vpon" in game title)<br></span>';
+        h += '<input name="adventurevp" type="checkbox">Victory point tracker in Adventures<br>';
+        h += '<input name="always-stack" type="checkbox">Always stack same-named cards in hand<br>';
+        h += 'Personal Black List: (one player name per line)<br><textarea name="blacklist"></textarea><br>';
         //    h+= '<input name="opt" style="width:95%"><br>';
-        h+= '<div style="align:center;text-align:center"><input type="submit" value="Save"></div></form>';
-        h+= '</div></div>';
+        h += '<div style="align:center;text-align:center"><input type="submit" value="Save"></div></form>';
+        h += '</div></div>';
         optwin.innerHTML = h;
         document.getElementById('viewport').appendChild(optwin);
         //    $('#optform input[name="opt"]').val('Aha');
-        $('#optform input[name="autokick"]').prop('checked',options.autokick);
-        $('#optform input[name="generator"]').prop('checked',options.generator);
-        $('#optform input[name="proranks"]').prop('checked',options.proranks);
-        $('#optform input[name="sort-rating"]').prop('checked',options.sortrating);
-        $('#optform input[name="always-stack"]').prop('checked',options.alwaysStack);
-        $('#optform input[name="vp-enabled"]').prop('checked',options.vpEnabled);
-        $('#optform input[name="vp-always-on"]').prop('checked',options.vpAlwaysOn);
-        $('#optform input[name="vp-always-off"]').prop('checked',options.vpAlwaysOff);
-        $('#optform input[name="adventurevp"]').prop('checked',options.adventurevp);
-        $('#optform textarea').val(options.blacklist.join("\n"));
+        $('#optform input[name="autokick"]').prop('checked', window.GokoSalvager.options.autokick);
+        $('#optform input[name="generator"]').prop('checked', window.GokoSalvager.options.generator);
+        $('#optform input[name="proranks"]').prop('checked', window.GokoSalvager.options.proranks);
+        $('#optform input[name="sort-rating"]').prop('checked', window.GokoSalvager.options.sortrating);
+        $('#optform input[name="always-stack"]').prop('checked', window.GokoSalvager.options.alwaysStack);
+        $('#optform input[name="vp-enabled"]').prop('checked', window.GokoSalvager.options.vpEnabled);
+        $('#optform input[name="vp-always-on"]').prop('checked', window.GokoSalvager.options.vpAlwaysOn);
+        $('#optform input[name="vp-always-off"]').prop('checked', window.GokoSalvager.options.vpAlwaysOff);
+        $('#optform input[name="adventurevp"]').prop('checked', window.GokoSalvager.options.adventurevp);
+        $('#optform textarea').val(window.GokoSalvager.options.blacklist.join("\n"));
         document.getElementById('optform').onsubmit = function () {
-            options.autokick = $('#optform input[name="autokick"]').prop('checked');
-            options.generator = $('#optform input[name="generator"]').prop('checked');
-            options.proranks = $('#optform input[name="proranks"]').prop('checked');
-            options.sortrating = $('#optform input[name="sort-rating"]').prop('checked');
-            options.alwaysStack = $('#optform input[name="always-stack"]').prop('checked');
-            options.vpEnabled = $('#optform input[name="vp-enabled"]').prop('checked');
-            options.vpAlwaysOn = $('#optform input[name="vp-always-on"]').prop('checked');
-            options.vpAlwaysOff = $('#optform input[name="vp-always-off"]').prop('checked');
-            options.adventurevp = $('#optform input[name="adventurevp"]').prop('checked');
-            options.blacklist = $('#optform textarea[name="blacklist"]').val().split("\n");
-            options_save();
+            window.GokoSalvager.options.autokick = $('#optform input[name="autokick"]').prop('checked');
+            window.GokoSalvager.options.generator = $('#optform input[name="generator"]').prop('checked');
+            window.GokoSalvager.options.proranks = $('#optform input[name="proranks"]').prop('checked');
+            window.GokoSalvager.options.sortrating = $('#optform input[name="sort-rating"]').prop('checked');
+            window.GokoSalvager.options.alwaysStack = $('#optform input[name="always-stack"]').prop('checked');
+            window.GokoSalvager.options.vpEnabled = $('#optform input[name="vp-enabled"]').prop('checked');
+            window.GokoSalvager.options.vpAlwaysOn = $('#optform input[name="vp-always-on"]').prop('checked');
+            window.GokoSalvager.options.vpAlwaysOff = $('#optform input[name="vp-always-off"]').prop('checked');
+            window.GokoSalvager.options.adventurevp = $('#optform input[name="adventurevp"]').prop('checked');
+            window.GokoSalvager.options.blacklist = $('#optform textarea[name="blacklist"]').val().split("\n");
+            window.GokoSalvager.options_save();
             $('#usersettings').hide();
             return false;
         };
@@ -1449,7 +1514,7 @@
 
         vpEnabledClicked();
     }
-    options_load();
+    window.GokoSalvager.options_load();
     options_window();
     FS.Templates.LaunchScreen.MAIN = FS.Templates.LaunchScreen.MAIN.replace('Logout</a>',
             'Logout</a><div onClick="$(\'#usersettings\').show()" class="fs-lg-settings-btn">User Settings</div>');

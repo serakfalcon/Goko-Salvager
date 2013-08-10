@@ -7,18 +7,16 @@ namespace :build do
   task :firefox do
     FileUtils.mkdir_p 'build/'
     FileUtils.cp_r 'firefox/', 'build/'
-    FileUtils.cp_r Dir.glob('src/dev/*.js'), 'build/firefox/data/'
-    FileUtils.cp_r Dir.glob('src/ext/*.js'), 'build/firefox/data/'
 
-    run_in_page_context('build/firefox/data/logviewerplus.js')
-    run_in_page_context('build/firefox/data/set_parser.js')
-    run_in_page_context('build/firefox/data/gokoHelpers.js')
-    run_in_page_context('build/firefox/data/automatch.js')
-    run_in_page_context('build/firefox/data/automatchSeekPop.js')
-    run_in_page_context('build/firefox/data/automatchOfferPop.js')
-    run_in_page_context('build/firefox/data/automatchGamePop.js')
+    # Copy source files
+    FileUtils.cp_r Dir.glob('src/ext/*'), 'build/firefox/data/'
 
-    sh 'cd build/ && cfx xpi --pkgdir=firefox/'
+    # Wrap each JS script to make it execute in the page's namespace
+    Dir.glob('build/firefox/data/*.js').each do |js_script|
+        run_in_page_context(js_script)
+    end
+
+    sh 'cd build/ && cfx xpi --pkgdir=firefox/ && cd ..'
     puts 'build/gokosalvager.xpi created'
   end
 
