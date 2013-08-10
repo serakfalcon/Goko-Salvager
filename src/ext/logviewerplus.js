@@ -9,7 +9,7 @@
 
     window.GokoSalvager = (window.GokoSalvager || {});
 
-    var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, types;
+    var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style;
 
     if (Dom.LogManager.prototype.old_addLog) {
         alert('More than one Dominion User Extension detected.'
@@ -170,261 +170,21 @@
         }";
     }
 
-    window.GokoSalvager.types = {
-        'Border Village': 'action',
-        'Farming Village': 'action',
-        'Mining Village': 'action',
-        'Native Village': 'action',
-        'Walled Village': 'action',
-        'Worker\'s Village': 'action',
-        'Ruined Village': 'action-ruins',
-        'Fishing Village': 'action-duration',
-        'Village': 'action',
-        'Ruined Library': 'action-ruins',
-        'Library': 'action',
-        'Abandoned Mine': 'action-ruins',
-        'Mine': 'action',
-        'Bag of Gold': 'action',
-        'Fool\'s Gold': 'treasure-reaction',
-        'Gold': 'treasure',
-        'Overgrown Estate': 'shelter-victory',
-        'Estate': 'victory',
-        'Counting House': 'action',
-        'Count': 'action',
-        'Coppersmith': 'action',
-        'Copper': 'treasure',
-        'Ruined Market': 'action-ruins',
-        'Grand Market': 'action',
-        'Black Market': 'action',
-        'Market Square': 'action-reaction',
-        'Market': 'action',
-        'Adventurer': 'action',
-        'Alchemist': 'action',
-        'Altar': 'action',
-        'Ambassador': 'action-attack',
-        'Apothecary': 'action',
-        'Apprentice': 'action',
-        'Armory': 'action',
-        'Band of Misfits': 'action',
-        'Bandit Camp': 'action',
-        'Baron': 'action',
-        'Bazaar': 'action',
-        'Bishop': 'action',
-        'Bridge': 'action',
-        'Bureaucrat': 'action-attack',
-        'Cartographer': 'action',
-        'Catacombs': 'action',
-        'Cellar': 'action',
-        'Chancellor': 'action',
-        'Chapel': 'action',
-        'City': 'action',
-        'Conspirator': 'action',
-        'Council Room': 'action',
-        'Courtyard': 'action',
-        'Crossroads': 'action',
-        'Cultist': 'action-attack',
-        'Cutpurse': 'action-attack',
-        'Dame Anna': 'action',
-        'Dame Molly': 'action',
-        'Dame Natalie': 'action',
-        'Dame Sylvia': 'action',
-        'Death Cart': 'action',
-        'Develop': 'action',
-        'Duchess': 'action',
-        'Embargo': 'action',
-        'Embassy': 'action',
-        'Envoy': 'action',
-        'Expand': 'action',
-        'Explorer': 'action',
-        'Familiar': 'action-attack',
-        'Feast': 'action',
-        'Festival': 'action',
-        'Followers': 'action-attack',
-        'Forager': 'action',
-        'Forge': 'action',
-        'Fortress': 'action',
-        'Fortune Teller': 'action-attack',
-        'Ghost Ship': 'action-attack',
-        'Golem': 'action',
-        'Goons': 'action-attack',
-        'Governor': 'action',
-        'Graverobber': 'action',
-        'Haggler': 'action',
-        'Hamlet': 'action',
-        'Harvest': 'action',
-        'Herbalist': 'action',
-        'Hermit': 'action',
-        'Highway': 'action',
-        'Hunting Grounds': 'action',
-        'Hunting Party': 'action',
-        'Inn': 'action',
-        'Ironmonger': 'action',
-        'Ironworks': 'action',
-        'JackOfAllTrades': 'action',
-        'Jester': 'action-attack',
-        'Junk Dealer': 'action',
-        'King\'s Court': 'action',
-        'Knights': 'action-attack',
-        'Laboratory': 'action',
-        'Lookout': 'action',
-        'Madman': 'action',
-        'Mandarin': 'action',
-        'Marauder': 'action-attack',
-        'Margrave': 'action-attack',
-        'Masquerade': 'action',
-        'Menagerie': 'action',
-        'Mercenary': 'action-attack',
-        'Militia': 'action-attack',
-        'Minion': 'action-attack',
-        'Mint': 'action',
-        'Moneylender': 'action',
-        'Monument': 'action',
-        'Mountebank': 'action-attack',
-        'Mystic': 'action',
-        'Navigator': 'action',
-        'Noble Brigand': 'action-attack',
-        'Nomad Camp': 'action',
-        'Oasis': 'action',
-        'Oracle': 'action-attack',
-        'Pawn': 'action',
-        'Pearl Diver': 'action',
-        'Peddler': 'action',
-        'Pillage': 'action-attack',
-        'Pirate Ship': 'action-attack',
-        'Poor House': 'action',
-        'Possession': 'action',
-        'Princess': 'action',
-        'Procession': 'action',
-        'Rabble': 'action-attack',
-        'Rats': 'action',
-        'Rebuild': 'action',
-        'Remake': 'action',
-        'Remodel': 'action',
-        'Rogue': 'action',
-        'Saboteur': 'action-attack',
-        'Sage': 'action',
-        'Salvager': 'action',
-        'Scavenger': 'action',
-        'Scheme': 'action',
-        'Scout': 'action',
-        'Scrying Pool': 'action-attack',
-        'Sea Hag': 'action-attack',
-        'Shanty Town': 'action',
-        'Sir Bailey': 'action',
-        'Sir Destry': 'action',
-        'Sir Martin': 'action',
-        'Sir Michael': 'action',
-        'Sir Vander': 'action',
-        'Smithy': 'action',
-        'Smugglers': 'action',
-        'Spice Merchant': 'action',
-        'Spy': 'action-attack',
-        'Squire': 'action',
-        'Stables': 'action',
-        'Steward': 'action',
-        'Storeroom': 'action',
-        'Swindler': 'action-attack',
-        'Thief': 'action-attack',
-        'Throne Room': 'action',
-        'Torturer': 'action-attack',
-        'Tournament': 'action',
-        'Trade Route': 'action',
-        'Trading Post': 'action',
-        'Transmute': 'action',
-        'Treasure Map': 'action',
-        'Treasury': 'action',
-        'Tribute': 'action',
-        'Trusty Steed': 'action',
-        'University': 'action',
-        'Upgrade': 'action',
-        'Urchin': 'action-attack',
-        'Vagrant': 'action',
-        'Vault': 'action',
-        'Wandering Minstrel': 'action',
-        'Warehouse': 'action',
-        'Wishing Well': 'action',
-        'Witch': 'action-attack',
-        'Young Witch': 'action-attack',
-        'Woodcutter': 'action',
-        'Workshop': 'action',
-        'Beggar': 'action-reaction',
-        'Watchtower': 'action-reaction',
-        'Horse Traders': 'action-reaction',
-        'Moat': 'action-reaction',
-        'Secret Chamber': 'action-reaction',
-        'Trader': 'action-reaction',
-        'Bank': 'treasure',
-        'Cache': 'treasure',
-        'Contraband': 'treasure',
-        'Counterfeit': 'treasure',
-        'Diadem': 'treasure',
-        'Hoard': 'treasure',
-        'Horn of Plenty': 'treasure',
-        'Ill-Gotten Gains': 'treasure',
-        'Loan': 'treasure',
-        'Philosopher\'s Stone': 'treasure',
-        'Platinum': 'treasure',
-        'Potion': 'treasure',
-        'Quarry': 'treasure',
-        'Royal Seal': 'treasure',
-        'Silver': 'treasure',
-        'Spoils': 'treasure',
-        'Stash': 'treasure',
-        'Talisman': 'treasure',
-        'Venture': 'treasure',
-        'Colony': 'victory',
-        'Duchy': 'victory',
-        'Duke': 'victory',
-        'Fairgrounds': 'victory',
-        'Farmland': 'victory',
-        'Feodum': 'victory',
-        'Gardens': 'victory',
-        'Province': 'victory',
-        'Silk Road': 'victory',
-        'Vineyard': 'victory',
-        'Caravan': 'action-duration',
-        'Haven': 'action-duration',
-        'Lighthouse': 'action-duration',
-        'Merchant Ship': 'action-duration',
-        'Outpost': 'action-duration',
-        'Tactician': 'action-duration',
-        'Wharf': 'action-duration',
-        'Survivors': 'action-ruins',
-        'Dame Josephine': 'action-victory',
-        'Great Hall': 'action-victory',
-        'Nobles': 'action-victory',
-        'Island': 'action-victory',
-        'Harem': 'treasure-victory',
-        'Hovel': 'shelter-reaction',
-        'Necropolis': 'action-shelter',
-        'Tunnel': 'victory-reaction',
-        'victory point chips': 'vp-chip',
-        'Curse': 'curse',
-        'Candlestick Maker': 'action',
-        'Stonemason': 'action',
-        'Doctor': 'action',
-        'Masterpiece': 'treasure',
-        'Advisor': 'action',
-        'Herald': 'action',
-        'Plaza': 'action',
-        'Taxman': 'action-attack',
-        'Baker': 'action',
-        'Butcher': 'action',
-        'Journeyman': 'action',
-        'Merchant Guild': 'action',
-        'Soothsayer': 'action-attack',
-    };
+    var types = {};
+    FS.Dominion.CardBuilder.Data.cards.map(function (card) {
+        types[card.name[0]] = card.type;
+    });
 
     var fixnames = { 'JackOfAllTrades': 'Jack of All Trades' };
     function fixname(n) { return fixnames[n] || n; }
 
-    var cards = Object.keys(window.GokoSalvager.types);
+    var cards = Object.keys(types);
     var reg = new RegExp(cards.sort(function (a, b) {
         return b.length - a.length;
     }).join('|'), 'g');
     colorize = function (x) {
         return x.replace(reg, function (m) {
-            var t = window.GokoSalvager.types[m];
+            var t = types[m];
             return "<" + t + ">" + fixname(m) + "</" + t + ">";
         });
     };
@@ -454,7 +214,7 @@
         'Silk Road': function (d) {
             var c, s = 0;
             for (c in d) {
-                if (window.GokoSalvager.types[c].match(/victory/)) {
+                if (types[c].match(/victory/)) {
                     s += d[c];
                 }
             }
@@ -463,7 +223,7 @@
         'Vineyard': function (d) {
             var c, s = 0;
             for (c in d) {
-                if (window.GokoSalvager.types[c].match(/\baction/)) {
+                if (types[c].match(/\baction/)) {
                     s += d[c];
                 }
             }
@@ -547,7 +307,7 @@
     function decodeCard(name) {
         var i;
         var n = name.toLowerCase().replace(/\.\d+$/, '');
-        for (i in window.GokoSalvager.types) {
+        for (i in types) {
             if (canonizeName(i) === n) {
                 return i;
             }
@@ -1053,10 +813,10 @@ loadKingdomGenerator = function () {
                 sets[setNames[t[i]]][c] = 1;
             }
         }
-        for (c in window.GokoSalvager.types) {
+        for (c in types) {
             n = window.GokoSalvager.canonizeName(c);
             if (setsComp.hasOwnProperty(n)) {
-                t = window.GokoSalvager.types[c].split('-');
+                t = types[c].split('-');
                 for (i = 0; i < t.length; i += 1) {
                     if (sets[t[i]] === undefined) {
                         sets[t[i]] = {};
