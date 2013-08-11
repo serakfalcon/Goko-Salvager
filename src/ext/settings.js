@@ -7,6 +7,9 @@
 (function () {
     "use strict";
 
+    window.GokoSalvager = window.GokoSalvager || {};
+    window.GokoSalvager.options = {};
+
     FS.EditTableView.prototype.old_modifyDOM = FS.EditTableView.prototype.modifyDOM;
     FS.EditTableView.prototype.modifyDOM = function () {
         var create = !_.isNumber(this.tableIndex);
