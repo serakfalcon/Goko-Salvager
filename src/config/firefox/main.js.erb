@@ -15,7 +15,7 @@ pageMod.PageMod({
     // Insert our changes to Goko's CSS
     contentStyleFile: [
         <% for css in config[:css] %>
-            self.data.url('<%= @css %>'),
+            self.data.url('<%= css %>'),
         <% end %>
     ],
 

@@ -1,6 +1,8 @@
 # encoding: UTF-8
 
 require 'rake/clean'
+require 'erb'
+require 'ostruct'
 
 CLEAN.include 'tmp/*'
 CLEAN.include 'build/*/'
@@ -47,6 +49,13 @@ def run_in_page_context(file)
     end
   end
   t.close
+end
+
+def write_from_template(templatefile, configfile, outfile) 
+    config = eval(File.open(configfile) {|f| f.read })
+    template = File.read(templatefile)
+    text = ERB.new(template).result(binding)
+    File.open(outfile, "w") { |f| f.write text }
 end
 
 Dir.glob('tasks/*.rake').each { |r| import r }

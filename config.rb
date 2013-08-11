@@ -11,17 +11,28 @@
         'nutki',
         'ragingduckd'
     ],
+    :icon16 => 'salvager16.png',
     :icon48 => 'salvager48.png',
+    :icon128 => 'salvager128.png',
     :homepage => 'http://forum.dominionstrategy.com/index.php?topic=9063.0',
     :license => 'MPL 2.0',
     :version => '2.2',
+    :manifest_version => '2',
 
     # The pages to run the extension on
     :targeturls => [
         'http://play.goko.com/Dominion/gameClient.html',
         'https://play.goko.com/Dominion/gameClient.html',
         'http://beta.goko.com/Dominion/gameClient.html',
-        'https://play.goko.com/Dominion/gameClient.html',
+        'https://beta.goko.com/Dominion/gameClient.html',
+    ],
+
+    # Domains to run the extension on (yes, it's redundant)
+    :domains => [
+        'http://play.goko.com/',
+        'https://play.goko.com/',
+        'http://beta.goko.com/',
+        'https://beta.goko.com/',
     ],
 
     # JS scripts for Goko to load, in order
