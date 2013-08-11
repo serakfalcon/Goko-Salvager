@@ -1,18 +1,24 @@
 {
   "name": "Goko Dominion Salvager",
   "description": "Enhance your Online Dominion experience!",
-  "version": "2.1",
+  "version": "2.1.1",
   "manifest_version": 2,
 
   "content_scripts": [
     {
+      "css": [ "logviewer.css" ],
       "js": [
-        "Goko_Live_Log_Viewer.user.js",
-        "automatch.js",
+        "settings.js",
+        "avatars.js",
+        "blacklist.js",
+        "lobby_ratings.js",
+        "logviewer.js",
+        "kingdom_generator.js",
+        "autokick.js",
         "automatchGamePop.js",
         "automatchOfferPop.js",
         "automatchSeekPop.js",
-        "gokoHelpers.js"
+        "automatch.js"
       ],
       "matches": [
         "http://play.goko.com/Dominion/gameClient.html",
