@@ -16,4 +16,9 @@ namespace :firefox do
 
     # Run the Firefox Add-On SDK builder
     sh 'cd build/ && cfx xpi --pkgdir=firefox/ && cd ..'
+
+    desc 'Create a .xpi for Firefox'
+    task build: ['build/gokosalvager.xpi'] do
+      puts 'build/gokosalvager.zip created'
+    end
 end
