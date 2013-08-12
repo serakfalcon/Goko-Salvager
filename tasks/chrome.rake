@@ -34,7 +34,7 @@ namespace :chrome do
 
     file 'build/gokosalvager.zip' => ['chrome:dev'] do |t|
         FileUtils.rm_rf 'build/gokosalvager.zip'
-        Dir.chdir('build') { sh 'zip -r gokosalvager.zip chrome' }
+        Dir.chdir('build/chrome') { sh 'zip -r ../gokosalvager.zip *' }
     end
 
     desc 'Create a .zip for Chrome'
