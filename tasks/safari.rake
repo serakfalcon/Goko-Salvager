@@ -14,9 +14,10 @@ namespace :safari do
         props = eval(File.open('config.rb') {|f| f.read })
         props[:version] = get_version
 
-        # Build package description
+        # Build info and settings files
         info_plist = fill_template 'src/config/safari/Info.plist.erb', props
         File.open('build/safari/Info.plist', 'w') {|f| f.write info_plist }
+        FileUtils.cp_r 'src/config/safari/Settings.plist', 'build/safari/'
 
         # Copy js, css, and png content
         # TODO: How to specify the Safari extension's icon?
