@@ -33,7 +33,8 @@ namespace :safari do
     end
 
     file 'gokosalvager.safariextz' => [:dev] do |t, args|
-        create_and_sign
+        create_and_sign 'build/safari', '~/.safari-certs',
+                        'build/gokosalvager.safariextz'
     end
 
     desc 'Create a signed .safariextz for Safari.'
@@ -43,27 +44,32 @@ namespace :safari do
 
 end
 
-# based on http://blog.streak.com/2013/01/how-to-build-safari-extension.html
-def create_and_sign
-    src = 'build/safari/'
-    target = 'build/gokosalvager.safariextz'
+# Based on http://blog.streak.com/2013/01/how-to-build-safari-extension.html.
+# Contains instructions on obtaining your Safari developer security files.
+def create_and_sign(src_dir, cert_dir, target)
 
+    # Required Apple Safari developer security files: 
+    # - cert.der, cert01, cert02, key.pem, size.txt
     cert_dir = File.expand_path('~/.safari-certs')
     size_file = File.join(cert_dir, 'size.txt')
 
-    sh "openssl dgst -sign #{cert_dir}/key.pem -binary < #{cert_dir}/key.pem | wc -c > #{size_file}"
-    sh "xar -czf #{target} --distribution #{src}"
+    # Create the extension archive file
+    sh "xar -czf #{target} --distribution #{src_dir}"
 
-    # NOTE: I'm almost certainly doing this wrong. --AI
+    # Generate and sign archive digest
+    sh "xar --sign -f #{target} \
+            --digestinfo-to-sign digest.dat \
+            --sig-size #{File.read(size_file).strip} \
+            --cert-loc #{cert_dir}/cert.der \
+            --cert-loc #{cert_dir}/cert01 \
+            --cert-loc #{cert_dir}/cert02"
     
-    # michaeljb's original sign command 
-    #sh "xar --sign -f #{target} --digestinfo-to-sign digest.dat --sig-size #{File.read(size_file).strip} --cert-loc #{cert_dir}/cert.der --cert-loc #{cert_dir}/cert01 --cert-loc #{cert_dir}/cert02"
-    
-    # The variant that I can run (though which probably doesn't work)
-    sh "xar --sign -f #{target} --digestinfo-to-sign digest.dat --sig-size #{File.read(size_file).strip} --cert-loc #{cert_dir}/cert.der"
-
-    sh "openssl rsautl -sign -inkey #{cert_dir}/key.pem -in digest.dat -out sig.dat"
+    # Generate and inject signature file
+    sh "openssl rsautl -sign -inkey #{cert_dir}/key.pem \
+                -in digest.dat -out sig.dat"
     sh "xar --inject-sig sig.dat -f #{target}"
+
+    # Clean up
     rm_f ['sig.dat', 'digest.dat']
     chmod 744, target
 
