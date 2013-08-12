@@ -3,10 +3,11 @@
 namespace :chrome do
 
     desc 'Assemble content and generate config files for Chrome extension'
-    task :assemble do
+    task :dev do
 
         # Prepare a blank Firefox Add-on project
         FileUtils.rm_rf 'build/chrome/'
+        FileUtils.rm_rf 'build/chrome/gokosalvager.zip'
         FileUtils.mkdir_p 'build/chrome/images'
 
         # Build package description from common config
@@ -23,21 +24,19 @@ namespace :chrome do
         Dir.glob('build/chrome/*.js').each do |js_script|
             run_in_page_context(js_script)
         end
+        
+        puts 'Assembled Chrome extension files. Ready to build or use as an
+              unpacked extension.'
     end
 
-    desc 'Use build/chrome/ as "unpacked extension" for developing on Chrome'
-    task :dev => [:assemble] do
-        puts 'ready to use build/chrome/ as unpacked extension'
-    end
-
-    file 'build/gokosalvager-chrome.zip' => ['chrome:dev'] do |t|
-        FileUtils.rm_rf 'build/gokosalvager-chrome.zip'
-        Dir.chdir('build') { sh 'zip -r ../gokosalvager-chrome.zip chrome' }
+    file 'build/gokosalvager.zip' => ['chrome:dev'] do |t|
+        FileUtils.rm_rf 'build/gokosalvager.zip'
+        Dir.chdir('build') { sh 'zip -r gokosalvager.zip chrome' }
     end
 
     desc 'Create a .zip for Chrome'
-    task :build => ['build/gokosalvager-chrome.zip'] do
-      puts 'build/gokosalvager-chrome.zip created'
+    task :build => ['build/gokosalvager.zip'] do
+      puts 'build/gokosalvager.zip created'
     end
 
 end

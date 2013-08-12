@@ -3,10 +3,11 @@
 namespace :firefox do
 
     desc 'Assemble content and generate config files for Firefox Add-on'
-    task :assemble do
+    task :dev do
 
         # Prepare a blank Firefox Add-on project
         FileUtils.rm_rf 'build/firefox/'
+        FileUtils.rm_rf 'build/firefox/gokosalvager.xpi'
         FileUtils.mkdir_p 'build/firefox/'
         Dir.chdir('build/firefox/') { sh 'cfx init' }
 
@@ -34,14 +35,14 @@ namespace :firefox do
     end
 
     desc 'Test the Firefox extension'
-    task :test => [:assemble] do
+    task :test => [:dev] do
         sh 'cfx -v run --pkgdir=build/firefox/ --binary-args \
             "-url https://play.goko.com/Dominion/gameClient.html \
             -jsconsole"'
     end
 
     desc 'Create the Firefox extension .xpi'
-    task :build => [:assemble] do
-        sh 'cfx -v xpi --pkgdir=build/firefox/'
+    task :build => [:dev] do
+        Dir.chdir('build') { sh 'cfx xpi --pkgdir=firefox' }
     end
 end

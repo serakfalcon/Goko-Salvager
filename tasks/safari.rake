@@ -3,10 +3,11 @@
 namespace :safari do
 
     desc 'Assemble content and generate config files for Firefox Add-on'
-    task :assemble do
+    task :dev do
 
         # Prepare an empty directory to assemble the Safari extension in
         FileUtils.rm_rf 'build/safari/'
+        FileUtils.rm_rf 'build/safari/gokosalvager.safariextz'
         FileUtils.mkdir_p 'build/safari/'
        
         # Build the config files from templates and the common config info
@@ -31,7 +32,7 @@ namespace :safari do
         puts 'Safari Extension assembled. Ready to build.'
     end
 
-    file 'gokosalvager.safariextz' => [:assemble] do |t, args|
+    file 'gokosalvager.safariextz' => [:dev] do |t, args|
         create_and_sign
     end
 
@@ -45,7 +46,7 @@ end
 # based on http://blog.streak.com/2013/01/how-to-build-safari-extension.html
 def create_and_sign
     src = 'build/safari/'
-    target = 'gokosalvager.safariextz'
+    target = 'build/gokosalvager.safariextz'
 
     cert_dir = File.expand_path('~/.safari-certs')
     size_file = File.join(cert_dir, 'size.txt')
@@ -53,15 +54,14 @@ def create_and_sign
     sh "openssl dgst -sign #{cert_dir}/key.pem -binary < #{cert_dir}/key.pem | wc -c > #{size_file}"
     sh "xar -czf #{target} --distribution #{src}"
 
-    # NOTE: I'm not at all sure I'm signing this correctly... I'm using my
-    # "safari_extension.cer" in place of the #{cert_dir} and I don't have a
-    # cert01 or cert02 file at all. Apple 
+    # NOTE: I'm almost certainly doing this wrong. --AI
     
     # michaeljb's original sign command 
     #sh "xar --sign -f #{target} --digestinfo-to-sign digest.dat --sig-size #{File.read(size_file).strip} --cert-loc #{cert_dir}/cert.der --cert-loc #{cert_dir}/cert01 --cert-loc #{cert_dir}/cert02"
     
-    # The variant that I can run (though I haven't tested the result)
+    # The variant that I can run (though which probably doesn't work)
     sh "xar --sign -f #{target} --digestinfo-to-sign digest.dat --sig-size #{File.read(size_file).strip} --cert-loc #{cert_dir}/cert.der"
+
     sh "openssl rsautl -sign -inkey #{cert_dir}/key.pem -in digest.dat -out sig.dat"
     sh "xar --inject-sig sig.dat -f #{target}"
     rm_f ['sig.dat', 'digest.dat']
