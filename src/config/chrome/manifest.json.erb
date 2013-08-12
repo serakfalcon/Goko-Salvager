@@ -2,36 +2,24 @@
     "name": "<%= config[:name] %>",
     "description": "<%= config[:title] %>",
     "version": "<%= config[:version] %>",
-    "manifest_version": <%= config[:manifestversion] %>,
-
+    "manifest_version": <%= config[:manifest_version] %>,
     "content_scripts": [{
         "css": [
-            <% for css in config[:css] %>
-                "<%= css %>",
-            <% end %>
+            "<%= config[:css].join("\",\n            \"") %>"
         ],
         "js": [
-            <% for js in config[:js] %>
-                "<%= js %>",
-            <% end %>
+            "<%= config[:js].join("\",\n            \"") %>"
         ],
         "matches": [
-            <% for url in config[:targeturls] %>
-                "<%= url %>"
-            <% end %>
+            "<%= config[:targeturls].join("\",\n            \"") %>"
         ]
     }],
-
     "permissions": [
-        <% for url in config[:domains] %>
-            "<%= url %>"
-        <% end %>
+        "<%= config[:domains].join("\",\n        \"") %>"
     ],
-
     "icons": {
-        "16": "images/<%= config[:icon16] %>"
+        "16": "images/<%= config[:icon16] %>",
         "48": "images/<%= config[:icon48] %>",
         "128": "images/<%= config[:icon128] %>"
     }
-
 }

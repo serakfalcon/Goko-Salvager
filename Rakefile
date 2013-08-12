@@ -5,7 +5,7 @@ require 'erb'
 require 'ostruct'
 
 CLEAN.include 'build/*/'
-CLOBBER.include 'build/*'
+CLOBBER.include 'build'
 
 PARSER = 'src/dev/set_parser.js'
 WRAPPER = 'src/dev/runInPageContext.js'
