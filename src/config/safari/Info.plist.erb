@@ -24,22 +24,16 @@
 		<dict>
 			<key>End</key>
 			<array>
-                <% for js in config[:js] %>
-                    <string><%= js %></string>
-                <% end %>
+                <string><%= config[:js].join("</string>\n                <string>") %></string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>
 		<array>
-            <% for css in config[:js] %>
-                <string><%= css %></string>
-            <% end %>
+            <string><%= config[:css].join("</string>\n            <string>") %></string>
 		</array>
 		<key>Whitelist</key>
 		<array>
-            <% for url in config[:targeturls] %>
-                <string><%= url %></string>
-            <% end %>
+            <string><%= config[:targeturls].join("</string>\n            <string>") %></string>
 		</array>
 	</dict>
 	<key>Description</key>

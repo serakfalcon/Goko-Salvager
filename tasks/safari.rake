@@ -7,7 +7,7 @@ namespace :safari do
 
         # Prepare an empty directory to assemble the Safari extension in
         FileUtils.rm_rf 'build/safari/'
-        FileUtils.rm_rf 'build/safari/gokosalvager.safariextz'
+        FileUtils.rm_rf 'build/gokosalvager.safariextz'
         FileUtils.mkdir_p 'build/safari/'
 
         # Read properties from common config and version files
