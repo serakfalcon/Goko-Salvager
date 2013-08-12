@@ -1,5 +1,8 @@
 # encoding: UTF-8
 
+# NOTE This won't work anymore, of course. Perhaps it should be rewritten to
+# modify the version key in config.rb? I lack the necessary Ruby skills for it.
+
 VERSION_BROWSER_INFO = {
   chrome: {
     CHROME_MANIFEST => [->(v) { "\"version\": \"#{v}\"" }]

@@ -9,7 +9,8 @@
         '1wheel',
         'michaeljb',
         'nutki',
-        'ragingduckd'
+        'ragingduckd',
+        'yed'
     ],
     :icon16 => 'salvager16.png',
     :icon48 => 'salvager48.png',
@@ -18,6 +19,7 @@
     :license => 'MPL 2.0',
     :version => '2.2',
     :manifest_version => '2',
+    :safarixtz_url => 'http://goo.gl/1SJmbB',
 
     # The pages to run the extension on
     :targeturls => [
@@ -27,7 +29,7 @@
         'https://beta.goko.com/Dominion/gameClient.html',
     ],
 
-    # Domains to run the extension on (yes, it's redundant)
+    # Domains to run the extension on (for Chrome)
     :domains => [
         'http://play.goko.com/',
         'https://play.goko.com/',

@@ -8,10 +8,8 @@ CLEAN.include 'tmp/*'
 CLEAN.include 'build/*/'
 CLOBBER.include 'build/*'
 
-SCRIPT = 'src/ext/Goko_Live_Log_Viewer.user.js'
-PARSER = 'src/dev/set_parser.js'
+#PARSER = 'src/dev/set_parser.js'
 
-CREATE_AND_SIGN = 'src/dev/createAndSign.sh'
 WRAPPER = 'src/dev/runInPageContext.js'
 
 VERSION = 'VERSION'

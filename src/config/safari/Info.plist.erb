@@ -3,19 +3,19 @@
 <plist version="1.0">
 <dict>
 	<key>Author</key>
-	<string>nutki, michaeljb, ragingduckd</string>
+    <string><%= config[:author] %></string>
 	<key>Builder Version</key>
 	<string>7536.30.1</string>
 	<key>CFBundleDisplayName</key>
-	<string>Goko Dominion Salvager</string>
+    <string><%= config[:title] %></string>
 	<key>CFBundleIdentifier</key>
-	<string>com.dominionstrategy.dominiononlineuserextension</string>
+    <string>com.dominionstrategy.safari.<%= config[:name] %></string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1</string>
+    <string><%= config[:version] %></string>
 	<key>CFBundleVersion</key>
-	<string>2.1</string>
+	<string><%= config[:version] %></string>
 	<key>Chrome</key>
 	<dict/>
 	<key>Content</key>
@@ -24,17 +24,26 @@
 		<dict>
 			<key>End</key>
 			<array>
-				<string>Goko_Live_Log_Viewer.user.js</string>
-				<string>automatch.js</string>
-				<string>automatchGamePop.js</string>
-				<string>automatchOfferPop.js</string>
-				<string>automatchSeekPop.js</string>
-				<string>gokoHelpers.js</string>
+                <% for js in config[:js] %>
+                    <string><%= js %></string>
+                <% end %>
 			</array>
 		</dict>
+		<key>Stylesheets</key>
+		<array>
+            <% for css in config[:js] %>
+                <string><%= css %></string>
+            <% end %>
+		</array>
+		<key>Whitelist</key>
+		<array>
+            <% for url in config[:targeturls] %>
+                <string><%= url %></string>
+            <% end %>
+		</array>
 	</dict>
 	<key>Description</key>
-	<string>Enhance your Online Dominion experience!</string>
+    <string><%= config[:desc] %></string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
@@ -45,11 +54,16 @@
 			<array>
 				<string>*.goko.com/Dominion</string>
 			</array>
+            <key>Include Secure Pages</key>
+            <true/>
 			<key>Level</key>
 			<string>Some</string>
 		</dict>
 	</dict>
 	<key>Website</key>
-	<string>http://forum.dominionstrategy.com/index.php?topic=8163.0</string>
+    <string><%= config[:homepage] %></string>
+    <key>URL</key>
+    <string><%= config[:safarixtz_url] %></string>
+
 </dict>
 </plist>

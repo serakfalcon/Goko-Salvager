@@ -1,0 +1,37 @@
+{
+    "name": "<%= config[:name] %>",
+    "description": "<%= config[:title] %>",
+    "version": "<%= config[:version] %>",
+    "manifest_version": <%= config[:manifestversion] %>,
+
+    "content_scripts": [{
+        "css": [
+            <% for css in config[:css] %>
+                "<%= css %>",
+            <% end %>
+        ],
+        "js": [
+            <% for js in config[:js] %>
+                "<%= js %>",
+            <% end %>
+        ],
+        "matches": [
+            <% for url in config[:targeturls] %>
+                "<%= url %>"
+            <% end %>
+        ]
+    }],
+
+    "permissions": [
+        <% for url in config[:domains] %>
+            "<%= url %>"
+        <% end %>
+    ],
+
+    "icons": {
+        "16": "images/<%= config[:icon16] %>"
+        "48": "images/<%= config[:icon48] %>",
+        "128": "images/<%= config[:icon128] %>"
+    }
+
+}
