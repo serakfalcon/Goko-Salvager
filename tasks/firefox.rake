@@ -11,15 +11,17 @@ namespace :firefox do
         FileUtils.mkdir_p 'build/firefox/'
         Dir.chdir('build/firefox/') { sh 'cfx init' }
 
-        # Build package description from common config
-        write_from_template('src/config/firefox/package.json.erb',
-                            'config.rb',
-                            'build/firefox/package.json')
+        # Read properties from common config and version files
+        props = eval(File.open('config.rb') {|f| f.read })
+        props[:version] = get_version
 
-        # Build "main" script from common config
-        write_from_template('src/config/firefox/main.js.erb',
-                            'config.rb',
-                            'build/firefox/lib/main.js')
+        # Build package description
+        pkg_json = fill_template 'src/config/firefox/package.json.erb', props
+        File.open('build/firefox/package.json', 'w') {|f| f.write pkg_json }
+
+        # Build "main" script
+        main_js = fill_template 'src/config/firefox/main.js.erb', props
+        File.open('build/firefox/lib/main.js', 'w') {|f| f.write main_js }
 
         # Copy js, css, and png files
         FileUtils.cp_r Dir.glob('src/ext/*.js'), 'build/firefox/data/'

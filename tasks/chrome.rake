@@ -10,10 +10,13 @@ namespace :chrome do
         FileUtils.rm_rf 'build/chrome/gokosalvager.zip'
         FileUtils.mkdir_p 'build/chrome/images'
 
-        # Build package description from common config
-        write_from_template('src/config/chrome/manifest.json.erb',
-                            'config.rb',
-                            'build/chrome/manifest.json')
+        # Read properties from common config and version files
+        props = eval(File.open('config.rb') {|f| f.read })
+        props[:version] = get_version
+
+        # Build package description
+        man_json = fill_template 'src/config/chrome/manifest.json.erb', props
+        File.open('build/chrome/manifest.json', 'w') {|f| f.write man_json }
 
         # Copy js, css, and png files
         FileUtils.cp_r Dir.glob('src/ext/*.js'), 'build/chrome/'
@@ -24,7 +27,7 @@ namespace :chrome do
         Dir.glob('build/chrome/*.js').each do |js_script|
             run_in_page_context(js_script)
         end
-        
+
         puts 'Assembled Chrome extension files. Ready to build or use as an
               unpacked extension.'
     end

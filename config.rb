@@ -17,7 +17,6 @@
     :icon128 => 'salvager128.png',
     :homepage => 'http://forum.dominionstrategy.com/index.php?topic=9063.0',
     :license => 'MPL 2.0',
-    :version => '2.2',
     :manifest_version => '2',
     :safarixtz_url => 'http://goo.gl/1SJmbB',
 

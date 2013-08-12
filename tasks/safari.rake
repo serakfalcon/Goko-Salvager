@@ -9,14 +9,14 @@ namespace :safari do
         FileUtils.rm_rf 'build/safari/'
         FileUtils.rm_rf 'build/safari/gokosalvager.safariextz'
         FileUtils.mkdir_p 'build/safari/'
-       
-        # Build the config files from templates and the common config info
-        write_from_template('src/config/safari/Info.plist.erb',
-                            'config.rb',
-                            'build/safari/Info.plist')
-        
-        # TODO: What, if anything, should get modified/put in Settings.plist?
-        FileUtils.cp 'src/config/safari/Settings.plist', 'build/safari/'
+
+        # Read properties from common config and version files
+        props = eval(File.open('config.rb') {|f| f.read })
+        props[:version] = get_version
+
+        # Build package description
+        info_plist = fill_template 'src/config/safari/Info.plist.erb', props
+        File.open('build/safari/Info.plist', 'w') {|f| f.write info_plist }
 
         # Copy js, css, and png content
         # TODO: How to specify the Safari extension's icon?
@@ -48,7 +48,7 @@ end
 # Contains instructions on obtaining your Safari developer security files.
 def create_and_sign(src_dir, cert_dir, target)
 
-    # Required Apple Safari developer security files: 
+    # Required Apple Safari developer security files:
     # - cert.der, cert01, cert02, key.pem, size.txt
     cert_dir = File.expand_path('~/.safari-certs')
     size_file = File.join(cert_dir, 'size.txt')
@@ -63,7 +63,7 @@ def create_and_sign(src_dir, cert_dir, target)
             --cert-loc #{cert_dir}/cert.der \
             --cert-loc #{cert_dir}/cert01 \
             --cert-loc #{cert_dir}/cert02"
-    
+
     # Generate and inject signature file
     sh "openssl rsautl -sign -inkey #{cert_dir}/key.pem \
                 -in digest.dat -out sig.dat"

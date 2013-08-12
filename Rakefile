@@ -4,33 +4,19 @@ require 'rake/clean'
 require 'erb'
 require 'ostruct'
 
-CLEAN.include 'tmp/*'
 CLEAN.include 'build/*/'
 CLOBBER.include 'build/*'
 
-#PARSER = 'src/dev/set_parser.js'
-
+PARSER = 'src/dev/set_parser.js'
 WRAPPER = 'src/dev/runInPageContext.js'
-
 VERSION = 'VERSION'
-
-CHROME_MANIFEST = 'chrome/manifest.json'
-CHROME_IMAGES = 'chrome/images/'
-
-FIREFOX_PACKAGE = 'firefox/package.json'
-
-SAFARI_INFO = 'safari/Info.plist'
-SAFARI_SETTINGS = 'safari/Settings.plist'
 
 def get_version
   File.read(VERSION).strip
 end
 
-def replace_pattern_in_file(old_pattern, new_string, target)
-  text = File.read(target).gsub(/#{old_pattern}/, "#{new_string}")
-  File.open(target, 'w') { |f| f.puts text }
-end
-
+# TODO: Restore this. I didn't understand it before, but it's better than
+#       manually merging set_parser.js and kingdom_builder.js as I'm doing now.
 def insert_set_parser_into_main_script(out_file_name)
   out = File.new(out_file_name, 'w')
   out.write(File.read(PARSER))
@@ -49,11 +35,10 @@ def run_in_page_context(file)
   t.close
 end
 
-def write_from_template(templatefile, configfile, outfile) 
-    config = eval(File.open(configfile) {|f| f.read })
+def fill_template(templatefile, property_hash)
+    config = property_hash
     template = File.read(templatefile)
-    text = ERB.new(template).result(binding)
-    File.open(outfile, "w") { |f| f.write text }
+    return ERB.new(template).result(binding)
 end
 
 Dir.glob('tasks/*.rake').each { |r| import r }
