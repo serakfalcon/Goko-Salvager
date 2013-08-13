@@ -5,7 +5,7 @@ namespace :chrome do
     desc 'Assemble content and generate config files for Chrome extension'
     task :dev do
 
-        # Prepare a blank Firefox Add-on project
+        # Prepare a blank Chrome Extension project
         FileUtils.rm_rf 'build/chrome/'
         FileUtils.rm_rf 'build/chrome/gokosalvager.zip'
         FileUtils.mkdir_p 'build/chrome/images'
