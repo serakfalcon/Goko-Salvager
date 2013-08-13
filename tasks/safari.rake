@@ -12,9 +12,8 @@ namespace :safari do
         FileUtils.rm_rf 'build/gokosalvager.safariextz'
         FileUtils.mkdir_p build_dir
 
-        # Read properties from common config and version files
+        # Read properties from common config file
         props = eval(File.open('config.rb') {|f| f.read })
-        props[:version] = get_version
 
         # Build info and settings files
         info_plist = fill_template 'src/config/safari/Info.plist.erb', props

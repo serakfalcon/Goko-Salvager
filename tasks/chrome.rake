@@ -10,9 +10,8 @@ namespace :chrome do
         FileUtils.rm_rf 'build/chrome/gokosalvager.zip'
         FileUtils.mkdir_p 'build/chrome/images'
 
-        # Read properties from common config and version files
+        # Read properties from common config file
         props = eval(File.open('config.rb') {|f| f.read })
-        props[:version] = get_version
 
         # Build package description
         man_json = fill_template 'src/config/chrome/manifest.json.erb', props

@@ -9,11 +9,6 @@ CLOBBER.include 'build'
 
 PARSER = 'src/dev/set_parser.js'
 WRAPPER = 'src/dev/runInPageContext.js'
-VERSION = 'VERSION'
-
-def get_version
-  File.read(VERSION).strip
-end
 
 # TODO: Restore this. I didn't understand it before, but it's better than
 #       manually merging set_parser.js and kingdom_builder.js as I'm doing now.

@@ -11,9 +11,8 @@ namespace :firefox do
         FileUtils.mkdir_p 'build/firefox/'
         Dir.chdir('build/firefox/') { sh 'cfx init' }
 
-        # Read properties from common config and version files
+        # Read properties from common config file
         props = eval(File.open('config.rb') {|f| f.read })
-        props[:version] = get_version
 
         # Build package description
         pkg_json = fill_template 'src/config/firefox/package.json.erb', props
