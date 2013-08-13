@@ -78,5 +78,6 @@ def create_and_sign(src_dir, cert_dir, target)
 
     # Clean up
     rm_f ['sig.dat', 'digest.dat']
+    FileUtils.chmod 744, target
 
 end

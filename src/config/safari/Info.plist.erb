@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>Author</key>
-    <string><%= config[:author] %></string>
+	<string><%= config[:author] %></string>
 	<key>Builder Version</key>
-	<string>7536.30.1</string>
+	<string>8536.30.1</string>
 	<key>CFBundleDisplayName</key>
-    <string><%= config[:name] %></string>
+	<string><%= config[:name] %></string>
 	<key>CFBundleIdentifier</key>
-    <string>com.dominionstrategy.safari.<%= config[:name] %></string>
+	<string>com.dominionstrategy.safari.<%= config[:name] %></string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-    <string><%= config[:version] %></string>
+	<string><%= config[:version] %></string>
 	<key>CFBundleVersion</key>
 	<string><%= config[:version] %></string>
 	<key>Chrome</key>
@@ -24,20 +24,20 @@
 		<dict>
 			<key>End</key>
 			<array>
-                <string><%= config[:js].join("</string>\n                <string>") %></string>
+				<string><%= config[:js].join("</string>\n				<string>") %></string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>
 		<array>
-            <string><%= config[:css].join("</string>\n            <string>") %></string>
+			<string><%= config[:css].join("</string>\n			<string>") %></string>
 		</array>
 		<key>Whitelist</key>
 		<array>
-            <string><%= config[:targeturls].join("</string>\n            <string>") %></string>
+			<string><%= config[:targeturls].join("</string>\n			<string>") %></string>
 		</array>
 	</dict>
 	<key>Description</key>
-    <string><%= config[:desc] %></string>
+	<string><%= config[:desc] %></string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
@@ -46,17 +46,17 @@
 		<dict>
 			<key>Allowed Domains</key>
 			<array>
-				<string>*.goko.com/Dominion</string>
+				<string>*.goko.com</string>
 			</array>
-            <key>Include Secure Pages</key>
-            <true/>
+			<key>Include Secure Pages</key>
+			<true/>
 			<key>Level</key>
 			<string>Some</string>
 		</dict>
 	</dict>
+	<key>URL</key>
+	<string><%= config[:safarixtz_url] %></string>
 	<key>Website</key>
-    <string><%= config[:homepage] %></string>
-    <key>URL</key>
-    <string><%= config[:safarixtz_url] %></string>
+	<string><%= config[:homepage] %></string>
 </dict>
 </plist>
