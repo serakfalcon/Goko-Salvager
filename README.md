@@ -22,4 +22,4 @@ Contributors
 
 Development-notes
 -----------------
-The current "safari:build" rake task doesn't quite work. It generates the correct content but it doesn't sign it correctly. To create a working Safari extension, open Safari, enable the Develop menu in Preferences, open Menu/Develop/Extension Builder, add the extension files using the bottom-left "+" sign, and then click "Build Package." You will need to have your Safari Developer certificate installed for this to work.
+The current "safari:build" rake task doesn't quite work for me (aiannacc), though it does work for michaeljb. For aiannacc It generates the correct content but it doesn't sign it correctly. If you face the same problem, you can create a working Safari extension by opening Safari, enabling the Develop menu in Preferences, opening Menu/Develop/Extension Builder, adding the extension files using the bottom-left "+" sign, and then clicking "Build Package." You will need to have your Safari Developer certificate installed for this to work.
