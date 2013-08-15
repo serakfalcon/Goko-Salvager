@@ -1,21 +1,45 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
-/*global $, _, FS, Goko */
+/*global $, _ */
+
+var loadAvatarModule;
+(function () {
+    "use strict";
+
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+
+    var waitLoop = setInterval(function () {
+        try {
+            window.GokoSalvager = window.GokoSalvager || {};
+    
+            var gs = window.GokoSalvager;
+            var gp = window.Goko.Player;
+            var ls = window.Goko.Templates.LaunchScreen;
+
+            if ([gs, gp, ls].every(exists)) {
+                clearInterval(waitLoop);
+                loadAvatarModule(gs, gp, ls);
+            }
+        } catch (e) {}
+    });
+}());
 
 /*
  * Custom Avatar module
  */
-(function () {
+loadAvatarModule = function (gs, gp, ls) {
     "use strict";
 
     var myCanvas = document.createElement("canvas");
     var myContext = myCanvas.getContext("2d");
-    Goko.Player.old_AvatarLoader = Goko.Player.AvatarLoader;
-    Goko.Player.AvatarLoader = function (userdata, callback) {
+    gp.old_AvatarLoader = gp.AvatarLoader;
+    gp.AvatarLoader = function (userdata, callback) {
         function loadImage() {
             var img = new Image();
             var img2 = new Image();
             img.onerror = img2.onerror = function () {
-                Goko.Player.old_AvatarLoader(userdata, callback);
+                gp.old_AvatarLoader(userdata, callback);
             };
             img.onload = function () {
                 try {
@@ -28,7 +52,7 @@
                 } catch (e) {
                     console.err(e);
                     alert(e.toString());
-                    Goko.Player.old_AvatarLoader(userdata, callback);
+                    gp.old_AvatarLoader(userdata, callback);
                 }
             };
             img.crossOrigin = "Anonymous";
@@ -37,17 +61,16 @@
         if (userdata.which < 3) {
             loadImage();
         } else {
-            Goko.Player.old_AvatarLoader(userdata, callback);
+            gp.old_AvatarLoader(userdata, callback);
         }
     };
 
-    Goko.Player.preloader = function (ids, which) {};
+    gp.preloader = function (ids, which) {};
 
-    FS.Templates.LaunchScreen.MAIN = FS.Templates.LaunchScreen.MAIN.replace('<div id="fs-player-pad-avatar"',
+    ls.MAIN = ls.MAIN.replace('<div id="fs-player-pad-avatar"',
             '<div style="display:none"><form id="uploadAvatarForm" method="post" action="http://dom.retrobox.eu/setavatar.php"><input type="text" id="uploadAvatarId" name="id" value="x"/></form></div>' +
             '<div id="fs-player-pad-avatar" onClick="' +
             'document.getElementById(\'uploadAvatarId\').setAttribute(\'value\',Goko.ObjectCache.getInstance().conn.connInfo.playerId);' +
             'document.getElementById(\'uploadAvatarForm\').submit();' +
             '"');
-}());
-
+};
