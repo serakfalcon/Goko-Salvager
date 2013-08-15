@@ -1,5 +1,31 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
-/*global $, _, FS, Goko */
+/*global $, _ */
+
+var loadLobbyRatingsModule;
+(function () {
+    "use strict";
+
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+
+    var waitLoop = setInterval(function () {
+        try {
+            window.GokoSalvager = window.GokoSalvager || {};
+    
+            var gs = window.GokoSalvager;
+            var rh = window.FS.RatingHelper;
+            var crv = window.FS.ClassicRoomView;
+
+            if ([gs, rh, crv].every(exists)) {
+                clearInterval(waitLoop);
+                loadLobbyRatingsModule(gs, rh, crv);
+            }
+        } catch (e) {}
+    });
+}());
+
+
 
 /*
  * Lobby ratings module
@@ -15,44 +41,42 @@
  * - insertInPlace()
  * - getRatingObject()
  */
-(function () {
+var loadLobbyRatingsModule = function (gs, rh, crv) {
     "use strict";
     var insertInPlace, getSortablePlayerObjectFromElement;
 
-    FS.RatingHelper.prototype.old_getRating =
-        FS.RatingHelper.prototype.getRating;
-    FS.RatingHelper.prototype.getRating = function (opts, callback) {
+    rh.prototype.old_getRating = rh.prototype.getRating;
+    rh.prototype.getRating = function (opts, callback) {
         var newCallback = callback, playerElement;
         if (opts.$el && opts.$el.hasClass('player-rank')) {
             playerElement = opts.$el.closest('li')[0];
             newCallback = function (resp) {
                 callback(resp);
-                if (window.GokoSalvager.options.sortrating) {
+                if (gs.options.sortrating) {
                     insertInPlace(playerElement);
                 }
-                if (window.GokoSalvager.options.blacklist.indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
+                if (gs.options.blacklist.indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
                     $(playerElement).hide();
                 } else {
                     $(playerElement).show();
                 }
             };
-            if (window.GokoSalvager.options.proranks) {
+            if (gs.options.proranks) {
                 opts.$elPro = opts.$el;
                 opts.$elQuit = $(document.createElement('div'));
                 delete opts.$el;
             }
         }
-        FS.RatingHelper.prototype.old_getRating.call(this, opts, newCallback);
+        rh.prototype.old_getRating.call(this, opts, newCallback);
     };
 
-    FS.ClassicRoomView.prototype.old_modifyDOM =
-        FS.ClassicRoomView.prototype.modifyDOM;
-    FS.ClassicRoomView.prototype.modifyDOM = function () {
+    crv.prototype.old_modifyDOM = crv.prototype.modifyDOM;
+    crv.prototype.modifyDOM = function () {
         var originalRating = this.meetingRoom.options.ratingSystemId;
-        if (window.GokoSalvager.options.proranks) {
+        if (gs.options.proranks) {
             this.meetingRoom.options.ratingSystemId = FS.MeetingRoomSetting.ratingSystemPro;
         }
-        FS.ClassicRoomView.prototype.old_modifyDOM.call(this);
+        crv.prototype.old_modifyDOM.call(this);
         this.meetingRoom.options.ratingSystemId = originalRating;
     };
 
@@ -89,4 +113,4 @@
             rating: rankSpan ? parseInt(rankSpan.innerHTML, 10) : -1
         };
     };
-}());
+};
