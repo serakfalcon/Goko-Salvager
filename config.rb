@@ -40,6 +40,8 @@
     # JS scripts for Goko to load, in order
     :js => [
         'settings.js',
+        'userOptions.js',
+        'tableState.js',
         'autokick.js',
         'avatars.js',
         'blacklist.js',
