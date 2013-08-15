@@ -14,7 +14,7 @@ var loadConfigurationModule;
  * Goko dependencies: none
  * Internal dependencies: none
  */
-loadConfigurationModule = function (gs, ls, lrow) {
+loadConfigurationModule = function (gs) {
     "use strict";
 
     var default_options = {

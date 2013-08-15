@@ -9,15 +9,15 @@ var loadAvatarModule;
         return (typeof obj !== 'undefined' && obj !== null);
     };
 
+    // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
         try {
-            window.GokoSalvager = window.GokoSalvager || {};
-    
             var gs = window.GokoSalvager;
+            var gso = gs.options;
             var gp = window.Goko.Player;
             var ls = window.Goko.Templates.LaunchScreen;
 
-            if ([gs, gp, ls].every(exists)) {
+            if ([gs, gso, gp, ls].every(exists)) {
                 clearInterval(waitLoop);
                 loadAvatarModule(gs, gp, ls);
             }

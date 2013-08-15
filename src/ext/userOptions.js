@@ -5,11 +5,19 @@ var loadUserOptionsModule;
 (function () {
     "use strict";
 
-    window.GokoSalvager = window.GokoSalvager || {};
-
+    // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
-        if ($('.fs-rs-logout-row').length > 0) {
-            loadUserOptionsModule(window.GokoSalvager);
+        var gs, gso, etv, detv;
+        try {
+            gs = window.GokoSalvager;
+            gso = gs.options;
+            etv = window.FS.EditTableView;
+            detv = window.FS.DominionEditTableView;
+        } catch (e) {}
+
+        if ($('.fs-rs-logout-row').length > 0
+                && typeof gso !== 'undefined' && gso !== null) {
+            loadUserOptionsModule(gs);
             clearInterval(waitLoop);
         }
     }, 100);

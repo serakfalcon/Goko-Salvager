@@ -1,5 +1,5 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
-/*global $, _, FS, Goko */
+/*global $, _ */
 
 /*
  * Kingdom generator module
@@ -8,31 +8,42 @@ var loadKingdomGenerator;
 (function () {
     "use strict";
 
-    // Wait (non-blocking) until Goko instantiates the FS.Dominion.DeckBuilder 
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+
+    // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
+        var gs, gso, db, dbp, detv, cdbc;
+    
         try {
-            if (typeof FS.Dominion.DeckBuilder !== 'undefined') {
-                loadKingdomGenerator();
-                clearInterval(dbWait);
-            }
-        } catch (e) { }
+            gs = window.GokoSalvager;
+            gso = gs.options;
+            db = window.FS.Dominion.DeckBuilder;
+            dbp = window.FS.Dominion.DeckBuilder.Persistent;
+            detv = window.FS.DominionEditTableView;
+            cdbc = window.FS.Dominion.CardBuilder.Data;
+        } catch (e) {}
+
+        if ([gso, db, dbp, detv, cdbc].every(exists)) {
+            loadKingdomGenerator(gs, db, dbp, detv, cdbc);
+            clearInterval(dbWait);
+        }
     }, 100);
 }());
 
-loadKingdomGenerator = function () {
+loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     "use strict";
 
     var set_parser;
-
-    window.GokoSalvager = window.GokoSalvager || {};
 
     var canonizeName = function (n) {
         return n.toLowerCase().replace(/\W+/g, '');
     };
 
     var hideKingdomGenerator = false;
-    FS.DominionEditTableView.prototype._old_renderRandomDeck = FS.DominionEditTableView.prototype._renderRandomDeck;
-    FS.DominionEditTableView.prototype._renderRandomDeck = function () {
+    detv.prototype._old_renderRandomDeck = detv.prototype._renderRandomDeck;
+    detv.prototype._renderRandomDeck = function () {
         if (this.ratingType === 'pro') {
             hideKingdomGenerator = true;
         }
@@ -270,11 +281,11 @@ loadKingdomGenerator = function () {
     };
 
     var types = {};
-    FS.Dominion.CardBuilder.Data.cards.map(function (card) {
+    cdbc.map(function (card) {
         types[card.name[0]] = card.type;
     });
 
-    sets = {};
+    var sets = {};
     function buildSets() {
         var c, i, t, n;
         sets.all = {};
@@ -384,29 +395,26 @@ loadKingdomGenerator = function () {
 
     var myCachedCards;
     var sel = new Kingdomsel('All');
-    if (FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod) {
+    if (dbp.prototype._old_proRandomMethod) {
         return;
     }
 
-    FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod =
-        FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod;
-    FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
+    dbp.prototype._old_proRandomMethod = dbp.prototype._proRandomMethod;
+    dbp.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
         myCachedCards = cachedCards;
         var ret = this._old_proRandomMethod(cachedCards, exceptCards, numberCards);
         return ret;
     };
 
-    FS.Dominion.DeckBuilder.Persistent.prototype._old_getRandomCards =
-        FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards;
-    FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards = function (opts, callback) {
+    dbp.prototype._old_getRandomCards = dbp.prototype.getRandomCards;
+    dbp.prototype.getRandomCards = function (opts, callback) {
         this._old_getRandomCards(opts, function (x) {
-            if (window.GokoSalvager.options.generator
-                    && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
+            if (gs.options.generator && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
                 sel.prompt(function (val) {
                     try {
                         var all = {};
                         myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
-                        var myret = myBuildDeck(all, window.GokoSalvager.set_parser.parse(val));
+                        var myret = myBuildDeck(all, gs.set_parser.parse(val));
                         if (myret) {
                             x = myret;
                         } else {

@@ -1,5 +1,30 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
-/*global $, _, FS, Goko */
+/*global $, _ */
+
+var loadAutokickModule;
+(function () {
+    "use strict";
+
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+
+    // Wait (non-blocking) until the required objects have been instantiated
+    var dbWait = setInterval(function () {
+        var gs, gso, zch;
+    
+        try {
+            gs = window.GokoSalvager;
+            gso = gs.options;
+            zch = window.FS.ZoneClassicHelper;
+        } catch (e) {}
+
+        if ([gso, zch].every(exists)) {
+            loadAutokickModule(gs, zch);
+            clearInterval(dbWait);
+        }
+    }, 100);
+}());
 
 /*
  * Auto kick module
@@ -12,21 +37,18 @@
  *   - rating-based auto kick enabled by options.autokick
  *   - personal black list auto kick enabled by options.blacklist
  */
-(function () {
+loadAutokickModule = function (gs, zch) {
     "use strict";
-
-    window.GokoSalvager = (window.GokoSalvager || {});
 
     var joinSound = document.createElement('div');
     joinSound.innerHTML = '<audio id="_joinSound" style="display: none;" src="sounds/startTurn.ogg"></audio>';
     document.getElementById('viewport').appendChild(joinSound);
-    FS.ZoneClassicHelper.prototype.old_onPlayerJoinTable =
-        FS.ZoneClassicHelper.prototype.onPlayerJoinTable;
-    FS.ZoneClassicHelper.prototype.onPlayerJoinTable = function (t, tp) {
+    zch.prototype.old_onPlayerJoinTable = zch.prototype.onPlayerJoinTable;
+    zch.prototype.onPlayerJoinTable = function (t, tp) {
         this.old_onPlayerJoinTable(t, tp);
         var p = tp.get('player');
 
-        if (window.GokoSalvager.options.autokick && this.isLocalOwner(t)) {
+        if (gs.options.autokick && this.isLocalOwner(t)) {
             var settings = JSON.parse(t.get("settings"));
             var pro = settings.ratingType === 'pro';
             var m = settings.name.toLowerCase().match(/\b(\d+)(\d{3}|k)\+/);
@@ -58,13 +80,13 @@
             }
         }
 
-        if (window.GokoSalvager.options.blacklist.indexOf(tp.getName()) > -1 && this.isLocalOwner(t)) {
+        if (gs.options.blacklist.indexOf(tp.getName()) > -1 && this.isLocalOwner(t)) {
             this.meetingRoom.conn.bootTable({
                 table: t.get('number'),
                 playerAddress: p.get('playerAddress')
             });
         }
     };
-}());
+};
 
 

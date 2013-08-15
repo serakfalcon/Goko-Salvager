@@ -1,26 +1,26 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
 /*global $, _, */
 
-var loadTableSavingModule, loadConfigurationModule;
+var loadTableSavingModule;
 (function () {
     "use strict";
-
-    window.GokoSalvager = window.GokoSalvager || {};
 
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
 
+    // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
-        var gs, etv, detv;
+        var gs, gso, etv, detv;
     
         try {
             gs = window.GokoSalvager;
+            gso = gs.options;
             etv = window.FS.EditTableView;
             detv = window.FS.DominionEditTableView;
         } catch (e) {}
 
-        if ([gs, etv, detv].every(exists)) {
+        if ([gso, etv, detv].every(exists)) {
             loadTableSavingModule(gs, etv, detv);
             clearInterval(waitLoop);
         }

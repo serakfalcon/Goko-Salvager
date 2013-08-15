@@ -9,16 +9,17 @@ var loadLogViewerModule;
         return (typeof obj !== 'undefined' && obj !== null);
     };
 
+    // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
         try {
-            window.GokoSalvager = window.GokoSalvager || {};
             var gs = window.GokoSalvager;
+            var gso = gs.options;
             var cbd_cards = window.FS.Dominion.CardBuilder.Data.cards;
             var lm = window.Dom.LogManager;
             var dw = window.Dom.DominionWindow;
             var dc = window.DominionClient;
 
-            if ([gs, cbd_cards, lm, dw, dc].every(exists)) {
+            if ([gs, gso, cbd_cards, lm, dw, dc].every(exists)) {
                 clearInterval(waitLoop);
                 loadLogViewerModule(gs, cbd_cards, lm, dw, dc);
             }
@@ -32,8 +33,6 @@ var loadLogViewerModule;
  */
 var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
     "use strict";   // JSLint setting
-
-    window.GokoSalvager = (window.GokoSalvager || {});
 
     var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, canonizeName;
 
@@ -405,12 +404,12 @@ var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
                 console.log(messageData.text);
 
                 if (messageData.text === "Dominion Online User Extension enabled (see goo.gl/4muRB)\nType \"#vpon\" before turn 5 to turn on point tracker.\nType \"#vpoff\" before turn 5 to disallow the point tracker.\n"
-                        && window.GokoSalvager.options.vpAlwaysOff
+                        && gs.options.vpAlwaysOff
                         && tablename.toUpperCase().indexOf("#VPON") === -1) {
                     sendVpOff = true;
                 }
 
-                if (window.GokoSalvager.options.vpEnabled && messageData.text.toUpperCase() === '#VPOFF' && (vpOn || !vpLocked)) {
+                if (gs.options.vpEnabled && messageData.text.toUpperCase() === '#VPOFF' && (vpOn || !vpLocked)) {
                     if (vpLocked) {
                         msgSend += 'Victory Point tracker setting locked\n';
                     } else {
@@ -418,7 +417,7 @@ var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
                         vpOn = false;
                         vpLocked = true;
                     }
-                } else if (window.GokoSalvager.options.vpEnabled && messageData.text.toUpperCase() === '#VPON' && !vpOn) {
+                } else if (gs.options.vpEnabled && messageData.text.toUpperCase() === '#VPON' && !vpOn) {
                     if (vpLocked) {
                         msgSend += 'Victory Point tracker setting locked\n';
                     } else {
@@ -427,7 +426,7 @@ var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
                         msgSend += 'Type "#vpoff" before turn 5 to disallow the point tracker.\n';
                         vpOn = true;
                     }
-                } else if (window.GokoSalvager.options.vpEnabled && messageData.text.toUpperCase() === '#VP?' && vpOn) {
+                } else if (gs.options.vpEnabled && messageData.text.toUpperCase() === '#VP?' && vpOn) {
                     msgSend += 'Current points: ' + vp_txt() + '\n';
                 }
             } else if (messageName === 'gameEvent2' && messageData.code === 'system.startGame') {
@@ -436,25 +435,25 @@ var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
                 if (tablename) {
                     tablename = tablename.toUpperCase();
                     msgSend += 'Dominion Online User Extension enabled (see goo.gl/4muRB)\n';
-                    if (window.GokoSalvager.options.vpEnabled && tablename.indexOf("#VPON") !== -1) {
+                    if (gs.options.vpEnabled && tablename.indexOf("#VPON") !== -1) {
                         msgSend += 'Victory Point tracker enabled and locked (see http://dom.retrobox.eu/vp.html)\n';
                         msgSend += 'Type "#vp?" at any time to display the score in the chat\n';
 
                         vpOn = true;
                         vpLocked = true;
-                    } else if (window.GokoSalvager.options.vpEnabled && tablename.indexOf("#VPOFF") !== -1) {
+                    } else if (gs.options.vpEnabled && tablename.indexOf("#VPOFF") !== -1) {
                         msgSend += 'Victory Point tracker disallowed and locked (see http://dom.retrobox.eu/vp.html)\n';
 
                         vpOn = false;
                         vpLocked = true;
-                    } else if (window.GokoSalvager.options.vpEnabled && window.GokoSalvager.options.vpAlwaysOn) {
+                    } else if (gs.options.vpEnabled && gs.options.vpAlwaysOn) {
                         sendVpOn = true;
-                    } else if (window.GokoSalvager.options.vpEnabled) {
+                    } else if (gs.options.vpEnabled) {
                         msgSend += 'Type "#vpon" before turn 5 to turn on point tracker.\n';
                         msgSend += 'Type "#vpoff" before turn 5 to disallow the point tracker.\n';
                     }
                 }
-            } else if (messageName === 'addLog' && messageData.text === 'Rating system: adventure' && window.GokoSalvager.options.adventurevp) {
+            } else if (messageName === 'addLog' && messageData.text === 'Rating system: adventure' && gs.options.adventurevp) {
                 vpOn = true;
             }
         } catch (e) {

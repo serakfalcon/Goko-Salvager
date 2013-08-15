@@ -9,23 +9,22 @@ var loadLobbyRatingsModule;
         return (typeof obj !== 'undefined' && obj !== null);
     };
 
+    // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
         try {
-            window.GokoSalvager = window.GokoSalvager || {};
-    
             var gs = window.GokoSalvager;
+            var gso = gs.options;
             var rh = window.FS.RatingHelper;
             var crv = window.FS.ClassicRoomView;
+            var mrs = window.FS.MeetingRoomSetting;
 
-            if ([gs, rh, crv].every(exists)) {
+            if ([gs, gso, rh, crv, mrs].every(exists)) {
                 clearInterval(waitLoop);
-                loadLobbyRatingsModule(gs, rh, crv);
+                loadLobbyRatingsModule(gs, rh, crv, mrs);
             }
         } catch (e) {}
     });
 }());
-
-
 
 /*
  * Lobby ratings module
@@ -34,14 +33,14 @@ var loadLobbyRatingsModule;
  * - getRating API specifics ($elPro and $elQuit trigger getting the pro ranking)
  * - class name of the player list rank element ('player-rank')
  * - format of the text content of the player list element ('username Rating: 1000')
+ * - FS.RatingHelper, FS.ClassicRoomView, FS.MeetingRoomSetting
  * Internal dependencies:
- * - pro rating display enabled by options.proranks
- * - sort by rating enabled by options.sortrating
- * - blacklisted players to be hidden set in options.blacklist
- * - insertInPlace()
- * - getRatingObject()
+ * - GokoSalvager.options:
+ *   - pro rating display enabled by options.proranks
+ *   - sort by rating enabled by options.sortrating
+ *   - blacklisted players to be hidden set in options.blacklist
  */
-var loadLobbyRatingsModule = function (gs, rh, crv) {
+var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
     "use strict";
     var insertInPlace, getSortablePlayerObjectFromElement;
 
@@ -74,7 +73,7 @@ var loadLobbyRatingsModule = function (gs, rh, crv) {
     crv.prototype.modifyDOM = function () {
         var originalRating = this.meetingRoom.options.ratingSystemId;
         if (gs.options.proranks) {
-            this.meetingRoom.options.ratingSystemId = FS.MeetingRoomSetting.ratingSystemPro;
+            this.meetingRoom.options.ratingSystemId = mrs.ratingSystemPro;
         }
         crv.prototype.old_modifyDOM.call(this);
         this.meetingRoom.options.ratingSystemId = originalRating;
