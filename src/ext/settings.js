@@ -1,50 +1,75 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
-/*global $, _, FS, Goko */
+/*global $, _, */
+
+var loadTableSavingModule, loadConfigurationModule;
+(function () {
+    "use strict";
+
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+
+    var waitLoop = setInterval(function () {
+        try {
+            window.GokoSalvager = window.GokoSalvager || {};
+    
+            var gs = window.GokoSalvager;
+            var etv = window.FS.EditTableView;
+            var detv = window.FS.DominionEditTableView;
+            var ls = window.Templates.LaunchScreen;
+    
+            if ([gs, etv, detv, ls].every(exists)) {
+                clearInterval(waitLoop);
+                loadTableSavingModule(gs, etv, detv);
+                loadConfigurationModule(gs, ls);
+            }
+        } catch (e) {}
+    });
+}());
 
 /*
  * Saving table name and settings module
  */
-(function () {
+loadTableSavingModule = function (gs, etv, detv) {
     "use strict";
 
-    window.GokoSalvager = window.GokoSalvager || {};
-    window.GokoSalvager.options = {};
+    gs.options = {};
 
-    FS.EditTableView.prototype.old_modifyDOM = FS.EditTableView.prototype.modifyDOM;
-    FS.EditTableView.prototype.modifyDOM = function () {
+    etv.prototype.old_modifyDOM = etv.prototype.modifyDOM;
+    etv.prototype.modifyDOM = function () {
         var create = !_.isNumber(this.tableIndex);
-        var lasttablename = this.$tableName.val() || window.GokoSalvager.options.lasttablename;
-        window.GokoSalvager.options.lasttablename = lasttablename;
-        window.GokoSalvager.options_save();
-        FS.EditTableView.prototype.old_modifyDOM.call(this);
+        var lasttablename = this.$tableName.val() || gs.options.lasttablename;
+        gs.options.lasttablename = lasttablename;
+        gs.options_save();
+        etv.prototype.old_modifyDOM.call(this);
         if (create && lasttablename) {
             this.$tableName.val(lasttablename);
         }
     };
 
     var firstCreateTable = true;
-    FS.DominionEditTableView.prototype.old_modifyDOM = FS.DominionEditTableView.prototype.modifyDOM;
-    FS.DominionEditTableView.prototype.modifyDOM = function () {
+    detv.prototype.old_modifyDOM = detv.prototype.modifyDOM;
+    detv.prototype.modifyDOM = function () {
         var create = !_.isNumber(this.tableIndex);
         if (create && firstCreateTable) {
-            if (window.GokoSalvager.options.cacheSettings) {
-                this.cacheSettings = window.GokoSalvager.options.cacheSettings;
+            if (gs.options.cacheSettings) {
+                this.cacheSettings = gs.options.cacheSettings;
             }
             firstCreateTable = false;
         }
-        FS.DominionEditTableView.prototype.old_modifyDOM.call(this);
+        detv.prototype.old_modifyDOM.call(this);
     };
 
-    FS.DominionEditTableView.prototype.old_retriveDOM = FS.DominionEditTableView.prototype.retriveDOM;
-    FS.DominionEditTableView.prototype.retriveDOM = function () {
-        var ret = FS.DominionEditTableView.prototype.old_retriveDOM.call(this);
+    detv.prototype.old_retriveDOM = detv.prototype.retriveDOM;
+    detv.prototype.retriveDOM = function () {
+        var ret = detv.prototype.old_retriveDOM.call(this);
         if (ret) {
-            window.GokoSalvager.options.cacheSettings = this.cacheSettings;
-            window.GokoSalvager.options_save();
+            gs.options.cacheSettings = this.cacheSettings;
+            gs.options_save();
         }
         return ret;
     };
-}());
+};
 
 /*
  * GokoSalvager Configuration module
@@ -54,7 +79,7 @@
  *   - Format of the main screen layout template: FS.Templates.LaunchScreen.MAIN
  * Internal dependencies: none
  */
-(function () {
+var loadConfigurationModule = function (gs, ls) {
     "use strict";
 
     var default_options = {
@@ -71,21 +96,18 @@
         blacklist: [""]
     };
 
-    // Need this to be global so that other blocks and scripts can use it
-    window.GokoSalvager = (window.GokoSalvager || {});
-
-    window.GokoSalvager.options_save = function () {
-        localStorage.salvagerOptions = JSON.stringify(window.GokoSalvager.options);
+    gs.options_save = function () {
+        localStorage.salvagerOptions = JSON.stringify(gs.options);
     };
 
-    window.GokoSalvager.options_load = function () {
+    gs.options_load = function () {
         if (localStorage.salvagerOptions) {
-            window.GokoSalvager.options = JSON.parse(localStorage.salvagerOptions);
+            gs.options = JSON.parse(localStorage.salvagerOptions);
         }
         var o;
         for (o in default_options) {
-            if (!(window.GokoSalvager.options.hasOwnProperty(o))) {
-                window.GokoSalvager.options[o] = default_options[o];
+            if (!(gs.options.hasOwnProperty(o))) {
+                gs.options[o] = default_options[o];
             }
         }
     };
@@ -116,28 +138,28 @@
         optwin.innerHTML = h;
         document.getElementById('viewport').appendChild(optwin);
         //    $('#optform input[name="opt"]').val('Aha');
-        $('#optform input[name="autokick"]').prop('checked', window.GokoSalvager.options.autokick);
-        $('#optform input[name="generator"]').prop('checked', window.GokoSalvager.options.generator);
-        $('#optform input[name="proranks"]').prop('checked', window.GokoSalvager.options.proranks);
-        $('#optform input[name="sort-rating"]').prop('checked', window.GokoSalvager.options.sortrating);
-        $('#optform input[name="always-stack"]').prop('checked', window.GokoSalvager.options.alwaysStack);
-        $('#optform input[name="vp-enabled"]').prop('checked', window.GokoSalvager.options.vpEnabled);
-        $('#optform input[name="vp-always-on"]').prop('checked', window.GokoSalvager.options.vpAlwaysOn);
-        $('#optform input[name="vp-always-off"]').prop('checked', window.GokoSalvager.options.vpAlwaysOff);
-        $('#optform input[name="adventurevp"]').prop('checked', window.GokoSalvager.options.adventurevp);
-        $('#optform textarea').val(window.GokoSalvager.options.blacklist.join("\n"));
+        $('#optform input[name="autokick"]').prop('checked', gs.options.autokick);
+        $('#optform input[name="generator"]').prop('checked', gs.options.generator);
+        $('#optform input[name="proranks"]').prop('checked', gs.options.proranks);
+        $('#optform input[name="sort-rating"]').prop('checked', gs.options.sortrating);
+        $('#optform input[name="always-stack"]').prop('checked', gs.options.alwaysStack);
+        $('#optform input[name="vp-enabled"]').prop('checked', gs.options.vpEnabled);
+        $('#optform input[name="vp-always-on"]').prop('checked', gs.options.vpAlwaysOn);
+        $('#optform input[name="vp-always-off"]').prop('checked', gs.options.vpAlwaysOff);
+        $('#optform input[name="adventurevp"]').prop('checked', gs.options.adventurevp);
+        $('#optform textarea').val(gs.options.blacklist.join("\n"));
         document.getElementById('optform').onsubmit = function () {
-            window.GokoSalvager.options.autokick = $('#optform input[name="autokick"]').prop('checked');
-            window.GokoSalvager.options.generator = $('#optform input[name="generator"]').prop('checked');
-            window.GokoSalvager.options.proranks = $('#optform input[name="proranks"]').prop('checked');
-            window.GokoSalvager.options.sortrating = $('#optform input[name="sort-rating"]').prop('checked');
-            window.GokoSalvager.options.alwaysStack = $('#optform input[name="always-stack"]').prop('checked');
-            window.GokoSalvager.options.vpEnabled = $('#optform input[name="vp-enabled"]').prop('checked');
-            window.GokoSalvager.options.vpAlwaysOn = $('#optform input[name="vp-always-on"]').prop('checked');
-            window.GokoSalvager.options.vpAlwaysOff = $('#optform input[name="vp-always-off"]').prop('checked');
-            window.GokoSalvager.options.adventurevp = $('#optform input[name="adventurevp"]').prop('checked');
-            window.GokoSalvager.options.blacklist = $('#optform textarea[name="blacklist"]').val().split("\n");
-            window.GokoSalvager.options_save();
+            gs.options.autokick = $('#optform input[name="autokick"]').prop('checked');
+            gs.options.generator = $('#optform input[name="generator"]').prop('checked');
+            gs.options.proranks = $('#optform input[name="proranks"]').prop('checked');
+            gs.options.sortrating = $('#optform input[name="sort-rating"]').prop('checked');
+            gs.options.alwaysStack = $('#optform input[name="always-stack"]').prop('checked');
+            gs.options.vpEnabled = $('#optform input[name="vp-enabled"]').prop('checked');
+            gs.options.vpAlwaysOn = $('#optform input[name="vp-always-on"]').prop('checked');
+            gs.options.vpAlwaysOff = $('#optform input[name="vp-always-off"]').prop('checked');
+            gs.options.adventurevp = $('#optform input[name="adventurevp"]').prop('checked');
+            gs.options.blacklist = $('#optform textarea[name="blacklist"]').val().split("\n");
+            gs.options_save();
             $('#usersettings').hide();
             return false;
         };
@@ -162,8 +184,8 @@
 
         vpEnabledClicked();
     }
-    window.GokoSalvager.options_load();
+    gs.options_load();
     options_window();
-    FS.Templates.LaunchScreen.MAIN = FS.Templates.LaunchScreen.MAIN.replace('Logout</a>',
+    ls.MAIN = ls.MAIN.replace('Logout</a>',
             'Logout</a><div onClick="$(\'#usersettings\').show()" class="fs-lg-settings-btn">User Settings</div>');
-}());
+};
