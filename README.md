@@ -13,17 +13,17 @@ Installation
 
 Contributing
 ------------
-We're using the [Feature Branch
-Workflow](https://www.atlassian.com/git/workflows#!workflow-feature-branch) model. [This](https://github.com/aiannacc/Goko-Salvager) is the
-central repository. 
+If you'd like to contribute, either fork this project and submit your changes via pull request, or ask [aiannacc](https://github.com/aiannacc) to make you a collaborator. [This](https://github.com/aiannacc/Goko-Salvager) is the project's central repository.
 
-In brief, if you want to fix a bug or add a feature:
+If you become a collaborator, please follow the [Feature Branch
+Workflow](https://www.atlassian.com/git/workflows#!workflow-feature-branch) model. In brief:
+
 1. Create a new branch from master
-2. Make and test your changes
+2. Make and test your changes locally
 3. Create a pull request that merges your branch into master
 4. Ask a collaborator to verify your changes and handle the pull request
 
-If you'd like to contribute, you can fork this project, make changes, and submit a pull request, or you can ask [aiannacc](https://github.com/aiannacc) to make you a collaborator. Github collaborators can all push changes to the same collaborative project.
+We have rake tasks for building and testing the extension. Running `rake firefox:build` will generate the firefox .xpi file, and there are similar tasks for Chrome and Safari. They all require Ruby (for rake) and a \*nix environment, but you'll also need the [Firefox Add-On SDK]() to build for Firefox. Building for Safari is a little more involved. See `tasks/safari.rake` and the blog it links to for more information.
 
 Contributors
 ------------
