@@ -23,7 +23,7 @@ Workflow](https://www.atlassian.com/git/workflows#!workflow-feature-branch) mode
 3. Create a pull request that merges your branch into master
 4. Ask a collaborator to verify your changes and handle the pull request
 
-We have rake tasks for building and testing the extension. Running `rake firefox:build` will generate the firefox .xpi file, and there are similar tasks for Chrome and Safari. They all require Ruby (for rake) and a \*nix environment, but you'll also need the [Firefox Add-On SDK]() to build for Firefox. Building for Safari is a little more involved. See `tasks/safari.rake` and the blog it links to for more information.
+We have rake tasks for building and testing the extension. Running `rake firefox:build` will generate the firefox .xpi file, and there are similar tasks for Chrome and Safari. They all require Ruby (for rake) and a \*nix environment, but you'll also need the [Firefox Add-On SDK](https://addons.mozilla.org/en-US/developers/docs/sdk/latest/) to build for Firefox. Building for Safari is a little more involved. See `tasks/safari.rake` and the blog it links to for more information.
 
 Contributors
 ------------
