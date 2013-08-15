@@ -10,21 +10,23 @@ var loadTableSavingModule, loadConfigurationModule;
     };
 
     var waitLoop = setInterval(function () {
+        var gs, etv, detv, ls, lrow;
+        window.GokoSalvager = window.GokoSalvager || {};
+    
         try {
-            window.GokoSalvager = window.GokoSalvager || {};
-    
-            var gs = window.GokoSalvager;
-            var etv = window.FS.EditTableView;
-            var detv = window.FS.DominionEditTableView;
-            var ls = window.Templates.LaunchScreen;
-    
-            if ([gs, etv, detv, ls].every(exists)) {
-                clearInterval(waitLoop);
-                loadTableSavingModule(gs, etv, detv);
-                loadConfigurationModule(gs, ls);
-            }
+            gs = window.GokoSalvager;
+            etv = window.FS.EditTableView;
+            detv = window.FS.DominionEditTableView;
+            ls = window.FS.Templates.LaunchScreen;
+            lrow = $('.fs-rs-logout-row')[0];
         } catch (e) {}
-    });
+
+        if ([gs, etv, detv, ls, lrow].every(exists)) {
+            loadTableSavingModule(gs, etv, detv);
+            loadConfigurationModule(gs, ls, lrow);
+            clearInterval(waitLoop);
+        }
+    }, 100);
 }());
 
 /*
@@ -79,7 +81,7 @@ loadTableSavingModule = function (gs, etv, detv) {
  *   - Format of the main screen layout template: FS.Templates.LaunchScreen.MAIN
  * Internal dependencies: none
  */
-var loadConfigurationModule = function (gs, ls) {
+var loadConfigurationModule = function (gs, ls, lrow) {
     "use strict";
 
     var default_options = {
@@ -186,6 +188,10 @@ var loadConfigurationModule = function (gs, ls) {
     }
     gs.options_load();
     options_window();
-    ls.MAIN = ls.MAIN.replace('Logout</a>',
-            'Logout</a><div onClick="$(\'#usersettings\').show()" class="fs-lg-settings-btn">User Settings</div>');
+
+    $('.fs-rs-logout-row').append(
+        $('<div></div>').addClass('fs-lg-settings-btn')
+                        .html('User Settings')
+                        .click(function () { $('#usersettings').show(); })
+    );
 };
