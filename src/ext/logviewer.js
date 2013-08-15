@@ -1,17 +1,43 @@
 /*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
-/*global jQuery, _, $, Audio, Dom, FS, DominionClient, Goko */
+/*global jQuery, _, $, Audio */
+
+var loadLogViewerModule;
+(function () {
+    "use strict";
+
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+
+    var waitLoop = setInterval(function () {
+        try {
+            window.GokoSalvager = window.GokoSalvager || {};
+            var gs = window.GokoSalvager;
+            var cbd_cards = window.FS.Dominion.CardBuilder.Data.cards;
+            var lm = window.Dom.LogManager;
+            var dw = window.Dom.DominionWindow;
+            var dc = window.DominionClient;
+
+            if ([gs, cbd_cards, lm, dw, dc].every(exists)) {
+                clearInterval(waitLoop);
+                loadLogViewerModule(gs, cbd_cards, lm, dw, dc);
+            }
+        } catch (e) {}
+    });
+}());
+
 
 /*
  * Log viewer module
  */
-(function () {
+var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
     "use strict";   // JSLint setting
 
     window.GokoSalvager = (window.GokoSalvager || {});
 
     var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, canonizeName;
 
-    if (Dom.LogManager.prototype.old_addLog) {
+    if (lm.prototype.old_addLog) {
         var msg = 'More than one Dominion User Extension detected.\n'
                 + 'Please uninstall or disable one of them.';
         console.err(msg);
@@ -35,16 +61,16 @@
     var possessed;
     var newLogHide = true;
 
-    Dom.DominionWindow.prototype._old_updateState = Dom.DominionWindow.prototype._updateState;
-    Dom.DominionWindow.prototype._updateState = function (opt) {
+    dw.prototype._old_updateState = dw.prototype._updateState;
+    dw.prototype._updateState = function (opt) {
         if (opt.dominionPhase) {
             newPhase = opt.dominionPhase;
         }
         this._old_updateState(opt);
     };
 
-    Dom.LogManager.prototype.old_addLog = Dom.LogManager.prototype.addLog;
-    Dom.LogManager.prototype.addLog = function (opt) {
+    lm.prototype.old_addLog = lm.prototype.addLog;
+    lm.prototype.addLog = function (opt) {
         if (opt.logUrl) {
             opt.logUrl = 'http://dom.retrobox.eu/?' + opt.logUrl.substr(29);
         }
@@ -174,7 +200,7 @@
     }
 
     var types = {};
-    FS.Dominion.CardBuilder.Data.cards.map(function (card) {
+    cbd_cards.map(function (card) {
         types[card.name[0]] = card.type;
     });
 
@@ -349,8 +375,8 @@
         }
         return ret.sort().join(', ');
     }
-    Dom.DominionWindow.prototype._old_moveCards = Dom.DominionWindow.prototype._moveCards;
-    Dom.DominionWindow.prototype._moveCards = function (options, callback) {
+    dw.prototype._old_moveCards = dw.prototype._moveCards;
+    dw.prototype._moveCards = function (options, callback) {
         var m = options.moves;
         try {
             for (i = 0; i < m.length; i += 1) {
@@ -365,8 +391,8 @@
         this._old_moveCards(options, callback);
     };
 
-    var old_onIncomingMessage = DominionClient.prototype.onIncomingMessage;
-    DominionClient.prototype.onIncomingMessage = function (messageName, messageData, message) {
+    var old_onIncomingMessage = dc.prototype.onIncomingMessage;
+    dc.prototype.onIncomingMessage = function (messageName, messageData, message) {
         var msgSend = "", sendVpOn = false, sendVpOff = false, tablename = "";
 
         try {
@@ -447,4 +473,4 @@
 
         old_onIncomingMessage.call(this, messageName, messageData, message);
     };
-}());
+};
