@@ -15,7 +15,7 @@ var loadLogViewerModule;
     var waitLoop = setInterval(function () {
         try {
             var gs = window.GokoSalvager;
-            var gso = gs.options_load;
+            var gso = gs.get_option;
             var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
             var lm = window.Dom.LogManager;
             var dw = window.Dom.DominionWindow;
@@ -406,12 +406,12 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                 console.log(messageData.text);
 
                 if (messageData.text === "Dominion Online User Extension enabled (see goo.gl/4muRB)\nType \"#vpon\" before turn 5 to turn on point tracker.\nType \"#vpoff\" before turn 5 to disallow the point tracker.\n"
-                        && gs.options.vpAlwaysOff
+                        && gs.get_option('vpAlwaysOff')
                         && tablename.toUpperCase().indexOf("#VPON") === -1) {
                     sendVpOff = true;
                 }
 
-                if (gs.options.vpEnabled && messageData.text.toUpperCase() === '#VPOFF' && (vpOn || !vpLocked)) {
+                if (gs.get_option('vpEnabled') && messageData.text.toUpperCase() === '#VPOFF' && (vpOn || !vpLocked)) {
                     if (vpLocked) {
                         msgSend += 'Victory Point tracker setting locked\n';
                     } else {
@@ -419,7 +419,7 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                         vpOn = false;
                         vpLocked = true;
                     }
-                } else if (gs.options.vpEnabled && messageData.text.toUpperCase() === '#VPON' && !vpOn) {
+                } else if (gs.get_option('vpEnabled') && messageData.text.toUpperCase() === '#VPON' && !vpOn) {
                     if (vpLocked) {
                         msgSend += 'Victory Point tracker setting locked\n';
                     } else {
@@ -428,7 +428,7 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                         msgSend += 'Type "#vpoff" before turn 5 to disallow the point tracker.\n';
                         vpOn = true;
                     }
-                } else if (gs.options.vpEnabled && messageData.text.toUpperCase() === '#VP?' && vpOn) {
+                } else if (gs.get_option('vpEnabled') && messageData.text.toUpperCase() === '#VP?' && vpOn) {
                     msgSend += 'Current points: ' + vp_txt() + '\n';
                 }
             } else if (messageName === 'gameEvent2' && messageData.code === 'system.startGame') {
@@ -437,25 +437,25 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                 if (tablename) {
                     tablename = tablename.toUpperCase();
                     msgSend += 'Dominion Online User Extension enabled (see goo.gl/4muRB)\n';
-                    if (gs.options.vpEnabled && tablename.indexOf("#VPON") !== -1) {
+                    if (gs.get_option('vpEnabled') && tablename.indexOf("#VPON") !== -1) {
                         msgSend += 'Victory Point tracker enabled and locked (see http://dom.retrobox.eu/vp.html)\n';
                         msgSend += 'Type "#vp?" at any time to display the score in the chat\n';
 
                         vpOn = true;
                         vpLocked = true;
-                    } else if (gs.options.vpEnabled && tablename.indexOf("#VPOFF") !== -1) {
+                    } else if (gs.get_option('vpEnabled') && tablename.indexOf("#VPOFF") !== -1) {
                         msgSend += 'Victory Point tracker disallowed and locked (see http://dom.retrobox.eu/vp.html)\n';
 
                         vpOn = false;
                         vpLocked = true;
-                    } else if (gs.options.vpEnabled && gs.options.vpAlwaysOn) {
+                    } else if (gs.get_option('vpEnabled') && gs.get_option('vpAlwaysOn')) {
                         sendVpOn = true;
-                    } else if (gs.options.vpEnabled) {
+                    } else if (gs.get_option('vpEnabled')) {
                         msgSend += 'Type "#vpon" before turn 5 to turn on point tracker.\n';
                         msgSend += 'Type "#vpoff" before turn 5 to disallow the point tracker.\n';
                     }
                 }
-            } else if (messageName === 'addLog' && messageData.text === 'Rating system: adventure' && gs.options.adventurevp) {
+            } else if (messageName === 'addLog' && messageData.text === 'Rating system: adventure' && gs.get_option('adventurevp')) {
                 vpOn = true;
             }
         } catch (e) {

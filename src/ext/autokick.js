@@ -17,7 +17,7 @@ var loadAutokickModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options_load;
+            gso = gs.get_option;
             zch = window.FS.ZoneClassicHelper;
         } catch (e) {}
 
@@ -37,8 +37,8 @@ var loadAutokickModule;
  *   - onPlayerJoinTable API
  *   - lot of other APIs (bootTable, table settings, isLocalOwner)
  * Internal dependencies
- *   - rating-based auto kick enabled by options.autokick
- *   - personal black list auto kick enabled by options.blacklist
+ *   - option: autokick
+ *   - option: blacklist
  */
 loadAutokickModule = function (gs, zch) {
     "use strict";
@@ -51,7 +51,7 @@ loadAutokickModule = function (gs, zch) {
         this.old_onPlayerJoinTable(t, tp);
         var p = tp.get('player');
 
-        if (gs.options.autokick && this.isLocalOwner(t)) {
+        if (gs.get_option('autokick') && this.isLocalOwner(t)) {
             var settings = JSON.parse(t.get("settings"));
             var pro = settings.ratingType === 'pro';
             var m = settings.name.toLowerCase().match(/\b(\d+)(\d{3}|k)\+/);
@@ -83,7 +83,7 @@ loadAutokickModule = function (gs, zch) {
             }
         }
 
-        if (gs.options.blacklist.indexOf(tp.getName()) > -1 && this.isLocalOwner(t)) {
+        if (gs.get_option('blacklist').indexOf(tp.getName()) > -1 && this.isLocalOwner(t)) {
             this.meetingRoom.conn.bootTable({
                 table: t.get('number'),
                 playerAddress: p.get('playerAddress')

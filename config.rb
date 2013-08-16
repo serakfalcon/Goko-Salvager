@@ -39,8 +39,10 @@
 
     # JS scripts for Goko to load, in order
     :js => [
+        'externals.js',
         'settings.js',
         'kingdom_generator.js',
+        'settingsDialog.js',
         'userSettings.js',
         'tableState.js',
         'autokick.js',
@@ -53,5 +55,8 @@
         'automatchSeekPop.js',
         'automatch.js'
     ],
-    :css => ['logviewer.css']
+    :css => [
+        'logviewer.css',
+        'jquery-smoothness.css'
+    ]
 }

@@ -18,7 +18,7 @@ var loadAutomatchModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options_load;
+            gso = gs.get_option;
             conn = window.FS.Connection;
         } catch (e) {}
 

@@ -15,7 +15,7 @@ var loadAvatarModule;
     var waitLoop = setInterval(function () {
         try {
             var gs = window.GokoSalvager;
-            var gso = gs.options_load;
+            var gso = gs.get_option;
             var gp = window.Goko.Player;
             var ls = window.FS.Templates.LaunchScreen;
 

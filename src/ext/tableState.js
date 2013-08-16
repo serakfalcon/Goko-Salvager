@@ -17,7 +17,7 @@ var loadTableSavingModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options_load;
+            gso = gs.get_option;
             etv = window.FS.EditTableView;
             detv = window.FS.DominionEditTableView;
         } catch (e) {}
@@ -39,9 +39,8 @@ loadTableSavingModule = function (gs, etv, detv) {
     etv.prototype.old_modifyDOM = etv.prototype.modifyDOM;
     etv.prototype.modifyDOM = function () {
         var create = !_.isNumber(this.tableIndex);
-        var lasttablename = this.$tableName.val() || gs.options.lasttablename;
-        gs.options.lasttablename = lasttablename;
-        gs.options_save();
+        var lasttablename = this.$tableName.val() || gs.get_option('lasttablename');
+        gs.set_option('lasttablename', lasttablename);
         etv.prototype.old_modifyDOM.call(this);
         if (create && lasttablename) {
             this.$tableName.val(lasttablename);
@@ -53,8 +52,8 @@ loadTableSavingModule = function (gs, etv, detv) {
     detv.prototype.modifyDOM = function () {
         var create = !_.isNumber(this.tableIndex);
         if (create && firstCreateTable) {
-            if (gs.options.cacheSettings) {
-                this.cacheSettings = gs.options.cacheSettings;
+            if (gs.get_option('cacheSettings')) {
+                this.cacheSettings = gs.get_option('cacheSettings');
             }
             firstCreateTable = false;
         }
@@ -65,8 +64,7 @@ loadTableSavingModule = function (gs, etv, detv) {
     detv.prototype.retriveDOM = function () {
         var ret = detv.prototype.old_retriveDOM.call(this);
         if (ret) {
-            gs.options.cacheSettings = this.cacheSettings;
-            gs.options_save();
+            gs.set_option('cacheSettings', this.cacheSettings);
         }
         return ret;
     };

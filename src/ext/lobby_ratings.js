@@ -15,7 +15,7 @@ var loadLobbyRatingsModule;
     var waitLoop = setInterval(function () {
         try {
             var gs = window.GokoSalvager;
-            var gso = gs.options_load;
+            var gso = gs.get_option;
             var rh = window.FS.RatingHelper;
             var crv = window.FS.ClassicRoomView;
             var mrs = window.FS.MeetingRoomSetting;
@@ -38,10 +38,9 @@ var loadLobbyRatingsModule;
  * - format of the text content of the player list element ('username Rating: 1000')
  * - FS.RatingHelper, FS.ClassicRoomView, FS.MeetingRoomSetting
  * Internal dependencies:
- * - GokoSalvager.options:
- *   - pro rating display enabled by options.proranks
- *   - sort by rating enabled by options.sortrating
- *   - blacklisted players to be hidden set in options.blacklist
+ * - option: proranks
+ * - option: sortrating
+ * - option: blacklist
  */
 var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
     "use strict";
@@ -54,16 +53,16 @@ var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
             playerElement = opts.$el.closest('li')[0];
             newCallback = function (resp) {
                 callback(resp);
-                if (gs.options.sortrating) {
+                if (gs.get_option('sortrating')) {
                     insertInPlace(playerElement);
                 }
-                if (gs.options.blacklist.indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
+                if (gs.get_option('blacklist').indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
                     $(playerElement).hide();
                 } else {
                     $(playerElement).show();
                 }
             };
-            if (gs.options.proranks) {
+            if (gs.get_option('proranks')) {
                 opts.$elPro = opts.$el;
                 opts.$elQuit = $(document.createElement('div'));
                 delete opts.$el;
@@ -75,7 +74,7 @@ var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
     crv.prototype.old_modifyDOM = crv.prototype.modifyDOM;
     crv.prototype.modifyDOM = function () {
         var originalRating = this.meetingRoom.options.ratingSystemId;
-        if (gs.options.proranks) {
+        if (gs.get_option('proranks')) {
             this.meetingRoom.options.ratingSystemId = mrs.ratingSystemPro;
         }
         crv.prototype.old_modifyDOM.call(this);

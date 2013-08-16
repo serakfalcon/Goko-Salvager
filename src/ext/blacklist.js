@@ -17,7 +17,7 @@ var loadBlacklistModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options_load;
+            gso = gs.get_option;
             mr = window.FS.MeetingRoom;
             ctv = window.FS.ClassicTableView;
         } catch (e) {}
@@ -40,7 +40,7 @@ loadBlacklistModule = function (gs, mr, ctv) {
     mr.prototype.onRoomChat = function (resp) {
         var player = this.playerList.findByAddress(resp.data.playerAddress).getName();
 
-        if (gs.options.blacklist.indexOf(player) > -1) {
+        if (gs.get_option('blacklist').indexOf(player) > -1) {
             return;
         }
 
@@ -57,7 +57,7 @@ loadBlacklistModule = function (gs, mr, ctv) {
             players = this.model.getJoinedPlayers();
             _(players).each(function (player, index, list) {
                 name = player.getName();
-                if (gs.options.blacklist.indexOf(name) > -1 && this.model && this.model.view && this.model.view.$el) {
+                if (gs.get_option('blacklist').indexOf(name) > -1 && this.model && this.model.view && this.model.view.$el) {
                     blacklisted = true;
                 }
                 if (name === this.meetingRoom.getLocalPlayer().getName()) {

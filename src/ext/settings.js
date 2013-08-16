@@ -13,37 +13,39 @@ var loadConfigurationModule = function (gs) {
     var default_options = {
         version: 2.2,
         autokick: true,
-        autoautomatch: null,
         generator: true,
         proranks: true,
         sortrating: true,
         adventurevp: true,
-        vpEnabled: true,
-        vpAlwaysOn: false,
-        vpAlwaysOff: false,
-        alwaysStack: false,
-        blacklist: [""]
+        vp_enabled: true,
+        vp_always_on: false,
+        vp_always_off: false,
+        always_stack: false,
+        blacklist: []
     };
 
-    gs.options_save = function () {
-        localStorage.salvagerOptions = JSON.stringify(gs.options);
-    };
-
-    gs.options_load = function () {
-        if (localStorage.salvagerOptions) {
-            gs.options = JSON.parse(localStorage.salvagerOptions);
-        }
-        var o;
-        for (o in default_options) {
-            if (!(gs.options.hasOwnProperty(o))) {
-                gs.options[o] = default_options[o];
-            }
+    gs.get_options = function () {
+        try {
+            return JSON.parse(localStorage.salvagerOptions);
+        } catch (e) {
+            gs.set_options(default_options);
+            return gs.get_options();
         }
     };
 
+    gs.set_options = function (options) {
+        localStorage.salvagerOptions = JSON.stringify(options);
+    };
 
+    gs.get_option = function (optName) {
+        return gs.get_options()[optName];
+    };
 
-    console.log('Done loading configuration module.');
+    gs.set_option = function (optionName, optionValue) {
+        var opts = gs.get_options();
+        opts[optionName] = optionValue;
+        gs.set_options(opts);
+    };
 };
 
 (function () {

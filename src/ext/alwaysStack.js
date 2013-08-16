@@ -18,7 +18,7 @@ var loadAlwaysStackModule;
         
         try {
             gs = window.GokoSalvager;
-            gso = gs.options_load;
+            gso = gs.get_option;
             csp = window.FS.Cards.CardStackPanel;
         } catch (e) {}
 
@@ -37,14 +37,14 @@ var loadAlwaysStackModule;
 // Goko dependencies:
 // - addView API (setting stackCards in that function, value of autoStackCards)
 // Internal dependencies:
-// - options.alwaysStack
+// - option: alwaysStack
 //
 loadAlwaysStackModule = function (gs, csp) {
     "use strict";
     csp.prototype.old_addView = csp.prototype.addView;
     csp.prototype.addView = function (view, index) {
         var ret = this.old_addView(view, index);
-        if (gs.options.alwaysStack && this.autoStackCards) {
+        if (gs.get_option('alwaysStack') && this.autoStackCards) {
             this.stackCards = true;
         }
         return ret;

@@ -20,7 +20,7 @@ var loadKingdomGenerator;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options_load;
+            gso = gs.get_option;
             db = window.FS.Dominion.DeckBuilder;
             dbp = window.FS.Dominion.DeckBuilder.Persistent;
             detv = window.FS.DominionEditTableView;
@@ -412,7 +412,7 @@ loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     dbp.prototype._old_getRandomCards = dbp.prototype.getRandomCards;
     dbp.prototype.getRandomCards = function (opts, callback) {
         this._old_getRandomCards(opts, function (x) {
-            if (gs.options.generator && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
+            if (gs.get_option('generator') && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
                 sel.prompt(function (val) {
                     try {
                         var all = {};
