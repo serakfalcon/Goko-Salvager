@@ -9,14 +9,16 @@ var loadUserSettingsModule;
 
     // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
-        var gs, gso;
+        var gs, gso, ang;
         try {
             gs = window.GokoSalvager;
             gso = gs.get_option;
         } catch (e) {}
 
         if ($('.fs-rs-logout-row').length > 0
-                && typeof gso !== 'undefined' && gso !== null) {
+                && typeof gso !== 'undefined' && gso !== null
+                && typeof window.angular !== 'undefined'
+                && typeof $('div').dialog !== 'undefined') {
             console.log('Loading User Settings module');
             loadUserSettingsModule(gs);
             clearInterval(waitLoop);
