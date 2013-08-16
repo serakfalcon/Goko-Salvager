@@ -5,6 +5,8 @@ var loadLobbyRatingsModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load Lobby Ratings module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -13,17 +15,18 @@ var loadLobbyRatingsModule;
     var waitLoop = setInterval(function () {
         try {
             var gs = window.GokoSalvager;
-            var gso = gs.options;
+            var gso = gs.options_load;
             var rh = window.FS.RatingHelper;
             var crv = window.FS.ClassicRoomView;
             var mrs = window.FS.MeetingRoomSetting;
 
             if ([gs, gso, rh, crv, mrs].every(exists)) {
+                console.log('Loading Lobby Ratings module');
                 clearInterval(waitLoop);
                 loadLobbyRatingsModule(gs, rh, crv, mrs);
             }
         } catch (e) {}
-    });
+    }, 100);
 }());
 
 /*

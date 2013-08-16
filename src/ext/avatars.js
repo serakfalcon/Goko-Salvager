@@ -5,6 +5,8 @@ var loadAvatarModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load Avatar module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -13,16 +15,17 @@ var loadAvatarModule;
     var waitLoop = setInterval(function () {
         try {
             var gs = window.GokoSalvager;
-            var gso = gs.options;
+            var gso = gs.options_load;
             var gp = window.Goko.Player;
-            var ls = window.Goko.Templates.LaunchScreen;
+            var ls = window.FS.Templates.LaunchScreen;
 
             if ([gs, gso, gp, ls].every(exists)) {
+                console.log('Loading Avatar module');
                 clearInterval(waitLoop);
                 loadAvatarModule(gs, gp, ls);
             }
         } catch (e) {}
-    });
+    }, 100);
 }());
 
 /*

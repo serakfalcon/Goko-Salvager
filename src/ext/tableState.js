@@ -5,6 +5,8 @@ var loadTableSavingModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load table state module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -15,12 +17,13 @@ var loadTableSavingModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
+            gso = gs.options_load;
             etv = window.FS.EditTableView;
             detv = window.FS.DominionEditTableView;
         } catch (e) {}
 
         if ([gso, etv, detv].every(exists)) {
+            console.log('Loading table state module');
             loadTableSavingModule(gs, etv, detv);
             clearInterval(waitLoop);
         }

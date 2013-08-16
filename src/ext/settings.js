@@ -1,20 +1,13 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
 /*global $, _, */
 
-var loadConfigurationModule;
-(function () {
-    "use strict";
-    window.GokoSalvager = window.GokoSalvager || {};
-    loadConfigurationModule(window.GokoSalvager);
-}());
-
 /*
  * GokoSalvager Configuration module
  *
  * Goko dependencies: none
  * Internal dependencies: none
  */
-loadConfigurationModule = function (gs) {
+var loadConfigurationModule = function (gs) {
     "use strict";
 
     var default_options = {
@@ -47,4 +40,15 @@ loadConfigurationModule = function (gs) {
             }
         }
     };
+
+
+
+    console.log('Done loading configuration module.');
 };
+
+(function () {
+    "use strict";
+    window.GokoSalvager = window.GokoSalvager || {};
+    console.log('Loading configuration module.');
+    loadConfigurationModule(window.GokoSalvager);
+}());

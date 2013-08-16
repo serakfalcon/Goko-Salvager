@@ -40,14 +40,14 @@
     # JS scripts for Goko to load, in order
     :js => [
         'settings.js',
-        'userOptions.js',
+        'kingdom_generator.js',
+        'userSettings.js',
         'tableState.js',
         'autokick.js',
         'avatars.js',
         'blacklist.js',
         'logviewer.js',
         'lobby_ratings.js',
-        'kingdom_generator.js',
         'automatchGamePop.js',
         'automatchOfferPop.js',
         'automatchSeekPop.js',

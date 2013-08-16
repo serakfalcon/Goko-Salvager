@@ -3,7 +3,9 @@
 
 var loadLogViewerModule;
 (function () {
-    "use strict";
+    "use strict";  // JSLint setting
+
+    console.log('Preparing to load Log Viewer module');
 
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
@@ -13,25 +15,25 @@ var loadLogViewerModule;
     var waitLoop = setInterval(function () {
         try {
             var gs = window.GokoSalvager;
-            var gso = gs.options;
-            var cbd_cards = window.FS.Dominion.CardBuilder.Data.cards;
+            var gso = gs.options_load;
+            var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
             var lm = window.Dom.LogManager;
             var dw = window.Dom.DominionWindow;
             var dc = window.DominionClient;
 
-            if ([gs, gso, cbd_cards, lm, dw, dc].every(exists)) {
+            if ([gs, gso, cdbc, lm, dw, dc].every(exists)) {
+                console.log('Loading Log Viewer module');
+                loadLogViewerModule(gs, cdbc, lm, dw, dc);
                 clearInterval(waitLoop);
-                loadLogViewerModule(gs, cbd_cards, lm, dw, dc);
             }
         } catch (e) {}
-    });
+    }, 100);
 }());
-
 
 /*
  * Log viewer module
  */
-var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
+var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
     "use strict";   // JSLint setting
 
     var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, canonizeName;
@@ -199,7 +201,7 @@ var loadLogViewerModule = function (gs, cbd_cards, lm, dw, dc) {
     }
 
     var types = {};
-    cbd_cards.map(function (card) {
+    cdbc.map(function (card) {
         types[card.name[0]] = card.type;
     });
 

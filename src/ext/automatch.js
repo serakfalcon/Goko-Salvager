@@ -6,6 +6,8 @@ var loadAutomatchModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load Automatch module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -16,11 +18,12 @@ var loadAutomatchModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
+            gso = gs.options_load;
             conn = window.FS.Connection;
         } catch (e) {}
 
         if ([gso, conn].every(exists)) {
+            console.log('Loading Automatch module');
             loadAutomatchModule(gs, conn);
             clearInterval(dbWait);
         }

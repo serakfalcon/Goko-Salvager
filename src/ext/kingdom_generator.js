@@ -8,6 +8,8 @@ var loadKingdomGenerator;
 (function () {
     "use strict";
 
+    console.log('Preparing to load kingdom generator.');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -18,14 +20,15 @@ var loadKingdomGenerator;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
+            gso = gs.options_load;
             db = window.FS.Dominion.DeckBuilder;
             dbp = window.FS.Dominion.DeckBuilder.Persistent;
             detv = window.FS.DominionEditTableView;
-            cdbc = window.FS.Dominion.CardBuilder.Data;
+            cdbc = window.FS.Dominion.CardBuilder.Data.cards;
         } catch (e) {}
 
         if ([gso, db, dbp, detv, cdbc].every(exists)) {
+            console.log('Loading Kingdom Generator');
             loadKingdomGenerator(gs, db, dbp, detv, cdbc);
             clearInterval(dbWait);
         }
@@ -414,7 +417,7 @@ loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
                     try {
                         var all = {};
                         myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
-                        var myret = myBuildDeck(all, gs.set_parser.parse(val));
+                        var myret = myBuildDeck(all, set_parser.parse(val));
                         if (myret) {
                             x = myret;
                         } else {
@@ -648,7 +651,7 @@ loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
                 return pre+this.upcomingInput()+"\n"+c+"^";},
     
             // test the lexed token: return FALSE when not a match, otherwise return token
-            test_match:function (match,indexed_rule){var token,lines,backup;if(this.options.backtrack_lexer){backup={yylineno:this.yylineno,yylloc:{first_line:this.yylloc.first_line,last_line:this.last_line,first_column:this.yylloc.first_column,last_column:this.yylloc.last_column},yytext:this.yytext,match:this.match,matches:this.matches,matched:this.matched,yyleng:this.yyleng,offset:this.offset,_more:this._more,_input:this._input,yy:this.yy,conditionStack:this.conditionStack.slice(0),done:this.done};if(this.options.ranges){backup.yylloc.range=this.yylloc.range.slice(0)}}lines=match[0].match(/(?:\r\n?|\n).*/g);if(lines){this.yylineno+=lines.length}this.yylloc={first_line:this.yylloc.last_line,last_line:this.yylineno+1,first_column:this.yylloc.last_column,last_column:lines?lines[lines.length-1].length-lines[lines.length-1].match(/\r?\n?/)[0].length:this.yylloc.last_column+match[0].length};this.yytext+=match[0];this.match+=match[0];this.matches=match;this.yyleng=this.yytext.length;if(this.options.ranges){this.yylloc.range=[this.offset,this.offset+=this.yyleng]}this._more=false;this._backtrack=false;this._input=this._input.slice(match[0].length);this.matched+=match[0];token=this.performAction.call(this,this.yy,this,indexed_rule,this.conditionStack[this.conditionStack.length-1]);if(this.done&&this._input){this.done=false}if(token){if(this.options.backtrack_lexer){delete backup}return token}else if(this._backtrack){for(var k in backup){this[k]=backup[k]}return false}if(this.options.backtrack_lexer){delete backup}return false},
+            test_match:function (match,indexed_rule){var token,lines,backup;if(this.options.backtrack_lexer){backup={yylineno:this.yylineno,yylloc:{first_line:this.yylloc.first_line,last_line:this.last_line,first_column:this.yylloc.first_column,last_column:this.yylloc.last_column},yytext:this.yytext,match:this.match,matches:this.matches,matched:this.matched,yyleng:this.yyleng,offset:this.offset,_more:this._more,_input:this._input,yy:this.yy,conditionStack:this.conditionStack.slice(0),done:this.done};if(this.options.ranges){backup.yylloc.range=this.yylloc.range.slice(0)}}lines=match[0].match(/(?:\r\n?|\n).*/g);if(lines){this.yylineno+=lines.length}this.yylloc={first_line:this.yylloc.last_line,last_line:this.yylineno+1,first_column:this.yylloc.last_column,last_column:lines?lines[lines.length-1].length-lines[lines.length-1].match(/\r?\n?/)[0].length:this.yylloc.last_column+match[0].length};this.yytext+=match[0];this.match+=match[0];this.matches=match;this.yyleng=this.yytext.length;if(this.options.ranges){this.yylloc.range=[this.offset,this.offset+=this.yyleng]}this._more=false;this._backtrack=false;this._input=this._input.slice(match[0].length);this.matched+=match[0];token=this.performAction.call(this,this.yy,this,indexed_rule,this.conditionStack[this.conditionStack.length-1]);if(this.done&&this._input){this.done=false}if(token){if(this.options.backtrack_lexer){delete window.backup}return token}else if(this._backtrack){for(var k in backup){this[k]=backup[k]}return false}if(this.options.backtrack_lexer){delete window.backup}return false},
     
             // return next match in input
             next:function (){if(this.done){return this.EOF}if(!this._input){this.done=true}var token,match,tempMatch,index;if(!this._more){this.yytext="";this.match=""}var rules=this._currentRules();for(var i=0;i<rules.length;i++){tempMatch=this._input.match(this.rules[rules[i]]);if(tempMatch&&(!match||tempMatch[0].length>match[0].length)){match=tempMatch;index=i;if(this.options.backtrack_lexer){token=this.test_match(tempMatch,rules[i]);if(token!==false){return token}else if(this._backtrack){match=false;continue}else{return false}}else if(!this.options.flex){break}}}if(match){token=this.test_match(match,rules[index]);if(token!==false){return token}return false}if(this._input===""){return this.EOF}else{return this.parseError("Lexical error on line "+(this.yylineno+1)+". Unrecognized text.\n"+this.showPosition(),{text:"",token:null,line:this.yylineno})}},

@@ -1,30 +1,31 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
 /*global $, _, */
 
-var loadUserOptionsModule;
+var loadUserSettingsModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load User Settings module');
+
     // Wait (non-blocking) until the required objects have been instantiated
     var waitLoop = setInterval(function () {
-        var gs, gso, etv, detv;
+        var gs, gso;
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
-            etv = window.FS.EditTableView;
-            detv = window.FS.DominionEditTableView;
+            gso = gs.options_load;
         } catch (e) {}
 
         if ($('.fs-rs-logout-row').length > 0
                 && typeof gso !== 'undefined' && gso !== null) {
-            loadUserOptionsModule(gs);
+            console.log('Loading User Settings module');
+            loadUserSettingsModule(gs);
             clearInterval(waitLoop);
         }
     }, 100);
 }());
 
 /*
- * GokoSalvager UserOptions Module: displays options menu on login screen
+ * GokoSalvager UserSettings Module: displays options menu on login screen
  *
  * Goko dependencies:
  *   - FS.Templates.LaunchScreen
@@ -32,7 +33,7 @@ var loadUserOptionsModule;
  * Internal dependencies:
  *   - GokoSalvager object + options
  */
-var loadUserOptionsModule = function (gs) {
+var loadUserSettingsModule = function (gs) {
     "use strict";
 
     function options_window() {

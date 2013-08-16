@@ -5,6 +5,8 @@ var loadAutokickModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load auto kick module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -15,11 +17,12 @@ var loadAutokickModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
+            gso = gs.options_load;
             zch = window.FS.ZoneClassicHelper;
         } catch (e) {}
 
         if ([gso, zch].every(exists)) {
+            console.log('Loading auto kick module');
             loadAutokickModule(gs, zch);
             clearInterval(dbWait);
         }

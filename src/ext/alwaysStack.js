@@ -6,6 +6,8 @@ var loadAlwaysStackModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load Always Stack module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -16,11 +18,12 @@ var loadAlwaysStackModule;
         
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
+            gso = gs.options_load;
             csp = window.FS.Cards.CardStackPanel;
         } catch (e) {}
 
         if ([gso, csp].every(exists)) {
+            console.log('Loading Always Stack module');
             loadAlwaysStackModule(gs, csp);
             clearInterval(dbWait);
         }

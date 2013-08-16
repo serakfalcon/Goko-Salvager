@@ -5,6 +5,8 @@ var loadBlacklistModule;
 (function () {
     "use strict";
 
+    console.log('Preparing to load Blacklist module');
+
     var exists = function (obj) {
         return (typeof obj !== 'undefined' && obj !== null);
     };
@@ -15,12 +17,13 @@ var loadBlacklistModule;
     
         try {
             gs = window.GokoSalvager;
-            gso = gs.options;
+            gso = gs.options_load;
             mr = window.FS.MeetingRoom;
             ctv = window.FS.ClassicTableView;
         } catch (e) {}
 
         if ([gso].every(exists)) {
+            console.log('Loading Blacklist module');
             loadBlacklistModule(gs, mr, ctv);
             clearInterval(dbWait);
         }
