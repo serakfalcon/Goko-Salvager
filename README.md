@@ -1,7 +1,7 @@
 Goko Dominion Salvager
 ======================
 
-Discuss the extension at the [Dominion Strategy forum](http://goo.gl/4muRB).
+Discuss the extension at the [Dominion Strategy forum](http://forum.dominionstrategy.com/index.php?topic=9063.0).
 
 
 Installation
