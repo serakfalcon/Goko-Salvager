@@ -44,7 +44,7 @@ loadAlwaysStackModule = function (gs, csp) {
     csp.prototype.old_addView = csp.prototype.addView;
     csp.prototype.addView = function (view, index) {
         var ret = this.old_addView(view, index);
-        if (gs.get_option('alwaysStack') && this.autoStackCards) {
+        if (gs.get_option('always_stack') && this.autoStackCards) {
             this.stackCards = true;
         }
         return ret;

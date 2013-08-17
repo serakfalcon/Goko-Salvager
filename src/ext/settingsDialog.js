@@ -19,7 +19,7 @@ window.GokoSalvager.createSettingsDialog = function () {
   </div>\
   <div ng:hide="us.vp_enabled" >\
     &nbsp;&nbsp;&nbsp;\
-    <input type="checkbox" ng:model="us.vp_always_on" ng:click="save(us)">\
+    <input type="checkbox" ng:model="us.vp_always_off" ng:click="save(us)">\
     Disable for opponents (unless #vpon in title)\
   </div>\
   <div ng:show="us.vp_enabled">\

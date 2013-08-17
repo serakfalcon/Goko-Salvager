@@ -36,15 +36,7 @@ var loadLogViewerModule;
 var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
     "use strict";   // JSLint setting
 
-    var vpLocked, updateDeck, colorize, newLogRefresh, vp_div, style, canonizeName;
-
-    if (lm.prototype.old_addLog) {
-        var msg = 'More than one Dominion User Extension detected.\n'
-                + 'Please uninstall or disable one of them.';
-        console.err(msg);
-        alert(msg);
-        return;
-    }
+    var updateDeck, colorize, newLogRefresh, style, canonizeName, vp_div, vpLocked, vpOn;
 
     var newLog = document.createElement('div');
     newLog.setAttribute("class", "newlog");
@@ -83,7 +75,7 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                     possessed = j[3] !== undefined;
                     newLogMode = newLogNames[j[1]];
                     if (parseInt(j[2], 10) > 4) {
-                        // Stop VP tracker settings after turn 4
+                        // Stop VP tracker settings at start of turn 5
                         vpLocked = true;
                     }
                     newLogText += '<h1 class="p' + newLogMode + '">' + h[1] + '</h1>';
@@ -344,7 +336,8 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
         }
         return undefined;
     }
-    var vpOn = false;
+
+    vpOn = false;
     vpLocked = false;
     vp_div = function () {
         if (!vpOn) {
@@ -368,14 +361,7 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
         ret += '</table></div>';
         return ret;
     };
-    function vp_txt() {
-        var i, ret = [];
-        var p = Object.keys(newLogNames);
-        for (i = 0; i < p.length; i += 1) {
-            ret.push(p[i] + ': ' + playervp[newLogNames[p[i]]]);
-        }
-        return ret.sort().join(', ');
-    }
+
     dw.prototype._old_moveCards = dw.prototype._moveCards;
     dw.prototype._moveCards = function (options, callback) {
         var m = options.moves;
@@ -392,6 +378,15 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
         this._old_moveCards(options, callback);
     };
 
+    function vp_txt() {
+        var i, ret = [];
+        var p = Object.keys(newLogNames);
+        for (i = 0; i < p.length; i += 1) {
+            ret.push(p[i] + ': ' + playervp[newLogNames[p[i]]]);
+        }
+        return ret.sort().join(', ');
+    }
+
     var old_onIncomingMessage = dc.prototype.onIncomingMessage;
     dc.prototype.onIncomingMessage = function (messageName, messageData, message) {
         var msgSend = "", sendVpOn = false, sendVpOff = false, tablename = "";
@@ -406,12 +401,12 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                 console.log(messageData.text);
 
                 if (messageData.text === "Dominion Online User Extension enabled (see goo.gl/4muRB)\nType \"#vpon\" before turn 5 to turn on point tracker.\nType \"#vpoff\" before turn 5 to disallow the point tracker.\n"
-                        && gs.get_option('vpAlwaysOff')
+                        && gs.get_option('vp_always_off')
                         && tablename.toUpperCase().indexOf("#VPON") === -1) {
                     sendVpOff = true;
                 }
 
-                if (gs.get_option('vpEnabled') && messageData.text.toUpperCase() === '#VPOFF' && (vpOn || !vpLocked)) {
+                if (gs.get_option('vp_enabled') && messageData.text.toUpperCase() === '#VPOFF' && (vpOn || vpLocked)) {
                     if (vpLocked) {
                         msgSend += 'Victory Point tracker setting locked\n';
                     } else {
@@ -419,7 +414,7 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                         vpOn = false;
                         vpLocked = true;
                     }
-                } else if (gs.get_option('vpEnabled') && messageData.text.toUpperCase() === '#VPON' && !vpOn) {
+                } else if (gs.get_option('vp_enabled') && messageData.text.toUpperCase() === '#VPON' && !vpOn) {
                     if (vpLocked) {
                         msgSend += 'Victory Point tracker setting locked\n';
                     } else {
@@ -428,7 +423,7 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                         msgSend += 'Type "#vpoff" before turn 5 to disallow the point tracker.\n';
                         vpOn = true;
                     }
-                } else if (gs.get_option('vpEnabled') && messageData.text.toUpperCase() === '#VP?' && vpOn) {
+                } else if (gs.get_option('vp_enabled') && messageData.text.toUpperCase() === '#VP?' && vpOn) {
                     msgSend += 'Current points: ' + vp_txt() + '\n';
                 }
             } else if (messageName === 'gameEvent2' && messageData.code === 'system.startGame') {
@@ -437,20 +432,20 @@ var loadLogViewerModule = function (gs, cdbc, lm, dw, dc) {
                 if (tablename) {
                     tablename = tablename.toUpperCase();
                     msgSend += 'Dominion Online User Extension enabled (see goo.gl/4muRB)\n';
-                    if (gs.get_option('vpEnabled') && tablename.indexOf("#VPON") !== -1) {
+                    if (gs.get_option('vp_enabled') && tablename.indexOf("#VPON") !== -1) {
                         msgSend += 'Victory Point tracker enabled and locked (see http://dom.retrobox.eu/vp.html)\n';
                         msgSend += 'Type "#vp?" at any time to display the score in the chat\n';
 
                         vpOn = true;
                         vpLocked = true;
-                    } else if (gs.get_option('vpEnabled') && tablename.indexOf("#VPOFF") !== -1) {
+                    } else if (gs.get_option('vp_enabled') && tablename.indexOf("#VPOFF") !== -1) {
                         msgSend += 'Victory Point tracker disallowed and locked (see http://dom.retrobox.eu/vp.html)\n';
 
                         vpOn = false;
                         vpLocked = true;
-                    } else if (gs.get_option('vpEnabled') && gs.get_option('vpAlwaysOn')) {
+                    } else if (gs.get_option('vp_enabled') && gs.get_option('vp_always_on')) {
                         sendVpOn = true;
-                    } else if (gs.get_option('vpEnabled')) {
+                    } else if (gs.get_option('vp_enabled')) {
                         msgSend += 'Type "#vpon" before turn 5 to turn on point tracker.\n';
                         msgSend += 'Type "#vpoff" before turn 5 to disallow the point tracker.\n';
                     }
