@@ -17,6 +17,8 @@ var loadKingdomGenerator;
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
         var gs, gso, db, dbp, detv, cdbc;
+
+        console.log('Checking for Kingdom Generator dependencies');
     
         try {
             gs = window.GokoSalvager;

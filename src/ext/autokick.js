@@ -14,6 +14,8 @@ var loadAutokickModule;
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
         var gs, gso, zch;
+
+        console.log('Checking for Auto Kick dependencies');
     
         try {
             gs = window.GokoSalvager;

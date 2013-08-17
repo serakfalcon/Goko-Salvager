@@ -14,6 +14,8 @@ var loadBlacklistModule;
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
         var gs, gso, mr, ctv;
+
+        console.log('Checking for Blacklist dependencies');
     
         try {
             gs = window.GokoSalvager;
