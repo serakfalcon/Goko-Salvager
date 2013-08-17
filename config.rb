@@ -50,6 +50,7 @@
         'blacklist.js',
         'logviewer.js',
         'lobby_ratings.js',
+        'alwaysStack.js',
         'automatchGamePop.js',
         'automatchOfferPop.js',
         'automatchSeekPop.js',
