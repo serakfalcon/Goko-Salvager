@@ -35,7 +35,7 @@ var loadUserSettingsModule;
  * Internal dependencies:
  *   - GokoSalvager option methods
  */
-var loadUserSettingsModule = function (gs) {
+loadUserSettingsModule = function (gs) {
     "use strict";
 
     window.gokoSalvagerUserSettingsController = function ($scope) {
