@@ -29,10 +29,10 @@ Contributors
 ------------
 - philosophyguy
 - nutki
-- 1wheel
-- michaeljb
-- ragingduckd
-- yed (Zdenek Bouska)
+- Adam Pearce (1wheel)
+- Michael Brandt (michaeljb)
+- Andrew Iannaccone (ragingduckd)
+- Zdenek Bouska (yed)
 
 Development Notes
 -----------------
