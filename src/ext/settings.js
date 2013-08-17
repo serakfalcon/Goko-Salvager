@@ -11,7 +11,6 @@ var loadConfigurationModule = function (gs) {
     "use strict";
 
     var default_options = {
-        version: 2.2,
         autokick: true,
         generator: true,
         proranks: true,

@@ -15,9 +15,7 @@ var loadAutomatchModule;
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
         var gs, gso, conn;
-
         console.log('Checking for Automatch dependencies');
-
         try {
             gs = window.GokoSalvager;
             gso = gs.get_option;
