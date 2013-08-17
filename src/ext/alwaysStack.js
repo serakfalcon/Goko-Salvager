@@ -15,7 +15,7 @@ var loadAlwaysStackModule;
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
         var gs, gso, csp;
-        
+
         try {
             gs = window.GokoSalvager;
             gso = gs.get_option;

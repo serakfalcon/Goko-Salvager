@@ -14,7 +14,7 @@ var loadAutokickModule;
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
         var gs, gso, zch;
-    
+
         try {
             gs = window.GokoSalvager;
             gso = gs.get_option;
@@ -91,5 +91,3 @@ loadAutokickModule = function (gs, zch) {
         }
     };
 };
-
-

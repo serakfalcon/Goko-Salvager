@@ -42,7 +42,7 @@ var loadLobbyRatingsModule;
  * - option: sortrating
  * - option: blacklist
  */
-var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
+loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
     "use strict";
     var insertInPlace, getSortablePlayerObjectFromElement;
 
