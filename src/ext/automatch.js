@@ -75,6 +75,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     AM.CASUAL_SYS_ID = '4fd6356ce0f90b12ebb0ff3a';  // Goko casual rating system
     AM.PRO_SYS_ID = '501726b67af16c2af2fc9c54';     // Goko pro rating system
 
+    // Runs at end of script
     initAutomatch = function (mtgRoom, gokoconn, zch) {
         debug('Initializing Automatch');
 
