@@ -40,11 +40,8 @@ loadAutomatchModule = function (gs, conn) {
         connectToAutomatchServer, confirmReceipt, confirmSeek, offerMatch,
         rescindOffer, announceGame, unannounceGame, joinAutomatchGame,
         createAutomatchGame, enableButtonWhenAutomatchReady,
-        handleLostAutomatchConnection,
-        enableAutoAccept,
-        disableAutoAccept,
-        gameReady,
-        attemptAutomatchInit, testPop;
+        handleLostAutomatchConnection, enableAutoAccept, disableAutoAccept,
+        gameReady, attemptAutomatchInit, testPop, sendAutoAutomatchSeekRequest;
 
     // Automatch global namespace
     AM = window.AM = (window.AM || {});
@@ -178,87 +175,20 @@ loadAutomatchModule = function (gs, conn) {
                 });
             });
 
-        // Override table creation method to also send an automatch seek
-        AM.zch.editTable_orig = AM.zch.editTable;
-        AM.zch.editTable = function (opts) {
+        // NOTE: Somehow this doesn't prevent Goko's click event. That's
+        //       almost exactly what I want, though it's a bit mysterious.
+        //       Unfortunately, I can't know whether this or the Goko click
+        //       event will trigger first.
+        $('.edit-table-btn-create').click(function () {
+
+            // TODO: bind automatch_on_seek properly
             if ($('#am-onseek-box').attr('checked')) {
                 gs.set_option('automatch_on_seek', true);
-                var tSettings = JSON.parse(opts.settings);
-                console.log("Table Settings:");
-                console.log(tSettings);
-
-                // Cache table settings so that we build the same game if we
-                // end up making an automatch in Casual or Unrated.
-                AM.tableSettings = tSettings;
-
-                var tName = tSettings.name;
-                var pCount = tSettings.seatsState.filter(function (s) {
-                    return s;
-                }).length;
-                var rSystem = tSettings.ratingType;
-
-                console.log('tname: ' + tName);
-                console.log('pcount: ' + pCount);
-                console.log('rSystem: ' + rSystem);
-
-                // Match title fragments like 5432+, 5k+, 5.4k+
-                console.log('Reading min rating req');
-                var m, minRating = null;
-                if ((m = tName.match(/\b(\d\.\d+)[kK]\+/)) !== null) {
-                    console.log(m);
-                    minRating = Math.floor(1000 * parseFloat(m[1], 10));
-                } else if ((m = tName.match(/\b(\d)[kK]\+/)) !== null) {
-                    console.log(m);
-                    minRating = 1000 * parseInt(m[1], 10);
-                } else if ((m = tName.match(/\b(\d\d\d\d)\+/)) !== null) {
-                    console.log(m);
-                    minRating = parseInt(m[1], 10);
-                } else {
-                    console.log('No match');
-                    console.log(m);
-                }
-
-                // Do not automatch if looking for a particular opponent
-                if ((m = tName.toLowerCase().match(/\bfor\s*\S*\b/)) !== null) {
-                    console.log('Table is for a specific opp; no automatch');
-                } else {
-                    var np, hn, rs, ar;
-
-                    np = {rclass: 'NumPlayers', props: {}};
-                    np.props.min_players = pCount;
-                    np.props.max_players = pCount;
-
-                    hn = {rclass: 'HostName', props: {}};
-                    hn.props.hostname = AM.player.pname;
-
-                    rs = {rclass: 'RatingSystem', props: {}};
-                    rs.props.rating_system = rSystem;
-
-                    ar = {rclass: 'AbsoluteRating', props: {}};
-                    ar.props.min_pts = minRating;
-                    ar.props.max_pts = null;
-                    ar.props.rating_system = rSystem;
-
-                    // Send seek request
-                    var seek = {
-                        player: AM.player,
-                        requirements: [np, hn, rs, ar]
-                    };
-                    console.log(seek);
-
-                    // TODO: wait for seek canceled confirmation
-                    if (AM.state.seek !== null) {
-                        AM.cancelSeek(AM.state.seek);
-                    }
-                    AM.submitSeek(seek);
-                }
-
-                console.log('Should automatch');
+                sendAutoAutomatchSeekRequest();
             } else {
                 gs.set_option('automatch_on_seek', false);
             }
-            AM.zch.editTable_orig(opts);
-        };
+        });
 
         // Notify automatch when the player starts a game
         AM.gokoconn.bind(AM.GAME_START, AM.gameStarted);
@@ -678,6 +608,85 @@ loadAutomatchModule = function (gs, conn) {
     AM.abortGame = function () {
         if (AM.state.game.hasOwnProperty('matchid')) {
             AM.ws.sendMessage('CANCEL_GAME', {matchid: AM.state.game.matchid});
+        }
+    };
+
+    /*
+     * Send an auto-automatch request
+     */
+    sendAutoAutomatchSeekRequest = function () {
+        console.log('Creating auto-automatch request');
+
+        var tSettings = JSON.parse(AM.mtgRoom.views.ClassicRoomsEditTable
+                                     .retriveDOM().settings);
+        console.log("Table Settings:");
+        console.log(tSettings);
+
+        // Cache table settings so that we build the same game if we
+        // end up making an automatch in Casual or Unrated.
+        AM.tableSettings = tSettings;
+
+        var tName = tSettings.name;
+        var pCount = tSettings.seatsState.filter(function (s) {
+            return s;
+        }).length;
+        var rSystem = tSettings.ratingType;
+
+        console.log('tname: ' + tName);
+        console.log('pcount: ' + pCount);
+        console.log('rSystem: ' + rSystem);
+
+        // Match title fragments like 5432+, 5k+, 5.4k+
+        console.log('Reading min rating req');
+        var m, minRating = null;
+        if ((m = tName.match(/(\d(\.\d+))[kK]\+/)) !== null) {
+            console.log(m);
+            minRating = Math.floor(1000 * parseFloat(m[1], 10));
+//        } else if ((m = tName.match(/(\d)[kK]\+/)) !== null) {
+//            console.log(m);
+//            minRating = 1000 * parseInt(m[1], 10);
+        } else if ((m = tName.match(/(\d\d\d\d)\+/)) !== null) {
+            console.log(m);
+            minRating = parseInt(m[1], 10);
+        } else {
+            console.log('No match');
+            console.log(m);
+        }
+
+        // Do not automatch if looking for a particular opponent
+        if ((m = tName.toLowerCase().match(/for\s*\S*/)) !== null) {
+            console.log('Table is for a specific opp; no automatch');
+        } else {
+            var np, hn, rs, ar;
+
+            np = {rclass: 'NumPlayers', props: {}};
+            np.props.min_players = pCount;
+            np.props.max_players = pCount;
+
+            hn = {rclass: 'HostName', props: {}};
+            hn.props.hostname = AM.player.pname;
+
+            rs = {rclass: 'RatingSystem', props: {}};
+            rs.props.rating_system = rSystem;
+
+            ar = {rclass: 'AbsoluteRating', props: {}};
+            ar.props.min_pts = minRating;
+            ar.props.max_pts = null;
+            ar.props.rating_system = rSystem;
+
+            // Send seek request
+            var seek = {
+                player: AM.player,
+                requirements: [np, hn, rs, ar]
+            };
+            console.log(seek);
+
+            // TODO: wait for seek canceled confirmation
+            if (AM.state.seek !== null) {
+                AM.cancelSeek(AM.state.seek);
+            }
+            console.log('Sending auto-automatch request');
+            AM.submitSeek(seek);
         }
     };
 
