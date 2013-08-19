@@ -619,9 +619,6 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
             minRating = Math.floor(1000 * parseFloat(m[1], 10));
         } else if ((m = tName.match(/(\d\d\d\d)\+/)) !== null) {
             minRating = parseInt(m[1], 10);
-        } else {
-            console.log('No match');
-            console.log(m);
         }
 
         // Do not automatch if looking for a particular opponent
@@ -656,6 +653,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
             if (AM.state.seek !== null) {
                 AM.cancelSeek(AM.state.seek);
             }
+
             console.log('Sending auto-automatch request');
             AM.submitSeek(seek);
         }
