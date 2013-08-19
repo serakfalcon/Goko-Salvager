@@ -14,19 +14,20 @@ var loadAutomatchModule;
 
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
-        var gs, gso, conn, mr, zch;
+        var gs, gso, gokoconn, connInfo, mr, zch;
         console.log('Checking for Automatch dependencies');
         try {
             gs = window.GokoSalvager;
             gso = gs.get_option;
-            conn = window.FS.Connection;
+            gokoconn = window.conn;
+            connInfo = gokoconn.connInfo;
             mr = window.mtgRoom;
             zch = mr.helpers.ZoneClassicHelper;
         } catch (e) {}
 
-        if ([gso, conn, mr, zch].every(exists)) {
+        if ([gso, gokoconn, connInfo, mr, zch].every(exists)) {
             console.log('Loading Automatch module');
-            loadAutomatchModule(gs, conn, mr, zch);
+            loadAutomatchModule(gs, gokoconn, mr, zch);
             clearInterval(dbWait);
         }
     }, 100);
@@ -49,7 +50,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     AM = window.AM = (window.AM || {});
 
     // Configuration
-    AM.log_debugging_messages = false;
+    AM.log_debugging_messages = true;
     AM.log_server_messages = false;
     AM.wsMaxFails = 100;
 
@@ -746,6 +747,8 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     };
 
     createTable = function (opps, ratingSystem) {
+        // TODO: destroy any existing table first.
+
         var seatsState, tKingdom, tSettings, tOpts;
         seatsState = [1, 2, 3, 4, 5, 6].map(function (i) {
             return (i <= opps.length + 1);
@@ -755,6 +758,8 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         if (AM.tableSettings !== null) {
             tSettings = AM.tableSettings;
         } else {
+            // Generate random game for casual/unrated.
+            // Goko will ignore these for pro games
             tKingdom = ["gardens", "cellar", "smithy", "village", "councilRoom",
                         "bureaucrat", "chapel", "workshop", "festival", "moat"];
             tSettings = {name: 'For ' + opps.join(', '),
