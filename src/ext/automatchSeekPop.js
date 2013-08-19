@@ -9,6 +9,32 @@
 
     AM.appendSeekPopup = function (viewport) {
         viewport.append([
+            '<div id="seekAAPop" title="Looking for Match">',
+            '<p>Automatch is looking for an opponent whose ',
+            '   search criteria match your table.</p>',
+            '<button id="seekAAStop">Stop Looking</button>',
+            '<button id="seekAAOkay">Keep Looking</button>',
+            '</div>'
+        ].join(''));
+
+        $('#seekAAPop').dialog({
+            modal: true,
+            width: 500,
+            draggable: false,
+            resizeable: false,
+            autoOpen: false
+        });
+
+        $('#seekAAStop').click(function () {
+            AM.showSeekPop(false);
+            AM.cancelSeek();
+        });
+
+        $('#seekAAOkay').click(function () {
+            AM.showSeekPop(false);
+        });
+
+        viewport.append([
             '<div id="seekPop" title="Request Automatch" ng:app ',
             '     ng:controller="gokoSalvagerUserSettingsController">',
             '  <table>',
@@ -214,9 +240,6 @@
     // Update and show/hide the dialog
     AM.showSeekPop = function (visible) {
         var seeking, canceling;
-        if (typeof visible === "undefined") {
-            visible = true;
-        }
 
         seeking = (AM.state.seek !== null);
         canceling = seeking && AM.state.seek.hasOwnProperty('canceling');
@@ -228,6 +251,16 @@
         $('#seekhide').prop('disabled', false);
         $('#seekstatus').html(seeking ? 'Looking for a match...' : '');
 
-        $('#seekPop').dialog(visible ? 'open' : 'close');
+        if (typeof visible === "undefined") {
+            visible = true;
+        }
+
+        if (AM.tableSettings === null) {
+            $('#seekPop').dialog(visible ? 'open' : 'close');
+            $('#seekhide').focus();
+        } else {
+            $('#seekAAPop').dialog(visible ? 'open' : 'close');
+            $('#seekAAOkay').focus();
+        }
     };
 }());

@@ -53,17 +53,10 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
 
     // Configuration
     AM.log_debugging_messages = true;
-    AM.log_server_messages = false;
     AM.wsMaxFails = 100;
 
-    if (location.protocol === 'http:') {
-        AM.server_url = 'ws://andrewiannaccone.com/automatch';
-    } else if (location.protocol === 'https:') {
-        AM.server_url = 'wss://andrewiannaccone.com/automatch';
-    } else {
-        alert(location.protocol);
-        console.error('Unexpected protocol: ' + location.protocol);
-    }
+    // Use secure websockets
+    AM.server_url = 'wss://andrewiannaccone.com/automatch';
 
     // Initial state
     automatchInitStarted = false;
@@ -543,6 +536,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     AM.cancelSeek = function (seek) {
         if (AM.state.seek !== null) {
             AM.state.seek.canceling = true;
+            AM.tableSettings = null;
             AM.ws.sendMessage('CANCEL_SEEK', {seekid: AM.state.seek.seekid},
                 function () { AM.state.seek = null; });
         }
