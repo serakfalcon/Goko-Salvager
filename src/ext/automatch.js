@@ -118,12 +118,15 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         $('#am-onseek-box').attr('checked', gs.get_option('automatch_on_seek'));
 
         // Show automatch information when user clicks on blue "(?)"
-        var amInfo = "<p>Automatch will search for opponents in other"
-                     + " lobbies while you're waiting at your table here.</p>"
-                     + "<p>This will not prevent players in this lobby from"
-                     + " joining your table like usual.</p>";
+        var amURL = "https://github.com/aiannacc/Goko-Salvager/wiki/Automatch";
+        var amInfo = '<p>Automatch can search for opponents in other'
+                     + ' lobbies while you wait at your table here.'
+                     + '<p>This will not prevent players in this lobby from'
+                     + ' joining your table.</p>'
+                     + '<a href="' + amURL + '" target="_blank">More</a>';
         $('#automatch-info-span').html(' (?)')
                                  .css('color', 'blue')
+                                 .css('cursor', 'pointer')
                                  .click(function () {
                 console.log('clicked for AM info');
                 if ($('#automatch-info-popup').length === 0) {
@@ -356,32 +359,39 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     };
 
     updateAMButton = function () {
-        var connected, gotPlayerInfo, ready, buttonText;
+        var connected, gotPlayerInfo, ready, buttonText, buttonColor;
 
         if (!AM.player.hasOwnProperty('sets_owned')
                 || !AM.player.rating.hasOwnProperty('goko_casual_rating')
                 || !AM.player.rating.hasOwnProperty('goko_pro_rating')) {
             ready = false;
             buttonText = 'Automatch: Getting Player Info';
+            buttonColor = 'LightGray';
         } else if (typeof AM.ws === 'undefined') {
             ready = false;
             buttonText = 'Automatch: Connecting';
+            buttonColor = 'LightGray';
         } else if (AM.ws.readyState === WebSocket.CONNECTING) {
             ready = false;
             buttonText = 'Automatch: Connecting';
+            buttonColor = 'LightGray';
         } else if (AM.ws.readyState === WebSocket.CLOSED
                 || AM.ws.readyState === WebSocket.CLOSING) {
             ready = false;
-            buttonText = 'Automatch: Disconnected';
+            buttonText = 'Automatch: Offline';
+            buttonColor = 'Red';
         } else if (AM.ws.readyState === WebSocket.OPEN) {
             ready = true;
             if (AM.state.seek !== null) {
                 buttonText = 'Automatch: Searching';
+                buttonColor = 'GreenYellow';
             } else {
                 buttonText = 'Automatch: Idle';
+                buttonColor = 'White';
             }
         }
         $('#automatchButton').prop('disabled', !ready)
+                             .css('color', buttonColor)
                              .html(buttonText);
     };
 
