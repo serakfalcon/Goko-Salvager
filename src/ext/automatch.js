@@ -23,6 +23,8 @@ var loadAutomatchModule;
             connInfo = gokoconn.connInfo;
             mr = window.mtgRoom;
             zch = mr.helpers.ZoneClassicHelper;
+            //db = window.FS.Dominion.DeckBuilder;
+            //dbp = window.FS.Dominion.DeckBuilder.persistent;
         } catch (e) {}
 
         if ([gso, gokoconn, connInfo, mr, zch].every(exists)) {
@@ -30,7 +32,7 @@ var loadAutomatchModule;
             loadAutomatchModule(gs, gokoconn, mr, zch);
             clearInterval(dbWait);
         }
-    }, 100);
+    }, 500);
 }());
 
 // To be executed in Goko's namespace
@@ -754,28 +756,43 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
             return (i <= opps.length + 1);
         });
 
-        // TODO: random kingdom cards for casual games
+
         if (AM.tableSettings !== null) {
+            // Use cached settings if available
             tSettings = AM.tableSettings;
+            tSettings.name = 'For ' + opps.join(', ');
+            tOpts = {settings: JSON.stringify(tSettings),
+                     isLock: false,
+                     isRequestJoin: true,
+                     isRequestSit: false,
+                     tableIndex: null};
+            AM.zch.createTable(tOpts);
+
         } else {
-            // Generate random game for casual/unrated.
-            // Goko will ignore these for pro games
-            tKingdom = ["gardens", "cellar", "smithy", "village", "councilRoom",
-                        "bureaucrat", "chapel", "workshop", "festival", "moat"];
-            tSettings = {name: 'For ' + opps.join(', '),
-                         seatsState: seatsState,
-                         gameData: {uid: ""},
-                         kingdomCards: tKingdom,
-                         platinumColony: false,
-                         useShelters: false,
-                         ratingType: ratingSystem};
+            // Otherwise generate new ones
+            var deck = new window.FS.Dominion.DeckBuilder.Model.CardDeck();
+            deck = deck.doEmpty();
+            deck.set({ name: 'Automatch Random deck' });
+            mtgRoom.deckBuilder.persistent.getRandomDeck({
+                app: mtgRoom.deckBuilder,
+                deck: deck,
+                useEternalGenerateMethod: true  // (Goko typo)
+            }, function (d) {
+                tSettings = {name: 'For ' + opps.join(', '),
+                             seatsState: seatsState,
+                             gameData: {uid: ""},
+                             kingdomCards: d.get('cardNameIds'),
+                             platinumColony: d.get('isColonyAndPlatinum'),
+                             useShelters: d.get('useShelters'),
+                             ratingType: ratingSystem};
+                tOpts = {settings: JSON.stringify(tSettings),
+                         isLock: false,
+                         isRequestJoin: true,
+                         isRequestSit: false,
+                         tableIndex: null};
+                AM.zch.createTable(tOpts);
+            });
         }
-        tOpts = {settings: JSON.stringify(tSettings),
-                 isLock: false,
-                 isRequestJoin: true,
-                 isRequestSit: false,
-                 tableIndex: null};
-        AM.zch.createTable(tOpts);
     };
 
     // Print debugging messages to the JS console
