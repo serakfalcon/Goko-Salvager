@@ -10,7 +10,7 @@
     AM.appendSeekPopup = function (viewport) {
         viewport.append([
             '<div id="seekAAPop" title="Looking for Match">',
-            '<p>Automatch is looking for an opponent whose ',
+            '<p>Automatch is looking for players whose ',
             '   search criteria match your table.</p>',
             '<button id="seekAAStop">Stop Looking</button>',
             '<button id="seekAAOkay">Keep Looking</button>',
