@@ -9,9 +9,8 @@
 
     AM.appendSeekPopup = function (viewport) {
         viewport.append([
-            '<div id="seekPop" style="visibility:hidden" ng:app ',
+            '<div id="seekPop" title="Request Automatch" ng:app ',
             '     ng:controller="gokoSalvagerUserSettingsController">',
-            '  <h3 style="text-align:center">Request Automatch</h3>',
             '  <table>',
             '    <tr>',
             '      <td colspan="2">',
@@ -123,15 +122,13 @@
         $('#seekPop select').css('visibility', 'inherit');
         $('#seekPop select').css('top', 'auto');
 
-        // Make this into a lightbox-style dialog
-        $('#seekPop').css("position", "absolute");
-        $('#seekPop').css("top", "50%");
-        $('#seekPop').css("left", "50%");
-        $('#seekPop').css("height", "250px");
-        $('#seekPop').css("margin-top", "-125px");
-        $('#seekPop').css("width", "40%");
-        $('#seekPop').css("margin-left", "-20%");
-        $('#seekPop').css("background", "white");
+        $('#seekPop').dialog({
+            modal: true,
+            width: 550,
+            draggable: false,
+            resizeable: false,
+            autoOpen: false
+        });
 
         // Submit request
         $('#seekreq').click(function () {
@@ -231,6 +228,6 @@
         $('#seekhide').prop('disabled', false);
         $('#seekstatus').html(seeking ? 'Looking for a match...' : '');
 
-        $('#seekPop').css('visibility', visible ? 'visible' : 'hidden');
+        $('#seekPop').dialog(visible ? 'open' : 'close');
     };
 }());
