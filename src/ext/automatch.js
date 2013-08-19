@@ -560,6 +560,7 @@ loadAutomatchModule = function (gs, conn) {
 
         // Host goes to room, creates game, notifies server
         if (AM.state.game.hostname === AM.player.pname) {
+
             var hostGame = function () {
                 AM.gokoconn.unbind(AM.ENTER_LOBBY, hostGame);
                 createAutomatchGame(function (tableindex) {
@@ -568,7 +569,13 @@ loadAutomatchModule = function (gs, conn) {
                 });
             };
             AM.gokoconn.bind(AM.ENTER_LOBBY, hostGame);
-            AM.zch.changeRoom(AM.state.game.roomid);
+
+            // Go to room or just create the game if we're already there
+            if (AM.zch.currentRoom.get('roomId') === AM.state.game.roomid) {
+                hostGame();
+            } else {
+                AM.zch.changeRoom(AM.state.game.roomid);
+            }
         }
     };
 
