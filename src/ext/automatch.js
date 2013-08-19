@@ -749,7 +749,11 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     };
 
     createTable = function (opps, ratingSystem) {
-        // TODO: destroy any existing table first.
+        // Leave current table first, if any
+        if (AM.zch.hasOwnProperty('currentTable')
+                && AM.zch.currentTable !== null) {
+            AM.zch.leaveTable(AM.zch.currentTable);
+        }
 
         var seatsState, tKingdom, tSettings, tOpts;
         seatsState = [1, 2, 3, 4, 5, 6].map(function (i) {
