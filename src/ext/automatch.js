@@ -615,14 +615,9 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         // Match title fragments like 5432+, 5k+, 5.4k+
         console.log('Reading min rating req');
         var m, minRating = null;
-        if ((m = tName.match(/(\d(\.\d+))[kK]\+/)) !== null) {
-            console.log(m);
+        if ((m = tName.match(/(\d(\.\d+){0,1})[kK]\+/)) !== null) {
             minRating = Math.floor(1000 * parseFloat(m[1], 10));
-//        } else if ((m = tName.match(/(\d)[kK]\+/)) !== null) {
-//            console.log(m);
-//            minRating = 1000 * parseInt(m[1], 10);
         } else if ((m = tName.match(/(\d\d\d\d)\+/)) !== null) {
-            console.log(m);
             minRating = parseInt(m[1], 10);
         } else {
             console.log('No match');
