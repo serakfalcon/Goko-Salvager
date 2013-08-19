@@ -14,24 +14,26 @@ var loadAutomatchModule;
 
     // Wait (non-blocking) until the required objects have been instantiated
     var dbWait = setInterval(function () {
-        var gs, gso, conn;
+        var gs, gso, conn, mr, zch;
         console.log('Checking for Automatch dependencies');
         try {
             gs = window.GokoSalvager;
             gso = gs.get_option;
             conn = window.FS.Connection;
+            mr = window.mtgRoom;
+            zch = mr.helpers.ZoneClassicHelper;
         } catch (e) {}
 
-        if ([gso, conn].every(exists)) {
+        if ([gso, conn, mr, zch].every(exists)) {
             console.log('Loading Automatch module');
-            loadAutomatchModule(gs, conn);
+            loadAutomatchModule(gs, conn, mr, zch);
             clearInterval(dbWait);
         }
     }, 100);
 }());
 
 // To be executed in Goko's namespace
-loadAutomatchModule = function (gs, conn) {
+loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     "use strict";   // JSLint mode
 
     var AM, debug, initAutomatch, automatchInitStarted, addAutomatchButton,
@@ -72,36 +74,6 @@ loadAutomatchModule = function (gs, conn) {
     AM.TABLE_STATE = "tableState";                  // Fired on table changes
     AM.CASUAL_SYS_ID = '4fd6356ce0f90b12ebb0ff3a';  // Goko casual rating system
     AM.PRO_SYS_ID = '501726b67af16c2af2fc9c54';     // Goko pro rating system
-
-    // Intercept Goko server event notifications:
-    conn.prototype.trigger_orig = conn.prototype.trigger;
-    conn.prototype.trigger = function () {
-
-        // Initialize automatch if possible
-        if (!automatchInitStarted) { attemptAutomatchInit(); }
-
-        // Optionally log the server event
-        if (AM.log_server_messages) { console.log(arguments); }
-
-        // Let Goko handle the event normally
-        this.trigger_orig.apply(this, arguments);
-    };
-
-    // Check for the necessary Goko helpers before initializing Automatch
-    attemptAutomatchInit = function () {
-        var mtgRoom;
-        if (typeof (mtgRoom = window.mtgRoom) !== 'undefined'
-                && typeof mtgRoom.conn !== 'undefined'
-                && typeof mtgRoom.getHelper('ZoneClassicHelper') !== 'undefined'
-                && $('.room-section-btn-find-table').length === 1
-                && $('.room-section-header-buttons').length === 1) {
-
-            // Everything's ready
-            automatchInitStarted = true;
-            initAutomatch(mtgRoom, mtgRoom.conn,
-                          mtgRoom.getHelper('ZoneClassicHelper'));
-        }
-    };
 
     initAutomatch = function (mtgRoom, gokoconn, zch) {
         debug('Initializing Automatch');
@@ -808,4 +780,6 @@ loadAutomatchModule = function (gs, conn) {
     };
 
     debug('Automatch script loaded.');
+    debug('Initializing automatch.');
+    initAutomatch(mtgRoom, conn, zch);
 };
