@@ -21,13 +21,13 @@ window.GokoSalvager.createSettingsDialog = function () {
     &nbsp;&nbsp;&nbsp;\
     <input type="checkbox" ng:model="us.vp_always_off" ng:click="save(us)">\
     Disable for opponents (unless #vpon in title)\
-  </div>\
+  </div>'
   //<div ng:show="us.vp_enabled">\
   //  &nbsp;&nbsp;&nbsp;\
   //  <input type="checkbox" ng:model="us.adventurevp" ng:click="save(us)">\
   //  Use in adventures\
   //</div>\
-  <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>\
++ '<input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>\
     Stack duplicate cards<br />\
   Blacklist (noplay + censor):\
   <table>\
