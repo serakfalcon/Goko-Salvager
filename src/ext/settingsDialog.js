@@ -41,7 +41,7 @@ window.GokoSalvager.createSettingsDialog = function () {
       <td></td>\
       <td><input type="text" ng:model="temp_bl" /></td>\
       <td><button ng:click="add_to_blacklist(temp_bl)" >Add</button></td>\
-      <td><button onclick="$(\'#usDialog\').dialog(\'close\');">Save</td>\
+      <td><button onclick="$(\'#usDialog\').dialog(\'close\');">Close</td>\
     <tr>\
   </table>\
 </div>');
