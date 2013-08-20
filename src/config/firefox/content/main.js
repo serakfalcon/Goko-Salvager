@@ -44,8 +44,11 @@ var myExtension = {
             var i;
             for (i = 0; i < scriptFiles.length; i += 1) {
                 var script = scriptFiles[i];
-                Services.scriptloader.loadSubScript(scriptDir + script, doc, "UTF-8");
+                Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+                    .getService(Components.interfaces.mozIJSSubScriptLoader)
+                    .loadSubScript(scriptDir + script, doc, "UTF-8");
             }
+
 
             // Inject css into Goko page
             var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]

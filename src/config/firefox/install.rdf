@@ -11,6 +11,7 @@
     <em:creator>The unofficial forum.dominionstrategy dev team</em:creator>
     <em:homepageURL>http://forum.dominionstrategy.com/index.php?topic=9063.0</em:homepageURL>
     <em:type>2</em:type>
+    <em:unpack>true</em:unpack>
 
     <!-- Mozilla Firefox -->
     <em:targetApplication>
