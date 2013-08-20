@@ -1,0 +1,12 @@
+/*jslint browser:true, devel:true */
+/*globals chrome */
+
+var scripts =  [
+    "<%= config[:js].join("\",\n    \"") %>"
+];
+var i, s, JS;
+for (i = 0; i < scripts.length; i += 1) {
+    JS = document.createElement('script');
+    JS.src = chrome.extension.getURL(scripts[i]);
+    document.body.appendChild(JS);
+}
