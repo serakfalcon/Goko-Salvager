@@ -18,7 +18,6 @@ var loadAutomatchModule;
         console.log('Checking for Automatch dependencies');
         try {
             gs = window.GokoSalvager;
-            gs.AM = gs.AM || {};
             gso = gs.get_option;
             gokoconn = window.conn;
             connInfo = gokoconn.connInfo;
@@ -50,7 +49,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         gameReady, attemptAutomatchInit, testPop, sendAutoAutomatchSeekRequest;
 
     // Configuration
-    gs.AM = {};
+    gs.AM = gs.AM || {};
     gs.AM.log_debugging_messages = true;
     gs.AM.wsMaxFails = 100;
 
