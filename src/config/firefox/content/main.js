@@ -24,7 +24,8 @@ var myExtension = {
             // Load javascript files in Goko page context
             var scriptDir = "chrome://gokosalvager/content/";
             var scriptFiles = [
-                'externals.js',
+                'jquery-ui.js',
+                'angular.min.js',
                 'settings.js',
                 'kingdom_generator.js',
                 'settingsDialog.js',

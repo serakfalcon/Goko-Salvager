@@ -22,6 +22,7 @@ namespace :chrome do
         File.open('build/chrome/loadAll.js', 'w') {|f| f.write man_json }
 
         # Copy js, css, and png files
+        FileUtils.cp_r Dir.glob('src/lib/*.js'), 'build/chrome/'
         FileUtils.cp_r Dir.glob('src/ext/*.js'), 'build/chrome/'
         FileUtils.cp_r Dir.glob('src/ext/*.css'), 'build/chrome/'
         FileUtils.cp Dir.glob('src/img/*.png'), 'build/chrome/images/'
