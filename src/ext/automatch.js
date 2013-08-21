@@ -452,6 +452,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
 
     rescindOffer = function (msg) {
         gs.AM.state.offer = null;
+        gs.AM.tableSettings = null;
         // TODO: handle this in a more UI-consistent way
         gs.AM.showOfferPop(false);
         alert('Automatch offer was rescinded:\n' + msg.reason);
