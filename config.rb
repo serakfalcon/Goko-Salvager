@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.2.2',
+    :version => '2.2.3',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience!',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -39,6 +39,7 @@
 
     # JS scripts for Goko to load, in order
     :js => [
+        #'utils.js',
         'externals.js',
         'settings.js',
         'kingdom_generator.js',
