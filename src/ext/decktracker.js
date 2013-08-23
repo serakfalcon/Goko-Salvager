@@ -157,5 +157,8 @@ loadDecktracker = function (gs, domWindow, logManager, cdbc) {
     alterCardCount = function (pname, card, n) {
         gs.cardCounts[pname][card] = gs.cardCounts[pname][card] || 0;
         gs.cardCounts[pname][card] += n;
+        if (gs.cardCounts[pname][card] === 0) {
+            delete gs.cardCounts[pname][card];
+        }
     };
 };
