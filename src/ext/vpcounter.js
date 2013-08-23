@@ -1,3 +1,69 @@
+
+    var vpoint = {
+        'Estate': function () {return 1; },
+        'Colony': function () {return 10; },
+        'Duchy': function () {return 3; },
+        'Duke': function (d) {return d.Duchy || 0; },
+        'Fairgrounds': function (d) {
+            var c, s = 0;
+            for (c in d) {
+                s += 1;
+            }
+            return 2 * Math.floor(s / 5);
+        },
+        'Farmland': function () {return 2; },
+        'Feodum': function (d) {return Math.floor((d.Silver || 0) / 3); },
+        'Gardens': function (d) {
+            var c, s = 0;
+            for (c in d) {
+                s += d[c];
+            }
+            return Math.floor(s / 10);
+        },
+        'Province': function () {return 6; },
+        'Silk Road': function (d) {
+            var c, s = 0;
+            for (c in d) {
+                if (types[c].match(/victory/)) {
+                    s += d[c];
+                }
+            }
+            return Math.floor(s / 4);
+        },
+        'Vineyard': function (d) {
+            var c, s = 0;
+            for (c in d) {
+                if (types[c].match(/\baction/)) {
+                    s += d[c];
+                }
+            }
+            return Math.floor(s / 3);
+        },
+        //'Overgrown Estate': function () {return 0},
+        'Dame Josephine': function () {return 2; },
+        'Great Hall': function () {return 1; },
+        'Nobles': function () {return 2; },
+        'Island': function () {return 2; },
+        'Harem': function () {return 2; },
+        'Tunnel': function () {return 2; },
+        'Curse': function () {return -1; },
+    };
+
+    function vp_in_deck(deck) {
+        var card, points = 0;
+        for (card in deck) {
+            if (vpoint[card]) {
+                points += deck[card] * vpoint[card](deck);
+            }
+        }
+        return points;
+    }
+
+
+
+
+
+
     vpOn = false;
     vpLocked = false;
     vp_div = function () {

@@ -37,6 +37,7 @@ var myExtension = {
                 'logviewer.js',
                 'lobby_ratings.js',
                 'alwaysStack.js',
+                'decktracker.js',
                 'automatchGamePop.js',
                 'automatchOfferPop.js',
                 'automatchSeekPop.js',

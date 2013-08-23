@@ -1,5 +1,5 @@
 /*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
-/*global jQuery, _, $, Audio */
+/*global jQuery, _, $, Audio, gsAlsoDo */
 
 var loadLogviewerModule, createLogviewer, resizeLogviewer;
 (function () {
@@ -94,14 +94,14 @@ var loadLogviewerModule = function (cdbc, lm, dw) {
     // Current player/phase
     var gamePhase, logPhase, possessed, gameStarted, gameOver;
 
-    dw.prototype._old_updateState = dw.prototype._updateState;
-    dw.prototype._updateState = function (opt) {
+    // "Listen" to game phase changes. These always precede the log messages
+    // of the new phase.
+    gsAlsoDo(dw, '_updateState', function (opt) {
         gamePhase = opt.dominionPhase || gamePhase;
-        this._old_updateState(opt);
-    };
+    });
 
-    lm.prototype.old_addLog = lm.prototype.addLog;
-    lm.prototype.addLog = function (opt) {
+    // "Listen" to log additions
+    gsAlsoDo(lm, 'addLog', function (opt) {
         if (opt.logUrl) {
             // Link to retrobox prettified log instead of Goko
             opt.logUrl = 'http://dom.retrobox.eu/?' + opt.logUrl.substr(29);
@@ -109,8 +109,7 @@ var loadLogviewerModule = function (cdbc, lm, dw) {
         if (opt.text) {
             parseLogLine(opt.text);
         }
-        this.old_addLog(opt);
-    };
+    });
 
     // Goko's map from card name to card type (e.g. 'Copper' --> 'treasure')
     var cardTypes = {};
@@ -159,8 +158,6 @@ var loadLogviewerModule = function (cdbc, lm, dw) {
 
     parseLogLine = function (line) {
         var m, pname, pindex;
-
-        console.log(line);
 
         if (line.match(setupPatt)) {
             $('#logdiv'.empty);
@@ -214,13 +211,12 @@ var loadLogviewerModule = function (cdbc, lm, dw) {
             logAppendPlayer(pname, pindex);
             logAppend(' ' + action + ' ');
 
-            // TODO: parse out and format card names, vp tokens, coin tokens
+            // Parse out and format card names, vp tokens, coin tokens
             var cards = [];
             var nonCardText = rest.replace(cardPatt, function (match) {
                 cards.push(match);
                 return '--XXX--';
             }).split('--XXX--');
-            console.log(nonCardText);
             var i, nctext;
             for (i = 0; i < nonCardText.length; i += 1) {
                 logAppend(' ' + nonCardText[i] + ' ');

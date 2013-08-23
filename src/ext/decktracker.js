@@ -1,164 +1,161 @@
-    vpOn = false;
-    vpLocked = false;
-    vp_div = function () {
-        if (!vpOn) {
-            return '';
-        }
-        var ret = '<div style="position:absolute;padding:2px;background-color:gray"><table>';
-        var p = Object.keys(newLogNames);
-        p.sort(function (a, b) {
-            var pa = newLogNames[a];
-            var pb = newLogNames[b];
-            if (playervp[pa] !== playervp[pb]) {
-                return playervp[pb] - playervp[pa];
-            }
-            return pb - pa;
-        });
-        var i;
-        for (i = 0; i < p.length; i += 1) {
-            var pn = newLogNames[p[i]];
-            ret += '<tr class="p' + pn + '"><td>' + p[i] + '</td><td>' + playervp[pn] + '</td></tr>';
-        }
-        ret += '</table></div>';
-        return ret;
+/*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
+/*global jQuery, _, $, Audio, gsAlsoDo */
+
+var loadDecktracker;
+(function () {
+    "use strict";  // JSLint setting
+
+    console.log('Preparing to load Decktracker module');
+
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
     };
 
-    dw.prototype._old_moveCards = dw.prototype._moveCards;
-    dw.prototype._moveCards = function (options, callback) {
-        var m = options.moves;
+    // Wait (non-blocking) until the required objects have been instantiated
+    var waitLoop = setInterval(function () {
+
+        console.log('Checking for Deck Tracker dependencies');
+
         try {
-            for (i = 0; i < m.length; i += 1) {
-                if (m[i].source.area.name === 'reveal'
-                        && m[i].destination.area.name === 'hand'
-                        && m[i].source.area.playerIndex !== m[i].destination.area.playerIndex) {
-                    updateDeckMasq(m[i].source.area.playerIndex + 1, m[i].destination.area.playerIndex + 1,
-                                    decodeCard(m[i].sourceCard));
-                }
+            var gs = window.GokoSalvager;
+            var logManager = window.Dom.LogManager;
+            var domWindow = window.Dom.DominionWindow;
+            var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
+
+            if ([gs, logManager, domWindow, cdbc].every(exists)) {
+                console.log('Loading Log Viewer module');
+                loadDecktracker(gs, domWindow, logManager, cdbc);
+                clearInterval(waitLoop);
             }
-        } catch (e) { console.log('exception: ' + e); }
-        this._old_moveCards(options, callback);
+        } catch (e) {}
+    }, 100);
+}());
+
+loadDecktracker = function (gs, domWindow, logManager, cdbc) {
+    "use strict";
+
+    var alterCardCount, parseLogLine, pnames, getHumanCardName;
+
+    // "Listen" to live log messages
+    gsAlsoDo(logManager, 'addLog', function (opt) {
+        if (opt.text) {
+            parseLogLine(opt.text);
+        }
+    });
+
+    getHumanCardName = function (codedCardName) {
+        // Strip the numbers
+        codedCardName = codedCardName.replace(/\.\d+$/, '');
+        console.log(codedCardName);
+        // Translate "foolsGold" into "Fool's Gold"
+        var c = cdbc.filter(function (card) {
+            return card.nameId === codedCardName;
+        })[0];
+        console.log(c);
+        return c.name[0];
     };
 
-    function vp_txt() {
-        var i, ret = [];
-        var p = Object.keys(newLogNames);
-        for (i = 0; i < p.length; i += 1) {
-            ret.push(p[i] + ': ' + playervp[newLogNames[p[i]]]);
-        }
-        return ret.sort().join(', ');
-    }
-
-
-    var updateDeckMasq = function (src_player, dst_player, card) {
-        if (!card || !src_player || !dst_player) {
-            return;
-        }
-        console.log('passed: ' + card + ' from ' + src_player + ' to ' + dst_player);
-        updateCards(src_player, [card], -1);
-        updateCards(dst_player, [card], 1);
-    };
-
-    var vpoint = {
-        'Estate': function () {return 1; },
-        'Colony': function () {return 10; },
-        'Duchy': function () {return 3; },
-        'Duke': function (d) {return d.Duchy || 0; },
-        'Fairgrounds': function (d) {
-            var c, s = 0;
-            for (c in d) {
-                s += 1;
-            }
-            return 2 * Math.floor(s / 5);
-        },
-        'Farmland': function () {return 2; },
-        'Feodum': function (d) {return Math.floor((d.Silver || 0) / 3); },
-        'Gardens': function (d) {
-            var c, s = 0;
-            for (c in d) {
-                s += d[c];
-            }
-            return Math.floor(s / 10);
-        },
-        'Province': function () {return 6; },
-        'Silk Road': function (d) {
-            var c, s = 0;
-            for (c in d) {
-                if (types[c].match(/victory/)) {
-                    s += d[c];
-                }
-            }
-            return Math.floor(s / 4);
-        },
-        'Vineyard': function (d) {
-            var c, s = 0;
-            for (c in d) {
-                if (types[c].match(/\baction/)) {
-                    s += d[c];
-                }
-            }
-            return Math.floor(s / 3);
-        },
-        //'Overgrown Estate': function () {return 0},
-        'Dame Josephine': function () {return 2; },
-        'Great Hall': function () {return 1; },
-        'Nobles': function () {return 2; },
-        'Island': function () {return 2; },
-        'Harem': function () {return 2; },
-        'Tunnel': function () {return 2; },
-        'Curse': function () {return -1; },
-    };
-
-    function vp_in_deck(deck) {
-        var card, points = 0;
-        for (card in deck) {
-            if (vpoint[card]) {
-                points += deck[card] * vpoint[card](deck);
-            }
-        }
-        return points;
-    }
-
-    function updateCards(player, cards, v) {
+    // "Listen" to card moves that may be Masquerade passes
+    // (Masquerade passes do not appear in the live log)
+    gsAlsoDo(domWindow, '_moveCards', function (options, callback) {
         var i;
-        for (i = 0; i < cards.length; i += 1) {
-            playerDecks[player][cards[i]] = playerDecks[player][cards[i]] ?
-                    playerDecks[player][cards[i]] + v : v;
-            if (playerDecks[player][cards[i]] <= 0) {
-                delete playerDecks[player][cards[i]];
+        for (i = 0; i < options.moves.length; i += 1) {
+            var move = options.moves[i];
+            var srcArea = move.source.area;
+            var dstArea = move.destination.area;
+            if (srcArea.name === 'reveal' && dstArea.name === 'hand'
+                    && srcArea.playerIndex !== dstArea.playerIndex) {
+
+                // This is a name like 'grandMarket.3'; translate it
+                var passedCard = move.sourceCard;
+                console.log('Passed: ' + passedCard);
+                passedCard = getHumanCardName(passedCard);
+
+                console.log('Translated: ' + passedCard);
+                console.log(pnames);
+                console.log(srcArea.playerIndex);
+                console.log(dstArea.playerIndex);
+
+                // Decrement the passer's count, increment the recipient's
+                alterCardCount(pnames[srcArea.playerIndex], passedCard, -1);
+                alterCardCount(pnames[dstArea.playerIndex], passedCard, 1);
             }
         }
-        playervp[player] = vpchips[player] + vp_in_deck(playerDecks[player]);
-    }
+    });
 
-    updateDeck = function (player, action) {
-        var h;
-        if ((h = action.match(/^returns (.*) to the Supply$/)) !== null) {
-            updateCards(player, [h[1]], -1);
-        } else if ((h = action.match(/^gains (.*)/)) !== null) {
-            updateCards(player, [h[1]], 1);
-        } else if ((h = action.match(/^trashes (.*)/)) !== null) {
-            if (possessed && player === newLogMode) {
-                return;
+    var startPatt = new RegExp(/^-+ Game Setup -+$/);
+    var turnPatt = new RegExp(/^-+ (.*): turn \d+( \[possessed\])? -+$/);
+    var returnPatt = new RegExp(/(.*) - returns (.*) to the Supply/);
+    var gainPatt = new RegExp(/(.*) - gains (.*)/);
+    var trashPatt = new RegExp(/(.*) - trashes (.*)/);
+    var startingCardsPatt = new RegExp(/^(.*) - starting cards: (.*)/);
+    var vptokenPatt = new RegExp(/(.*) - receives ([0-9]*) victory point chips/);
+    var spoilsPatt = new RegExp(/(.*) - plays Spoils/);
+    var madmanPatt = new RegExp(/(.*) - plays Madman/);
+    // TODO: Are Monument or Goons bugged too?
+    var bishopPatt = new RegExp(/(.*) - plays Bishop/);
+
+    var turnPlayerName, possessed;
+    parseLogLine = function (line) {
+        var m, actorName, card;
+        if (line.match(startPatt)) {
+            gs.cardCounts = {};
+            gs.vptokens = {};
+            pnames = [];
+
+        } else if ((m = line.match(startingCardsPatt)) !== null) {
+
+            // Initialize players' card/vptoken counts
+            actorName = m[1];
+            gs.cardCounts[actorName] = {};
+            gs.vptokens[actorName] = 0;
+            pnames.push(actorName);
+
+            // Add starting cards
+            m[2].split(', ').map(function (card) {
+                alterCardCount(actorName, card, 1);
+            });
+
+        } else if ((m = line.match(turnPatt)) !== null) {
+            // Keep track of whose turn it is
+            turnPlayerName = m[1];
+            possessed = m[2] === ' [possessed]';
+
+        } else if ((m = line.match(gainPatt)) !== null) {
+            alterCardCount(m[1], m[2], 1);
+
+        } else if ((m = line.match(returnPatt)) !== null) {
+            alterCardCount(m[1], m[2], -1);
+
+        } else if ((m = line.match(trashPatt)) !== null) {
+            actorName = m[1];
+            card = m[2];
+            if (possessed) {
+                if (actorName !== turnPlayerName) {
+                    alterCardCount(actorName, card, -1);
+                }
+            } else if (card !== 'Fortress') {
+                // TODO: Does this handle Band of Misfits as Fortress correctly?
+                alterCardCount(actorName, card, -1);
             }
-            updateCards(player, h[1].split(', ').filter(function (c) {
-                return c !== "Fortress";
-            }), -1);
-        } else if ((h = action.match(/^starting cards: (.*)/)) !== null) {
-            updateCards(player, h[1].split(', '), 1);
-            /* live log does not have passed card names
-               } else if (h = action.match(/^passes (.*)/)) {
-               updateCards(player, [h[1]], -1);
-               updateCards(player === newLogPlayers ? 1 : player + 1, [h[1]], 1);
-               */
-        } else if ((h = action.match(/^receives ([0-9]*) victory point chips$/)) !== null) {
-            vpchips[player] += parseInt(h[1], 10);
-            updateCards(player, []);
-        } else if ((h = action.match(/^plays Bishop$/)) !== null) {
-            vpchips[player] += 1;
-            updateCards(player, []);
-        } else if ((h = action.match(/^plays (Spoils|Madman)$/)) !== null) {
-            updateCards(player, [h[1]], -1);
+
+        } else if ((m = line.match(bishopPatt)) !== null) {
+            // Bishop's +1 VP doesn't show up in the live log
+            gs.vptokens[m[1]] += 1;
+
+        } else if ((m = line.match(vptokenPatt)) !== null) {
+            gs.vptokens[m[1]] += parseInt(m[2], 10);
+
+        } else if ((m = line.match(spoilsPatt)) !== null) {
+            alterCardCount(m[1], 'Spoils', -1);
+
+        } else if ((m = line.match(madmanPatt)) !== null) {
+            alterCardCount(m[1], 'Madman', -1);
         }
     };
 
-
+    alterCardCount = function (pname, card, n) {
+        gs.cardCounts[pname][card] = gs.cardCounts[pname][card] || 0;
+        gs.cardCounts[pname][card] += n;
+    };
+};
