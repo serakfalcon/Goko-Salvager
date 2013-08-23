@@ -1,11 +1,3 @@
-    dw.prototype._old_updateState = dw.prototype._updateState;
-    dw.prototype._updateState = function (opt) {
-        if (opt.dominionPhase) {
-            newPhase = opt.dominionPhase;
-        }
-        this._old_updateState(opt);
-    };
-
     // For handling #vpon/#vpoff
     var old_onIncomingMessage = dc.prototype.onIncomingMessage;
     dc.prototype.onIncomingMessage = function (messageName, messageData, message) {
