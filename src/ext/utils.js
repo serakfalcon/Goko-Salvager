@@ -2,13 +2,13 @@ gsAlsoDo = function (object, methodname, fnBefore, fnAfter) {
 
     // Cache old version without overriding previous old versions' names
     var methodname_o = '_' + methodname + '_orig';
-    while (typeof object[methodname_o] !== 'undefined') {
+    while (typeof object.prototype[methodname_o] !== 'undefined') {
         methodname_o = methodname_o + 'X';
     }
-    object[methodname_o] = object[methodname];
+    object.prototype[methodname_o] = object.prototype[methodname];
 
     // Run old version sandwiched between "before" and "after" functions
-    object[methodname] = function () {
+    object.prototype[methodname] = function () {
         if (typeof fnBefore !== 'undefined' && fnBefore !== null) {
             fnBefore.apply(this, arguments);
         }
