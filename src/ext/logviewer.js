@@ -24,11 +24,15 @@ var loadLogviewerModule, createLogviewer, resizeLogviewer;
             var dw = window.Dom.DominionWindow;
             var dc = window.DominionClient;
 
-            if ([gs, gso, cdbc, lm, dw, dc].every(exists)) {
-                console.log('Loading Log Viewer module');
-                createLogviewer();
-                loadLogviewerModule(cdbc, lm, dw);
-                clearInterval(waitLoop);
+            try {
+                if ([gs, gso, cdbc, lm, dw, dc].every(exists)) {
+                    console.log('Loading Log Viewer module');
+                    createLogviewer();
+                    loadLogviewerModule(cdbc, lm, dw);
+                    clearInterval(waitLoop);
+                }
+            } catch (e2) {
+                console.err(e2);
             }
         } catch (e) {}
     }, 100);

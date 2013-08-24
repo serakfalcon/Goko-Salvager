@@ -20,9 +20,8 @@
         proranks: true,
         sortrating: true,
         adventurevp: true,
-        vp_enabled: true,
-        vp_always_on: false,
-        vp_always_off: false,
+        vp_request: true,
+        vp_disallow: false,
         always_stack: false,
         blacklist: [],
         automatch_on_seek: true,
@@ -48,7 +47,7 @@
     };
 
     gs.get_option = function (optName) {
-        return gs.get_options()[optName];
+        return gs.get_options()[optName] || default_options[optName];
     };
 
     gs.set_option = function (optionName, optionValue) {

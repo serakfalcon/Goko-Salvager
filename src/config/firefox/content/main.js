@@ -35,6 +35,8 @@ var myExtension = {
                 'avatars.js',
                 'blacklist.js',
                 'logviewer.js',
+                'decktracker.js',
+                'vpcounter.js',
                 'lobby_ratings.js',
                 'alwaysStack.js',
                 'decktracker.js',

@@ -1,21 +1,67 @@
 /*jslint browser:true, devel:true, nomen:true, forin:true, vars:true, regexp:true */
 /*globals $, _, gsAlsoDo */
 
-var x = function (gs, dc, cdbc, mroom) {
+var x;
+(function () {
+    "use strict";  // JSLint setting
+    console.log('Preparing to load VP Counter module');
+    var exists = function (obj) {
+        return (typeof obj !== 'undefined' && obj !== null);
+    };
+    var waitLoop = setInterval(function () {
+        console.log('Checking for VP Counter dependencies');
+
+        try {
+            var gs = window.GokoSalvager;
+            var gso = gs.get_option;
+            var dc = window.DominionClient;
+            var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
+            var mroom = window.mtgRoom;
+
+            try {
+                if ([gs, gso, cdbc, dc, mroom].every(exists)) {
+                    console.log('Loading VP Counter module');
+                    x(gs, dc, cdbc, mroom);
+                    clearInterval(waitLoop);
+                }
+            } catch (e2) {
+                console.err(e2);
+            }
+        } catch (e) {}
+    }, 5000);
+}());
+
+
+x = function (gs, dc, cdbc, mroom) {
     "use strict";
+
+    // Namespace for VP Counter
+    gs.vp = {};
+
+    // TODO: put somewhere more sensible
+    gs.salvagerURL = 'github.com/aiannacc/Goko-Salvager';
+
+    var tablename;
+
     var handleChat, handleLog, announceLock, isMyT1, sendChat, getScores, formatForChat,
-        deckVPValue, cardVPValue, pname, cardTypes, sum;
+        deckVPValue, cardVPValue, cardTypes, sum, createVPCounter;
  
-    var salvagerURL = ''; // TODO
     // TODO: UI displays VP counter if (s === true) or ((s === null) && (any(p)))
     // TODO: synchronize
-    
+
     // TODO
-    sendChat = function (message) {};
-    // TODO
-    getScores = function () {};
-    // TODO
-    formatForChat = function (scores) {};
+    getScores = function () {
+        return {
+            'hat': -1,
+            'fish': 5
+        };
+    };
+
+    formatForChat = function (scores) {
+        return _.keys(scores).map(function (pname) {
+            return pname + ': ' + scores[pname];
+        }).join(', ');
+    };
 
     cardTypes = {};
     cdbc.map(function (card) {
@@ -66,24 +112,34 @@ var x = function (gs, dc, cdbc, mroom) {
         }).reduce(sum);
     };
 
+
     // TODO: do with angular instead (?)
     // TODO: sort on update
     // TODO: add this to the display
-    $('<div id="vpdiv"/>').css('position', 'absolute')
-                          .css('padding', '2px')
-                          .css('background-color', 'gray');
-    $('<table id="vptable"/>').appendTo($('vpdiv'));
-    for (pname in gs.vp.pnames) {
-        var pindex = 0; // TODO
-        var row = $('<tr/>').attr('id', pname + 'VPRow')
-                            .addClass('p' + pindex);
-        $('<td/>').text(pname).appendTo(row);
-        $('<td/>').attr('id', pname + 'VP').appendTo(row);
-        $('#vptable').append(row);
-    }
+    createVPCounter = function () {
+        var pname;
+        $('#vpdiv').remove();
+        $('<div id="vpdiv"/>').css('position', 'absolute')
+                              .css('padding', '2px')
+                              .css('background-color', 'gray');
+        $('<table id="vptable"/>').appendTo($('vpdiv'));
+        for (pname in gs.vp.pnames) {
+            var pindex = 0; // TODO
+            var row = $('<tr/>').attr('id', pname + 'VPRow')
+                                .addClass('p' + pindex);
+            $('<td/>').text(pname).appendTo(row);
+            $('<td/>').attr('id', pname + 'VP').appendTo(row);
+            $('#vptable').append(row);
+        }
+    };
 
     // Listen to log and chat messages
     gsAlsoDo(dc, 'onIncomingMessage', function (messageName, messageData, message) {
+        // TODO: cache this somewhere more sensible
+        gs.clientConnection = gs.clientConnection || this.clientConnection;
+
+        var tname = JSON.parse(this.table.get("settings")).name;
+        tablename = tname || tablename;
         if (messageName === 'addLog') {
             handleLog(messageData.text);
         } else if (messageName === 'RoomChat') {
@@ -98,39 +154,46 @@ var x = function (gs, dc, cdbc, mroom) {
         var m = logText.match(/(.*): turn 1/);
         return m !== null
             && m[1] === mroom.localPlayer.get('playerName')
-            && !gs.vp.locked;
+            && !gs.vp.lock;
     };
 
     handleLog = function (text) {
+        console.log(text);
 
         if (text.match(/^-+ Game Setup -+$/)) {
             // Initialize
-            gs.vp.humancount = 0;
+            gs.vp.humanCount = 0;
             gs.vp.pnamesVPON = [];
             gs.vp.pnames = [];
             gs.vp.vpon = false;
             gs.vp.lock = false;
 
+            createVPCounter();
+
             // Handle table name #vpon/#vpoff commands
-            var tableName = JSON.parse(dc.table.get('settings')).name;
-            if (tableName.match(/#vpon/i)) {
-                gs.vp.vpon = true;
-                gs.vp.lock = true;
-                announceLock(true);
-            } else if (tableName.match(/#vpoff/i)) {
-                gs.vp.vpon = false;
-                gs.vp.lock = true;
-                announceLock(true);
+            if (typeof tablename !== 'undefined') {
+                if (tablename.match(/#vpon/i)) {
+                    gs.vp.vpon = true;
+                    gs.vp.lock = true;
+                    announceLock(true);
+                } else if (tablename.match(/#vpoff/i)) {
+                    gs.vp.vpon = false;
+                    gs.vp.lock = true;
+                    announceLock(true);
+                }
             }
 
         } else if (text.match(/(.*) - starting cards/)) {
             // Collect the player names
-            if (!text.match(/(Bottington.*| Bot|Bot [VI]+) - starting cards/)) {
+            var m = text.match(/(.*) - starting cards/);
+            var pname = m[1];
+            gs.vp.pnames.push(pname);
+            if (!pname.match(/(Bottington| Bot)( [VI]+)?$/)) {
                 gs.vp.humanCount += 1;
             }
 
-        } else if (isMyT1(text) && !gs.vp.locked) {
-            if (gs.getOption('vp_request')) {
+        } else if (isMyT1(text) && !gs.vp.lock) {
+            if (gs.get_option('vp_request')) {
                 sendChat('#vpon');
             }
 
@@ -146,53 +209,69 @@ var x = function (gs, dc, cdbc, mroom) {
 
     handleChat = function (speaker, text) {
         console.log('Chat from ' + speaker + ': ' + text);
-        if (text.match(/#vpon/i)) {
+        if (text.match(/^#vpon$/i)) {
 
-            if (gs.vp.locked) {
+            if (gs.vp.lock) {
                 // Do nothing if already locked
-                sendChat('Sorry, my VP counter is locked.');
-
-            } else if (gs.vp.pnamesVPON.indexOf(speaker) === -1) {
-                // Lock ON if all human players have requested #vpon
-                gs.vp.pnamesVPON.push(speaker);
-                gs.vp.vpon = true;
-                if (gs.vp.pnamesVPON.length === gs.vp.humanCount) {
-                    gs.vp.locked = true;
-                    announceLock(false);
+                if (!gs.vp.vpon) {
+                    sendChat('Sorry, my VP counter is already locked to OFF.');
                 }
 
-            } else if (gs.getOption('vp_disallow')) {
+            } else if (gs.get_option('vp_disallow')) {
                 // Automatically refuse if using vp_disallow option
                 sendChat('#vpoff');
 
             } else {
-                // Otherwise enable
+                // Otherwise enable without locking
                 gs.vp.vpon = true;
+
                 // If it's my own #vpon chat, explain it
-                if (speaker === mroom.localPlayer.get('playerName')) {
-                    sendChat('I would like to use a VP Counter (' + salvagerURL + '). '
+                if (speaker === mroom.localPlayer.get('playerName')
+                        && gs.vp.humanCount > 1) {
+                    sendChat('I would like to use a VP Counter (' + gs.salvagerURL + '). '
                            + 'Say "#vpoff" before turn 5 to disallow it or '
                            + '"#vp?" any time to see the score in chat.');
                 }
-            }
-         
-        } else if (text.match(/#vpoff/i)) {
-            gs.vp.vpon = false;
-            gs.vp.lock = true;
-            sendChat('My VP counter is now disabled.');
 
-        } else if (text.match(/#vp?/i)) {
+                // Lock ON if all human players have requested #vpon
+                if (gs.vp.pnamesVPON.indexOf(speaker) === -1) {
+                    gs.vp.pnamesVPON.push(speaker);
+                    gs.vp.vpon = true;
+                    if (gs.vp.pnamesVPON.length === gs.vp.humanCount) {
+                        gs.vp.lock = true;
+                        announceLock(false);
+                    }
+                }
+            }
+
+        } else if (text.match(/^#vpoff$/i)) {
+            if (gs.vp.lock) {
+                // Do nothing if already locked
+                if (!gs.vp.vpoff) {
+                    sendChat('Sorry, my VP counter is already locked to ON.');
+                }
+            } else {
+                gs.vp.vpon = false;
+                gs.vp.lock = true;
+                announceLock(false);
+            }
+
+        } else if (text.match(/^#vp\?$/i)) {
             if (gs.vp.vpon) {
                 sendChat(formatForChat(getScores()));
             } else {
-                sendChat('Sorry, my VP counter is disabled.');
+                sendChat('Sorry, my VP counter is off.');
             }
         }
     };
 
     announceLock = function (includeURL) {
         var msg = 'My VP counter is now ' + (gs.vp.vpon ? 'on' : 'disabled') + ' and locked.';
-        if (includeURL) { msg += ' See ' + salvagerURL; }
+        if (includeURL) { msg += ' See ' + gs.salvagerURL; }
         sendChat(msg);
+    };
+
+    sendChat = function (message) {
+        gs.clientConnection.send('sendChat', {text: message});
     };
 };
