@@ -138,10 +138,18 @@ x = function (gs, dc, cdbc, mroom) {
         // TODO: cache this somewhere more sensible
         gs.clientConnection = gs.clientConnection || this.clientConnection;
 
-        var tname = JSON.parse(this.table.get("settings")).name;
-        tablename = tname || tablename;
+        // TODO: figure out which messages actually contain the table name,
+        //       rather than just being overcautious like this
+        var tsettings = this.table.get("settings");
+        if (typeof tsettings !== 'undefined' && tsettings !== null) {
+            var tname = JSON.parse(this.table.get("settings")).name;
+            tablename = tname || tablename;
+        }
+
         if (messageName === 'addLog') {
-            handleLog(messageData.text);
+            if (messageData.hasOwnProperty('text')) {
+                handleLog(messageData.text);
+            }
         } else if (messageName === 'RoomChat') {
             var speaker = mroom.playerList.findByAddress(
                 messageData.playerAddress
@@ -151,10 +159,8 @@ x = function (gs, dc, cdbc, mroom) {
     });
 
     isMyT1 = function (logText) {
-        var m = logText.match(/(.*): turn 1/);
-        return m !== null
-            && m[1] === mroom.localPlayer.get('playerName')
-            && !gs.vp.lock;
+        var m = logText.match(/^-+ (.*): turn 1 -+$/);
+        return (m !== null) && (m[1] === mroom.localPlayer.get('playerName'));
     };
 
     handleLog = function (text) {
@@ -197,7 +203,7 @@ x = function (gs, dc, cdbc, mroom) {
                 sendChat('#vpon');
             }
 
-        } else if (text.match(/: turn 5/)) {
+        } else if (text.match(/^-+ (.*): turn 5 -+$/)) {
             // Lock counter on the first player's T5
             gs.vp.vpon = gs.vp.vpon || false;
             if (!gs.vp.lock && gs.vp.announced) {
@@ -231,6 +237,7 @@ x = function (gs, dc, cdbc, mroom) {
                     sendChat('I would like to use a VP Counter (' + gs.salvagerURL + '). '
                            + 'Say "#vpoff" before turn 5 to disallow it or '
                            + '"#vp?" any time to see the score in chat.');
+                    gs.vp.announced = true;
                 }
 
                 // Lock ON if all human players have requested #vpon

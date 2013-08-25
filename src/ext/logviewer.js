@@ -39,7 +39,7 @@ var loadLogviewerModule, createLogviewer, resizeLogviewer;
 }());
 
 // Add logviewer to GUI
-var createLogviewer = function () {
+createLogviewer = function () {
     "use strict";
     $('<div id="logview" />').appendTo($('#goko-game'));
     $('<div id="logdiv" />').addClass('prettylog')
@@ -87,7 +87,7 @@ resizeLogviewer = function () {
 /*
  * Log viewer module
  */
-var loadLogviewerModule = function (cdbc, lm, dw) {
+loadLogviewerModule = function (cdbc, lm, dw) {
     "use strict";   // JSLint setting
 
     var parseLogLine, logAppendCards, logAppend, logAppendPlayer;
@@ -112,6 +112,8 @@ var loadLogviewerModule = function (cdbc, lm, dw) {
         }
         if (opt.text) {
             parseLogLine(opt.text);
+            // Scroll to bottom of log
+            $('#logdiv').scrollTop($('#logdiv')[0].scrollHeight);
         }
     });
 
