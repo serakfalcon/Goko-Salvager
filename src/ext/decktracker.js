@@ -1,43 +1,13 @@
-/*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
-/*global jQuery, _, $, Audio, gsAlsoDo */
+/*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true, white:true */
+/*global jQuery, _, $, Audio */
 
-var loadDecktracker;
-(function () {
-    "use strict";  // JSLint setting
-
-    console.log('Preparing to load Decktracker module');
-
-    var exists = function (obj) {
-        return (typeof obj !== 'undefined' && obj !== null);
-    };
-
-    // Wait (non-blocking) until the required objects have been instantiated
-    var waitLoop = setInterval(function () {
-
-        console.log('Checking for Deck Tracker dependencies');
-
-        try {
-            var gs = window.GokoSalvager;
-            var logManager = window.Dom.LogManager;
-            var domWindow = window.Dom.DominionWindow;
-            var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
-
-            if ([gs, logManager, domWindow, cdbc].every(exists)) {
-                console.log('Loading Log Viewer module');
-                loadDecktracker(gs, domWindow, logManager, cdbc);
-                clearInterval(waitLoop);
-            }
-        } catch (e) {}
-    }, 100);
-}());
-
-loadDecktracker = function (gs, domWindow, logManager, cdbc) {
+var loadDecktracker = function (gs, domWindow, logManager, cdbc) {
     "use strict";
 
     var alterCardCount, parseLogLine, pnames, getHumanCardName;
 
     // "Listen" to live log messages
-    gsAlsoDo(logManager, 'addLog', function (opt) {
+    gs.alsoDo(logManager, 'addLog', function (opt) {
         if (opt.text) {
             parseLogLine(opt.text);
         }
@@ -57,7 +27,7 @@ loadDecktracker = function (gs, domWindow, logManager, cdbc) {
 
     // "Listen" to card moves that may be Masquerade passes
     // (Masquerade passes do not appear in the live log)
-    gsAlsoDo(domWindow, '_moveCards', function (options, callback) {
+    gs.alsoDo(domWindow, '_moveCards', function (options, callback) {
         var i;
         for (i = 0; i < options.moves.length; i += 1) {
             var move = options.moves[i];
@@ -162,3 +132,11 @@ loadDecktracker = function (gs, domWindow, logManager, cdbc) {
         }
     };
 };
+
+window.GokoSalvager.depWait(
+    ['GokoSalvager',
+     'Dom.DominionWindow',
+     'Dom.LogManager',
+     'FS.Dominion.CardBuilder.Data.cards'],
+    5000, loadDecktracker, this, 'Decktracker Module'
+);

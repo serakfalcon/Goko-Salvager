@@ -12,9 +12,18 @@
   font-family: "TrajanPro", san-serif;
 }
 
-.prettylog {
+.prettylogview {
+  position:absolute;
+  overflow:auto;
+  background-color:white;
+  z-index:-1;
+}
+
+.prettylogdiv {
   font-size:12px;
   font-family:Helvetica, Arial;
+  overflow:auto;
+  padding:195px 5px 5px 5px;
 }
 
 table.logviewer {

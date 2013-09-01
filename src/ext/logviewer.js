@@ -1,55 +1,21 @@
-/*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
-/*global jQuery, _, $, Audio, gsAlsoDo */
+/*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true, white:true */
+/*global jQuery, _, $, Audio  */
 
 var loadLogviewerModule, createLogviewer, resizeLogviewer;
-(function () {
-    "use strict";  // JSLint setting
-
-    console.log('Preparing to load Log Viewer module');
-
-    var exists = function (obj) {
-        return (typeof obj !== 'undefined' && obj !== null);
-    };
-
-    // Wait (non-blocking) until the required objects have been instantiated
-    var waitLoop = setInterval(function () {
-
-        console.log('Checking for Log Viewer dependencies');
-
-        try {
-            var gs = window.GokoSalvager;
-            var gso = gs.get_option;
-            var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
-            var lm = window.Dom.LogManager;
-            var dw = window.Dom.DominionWindow;
-            var dc = window.DominionClient;
-
-            try {
-                if ([gs, gso, cdbc, lm, dw, dc].every(exists)) {
-                    console.log('Loading Log Viewer module');
-                    createLogviewer();
-                    loadLogviewerModule(cdbc, lm, dw);
-                    clearInterval(waitLoop);
-                }
-            } catch (e2) {
-                console.err(e2);
-            }
-        } catch (e) {}
-    }, 100);
-}());
 
 // Add logviewer to GUI
 createLogviewer = function () {
     "use strict";
-    $('<div id="logview" />').appendTo($('#goko-game'));
-    $('<div id="logdiv" />').addClass('prettylog')
-                            .appendTo('#logview');
-    $('#logview').css('position', 'absolute')
-                 .css('overflow', 'auto')
-                 .css('background-color', 'white')
-                 .css('z-index', '-1');
-    $('#logdiv').css('overflow', 'auto')
-                .css('padding', '195px 5px 5px 5px');
+    $('<div>').attr('id', 'logview')
+              .addClass('prettylogview')
+              .appendTo($('#goko-game'));
+    $('<div>').attr('id', 'vpdiv')
+              .appendTo($('#logview'));
+    $('<table>').attr('id', 'vptable')
+                .appendTo($('#vpdiv'));
+    $('<div>').attr('id', 'logdiv')
+              .addClass('prettylogdiv')
+              .appendTo($('#logview'));
 
     window.addEventListener('resize', function () {
         setTimeout(resizeLogviewer, 100);
@@ -87,7 +53,7 @@ resizeLogviewer = function () {
 /*
  * Log viewer module
  */
-loadLogviewerModule = function (cdbc, lm, dw) {
+loadLogviewerModule = function (gs, cdbc, lm, dw) {
     "use strict";   // JSLint setting
 
     var parseLogLine, logAppendCards, logAppend, logAppendPlayer;
@@ -98,14 +64,17 @@ loadLogviewerModule = function (cdbc, lm, dw) {
     // Current player/phase
     var gamePhase, logPhase, possessed, gameStarted, gameOver;
 
+    // Create the HTML GUI widgets
+    createLogviewer();
+
     // "Listen" to game phase changes. These always precede the log messages
     // of the new phase.
-    gsAlsoDo(dw, '_updateState', function (opt) {
+    gs.alsoDo(dw, '_updateState', function (opt) {
         gamePhase = opt.dominionPhase || gamePhase;
     });
 
     // "Listen" to log additions
-    gsAlsoDo(lm, 'addLog', function (opt) {
+    gs.alsoDo(lm, 'addLog', function (opt) {
         if (opt.logUrl) {
             // Link to retrobox prettified log instead of Goko
             opt.logUrl = 'http://dom.retrobox.eu/?' + opt.logUrl.substr(29);
@@ -242,3 +211,11 @@ loadLogviewerModule = function (cdbc, lm, dw) {
         }
     };
 };
+
+window.GokoSalvager.depWait(
+    ['GokoSalvager',
+     'FS.Dominion.CardBuilder.Data.cards',
+     'Dom.LogManager',
+     'Dom.DominionWindow'],
+    5000, loadLogviewerModule, this, 'Logviewer Module'
+);

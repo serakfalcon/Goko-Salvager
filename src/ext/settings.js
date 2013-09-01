@@ -11,7 +11,7 @@
     "use strict";
 
     // All extension globals should be defined here
-    window.GokoSalvager = {};
+    window.GokoSalvager = window.GokoSalvager || {};
     var gs = window.GokoSalvager;
 
     var default_options = {

@@ -1,38 +1,7 @@
-/*jslint browser:true, devel:true, nomen:true, forin:true, vars:true, regexp:true */
-/*globals $, _, gsAlsoDo */
+/*jslint browser:true, devel:true, nomen:true, forin:true, vars:true, regexp:true, white:true */
+/*globals $, _ */
 
-var x;
-(function () {
-    "use strict";  // JSLint setting
-    console.log('Preparing to load VP Counter module');
-    var exists = function (obj) {
-        return (typeof obj !== 'undefined' && obj !== null);
-    };
-    var waitLoop = setInterval(function () {
-        console.log('Checking for VP Counter dependencies');
-
-        try {
-            var gs = window.GokoSalvager;
-            var gso = gs.get_option;
-            var dc = window.DominionClient;
-            var cdbc = window.FS.Dominion.CardBuilder.Data.cards;
-            var mroom = window.mtgRoom;
-
-            try {
-                if ([gs, gso, cdbc, dc, mroom].every(exists)) {
-                    console.log('Loading VP Counter module');
-                    x(gs, dc, cdbc, mroom);
-                    clearInterval(waitLoop);
-                }
-            } catch (e2) {
-                console.err(e2);
-            }
-        } catch (e) {}
-    }, 5000);
-}());
-
-
-x = function (gs, dc, cdbc, mroom) {
+var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     "use strict";
 
     // Namespace for VP Counter
@@ -44,7 +13,7 @@ x = function (gs, dc, cdbc, mroom) {
     var tablename;
 
     var handleChat, handleLog, announceLock, isMyT1, sendChat, getScores, formatForChat,
-        deckVPValue, cardVPValue, cardTypes, sum, createVPCounter;
+        deckVPValue, cardVPValue, cardTypes, sum, createVPCounter, updateVPCounter;
  
     // TODO: UI displays VP counter if (s === true) or ((s === null) && (any(p)))
     // TODO: synchronize
@@ -52,8 +21,7 @@ x = function (gs, dc, cdbc, mroom) {
     // TODO
     getScores = function () {
         return {
-            'hat': -1,
-            'fish': 5
+            // TODO
         };
     };
 
@@ -112,29 +80,32 @@ x = function (gs, dc, cdbc, mroom) {
         }).reduce(sum);
     };
 
-
     // TODO: do with angular instead (?)
     // TODO: sort on update
     // TODO: add this to the display
     createVPCounter = function () {
-        var pname;
+        var i;
         $('#vpdiv').remove();
         $('<div id="vpdiv"/>').css('position', 'absolute')
                               .css('padding', '2px')
-                              .css('background-color', 'gray');
-        $('<table id="vptable"/>').appendTo($('vpdiv'));
-        for (pname in gs.vp.pnames) {
-            var pindex = 0; // TODO
-            var row = $('<tr/>').attr('id', pname + 'VPRow')
-                                .addClass('p' + pindex);
-            $('<td/>').text(pname).appendTo(row);
-            $('<td/>').attr('id', pname + 'VP').appendTo(row);
-            $('#vptable').append(row);
+                              .css('background-color', 'gray')
+                              .appendTo($('#logview'));
+        $('<table id="vptable"/>').appendTo($('#vpdiv'));
+    };
+
+    updateVPCounter = function () {
+        $('#vptable').empty();
+        var i, pname;
+        for (i = 0; i < gs.vp.pnames.length; i += 1) {
+            pname = gs.vp.pnames[i];
+            $('<tr/>').append($('<td/>').addClass('vppname'))
+                      .append($('<td/>').attr('id', pname + 'VP'))
+                      .appendTo($('#vptable'));
         }
     };
 
     // Listen to log and chat messages
-    gsAlsoDo(dc, 'onIncomingMessage', function (messageName, messageData, message) {
+    gs.alsoDo(dc, 'onIncomingMessage', function (messageName, messageData, message) {
         // TODO: cache this somewhere more sensible
         gs.clientConnection = gs.clientConnection || this.clientConnection;
 
@@ -174,8 +145,6 @@ x = function (gs, dc, cdbc, mroom) {
             gs.vp.vpon = false;
             gs.vp.lock = false;
 
-            createVPCounter();
-
             // Handle table name #vpon/#vpoff commands
             if (typeof tablename !== 'undefined') {
                 if (tablename.match(/#vpon/i)) {
@@ -197,6 +166,9 @@ x = function (gs, dc, cdbc, mroom) {
             if (!pname.match(/(Bottington| Bot)( [VI]+)?$/)) {
                 gs.vp.humanCount += 1;
             }
+
+        } else if (text.match(/^-+ (.*): turn 1 -+$/)) {
+            createVPCounter();
 
         } else if (isMyT1(text) && !gs.vp.lock) {
             if (gs.get_option('vp_request')) {
@@ -282,3 +254,8 @@ x = function (gs, dc, cdbc, mroom) {
         gs.clientConnection.send('sendChat', {text: message});
     };
 };
+
+window.GokoSalvager.depWait(
+    ['GokoSalvager', 'DominionClient', 'FS.Dominion.CardBuilder.Data.cards', 'mtgRoom'],
+    5000, loadVPCounterModule, this, 'VP Counter Module'
+);
