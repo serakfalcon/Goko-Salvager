@@ -452,6 +452,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
 
     rescindOffer = function (msg) {
         gs.AM.state.offer = null;
+        gs.AM.tableSettings = null;
         // TODO: handle this in a more UI-consistent way
         gs.AM.showOfferPop(false);
         alert('Automatch offer was rescinded:\n' + msg.reason);
@@ -631,14 +632,11 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         if ((m = tName.toLowerCase().match(/for\s*\S*/)) !== null) {
             console.log('Table is for a specific opp; no automatch');
         } else {
-            var np, hn, rs, ar;
+            var np, rs, ar;
 
             np = {rclass: 'NumPlayers', props: {}};
             np.props.min_players = pCount;
             np.props.max_players = pCount;
-
-            hn = {rclass: 'HostName', props: {}};
-            hn.props.hostname = gs.AM.player.pname;
 
             rs = {rclass: 'RatingSystem', props: {}};
             rs.props.rating_system = rSystem;
@@ -651,7 +649,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
             // Send seek request
             var seek = {
                 player: gs.AM.player,
-                requirements: [np, hn, rs, ar]
+                requirements: [np, rs, ar]
             };
             console.log(seek);
 
