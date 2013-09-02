@@ -31,16 +31,12 @@ var myExtension = {
             // Load javascript files in Goko page context
             var scriptDir = "chrome://gokosalvager/content/";
             var scriptFiles = [
-<<<<<<< HEAD
-                'avatars.js',
                 //'jquery-1.9.1.js',
                 'jquery-ui.js',
                 'angular.min.js',
-=======
-                'externals.js',
                 'utils.js',
->>>>>>> master
                 'settings.js',
+                'avatars.js',
                 'kingdom_generator.js',
                 'settingsDialog.js',
                 'userSettings.js',
