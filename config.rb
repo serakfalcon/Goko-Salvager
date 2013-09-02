@@ -7,11 +7,11 @@
     :author => 'The unofficial forum.dominionstrategy dev team',
     :contributors => [
         'philosophyguy',
-        '1wheel',
-        'michaeljb',
+        'Adam Pearce (1wheel)',
         'nutki',
-        'ragingduckd',
-        'yed'
+        'Michael Brandt (michaeljb)',
+        'Andrew Iannaccone (ragingduckd)',
+        'Zdenek Bouska (yed)'
     ],
     :icon16 => 'salvager16.png',
     :icon48 => 'salvager48.png',
@@ -21,26 +21,11 @@
     :manifest_version => '2',
     :safarixtz_url => 'http://goo.gl/1SJmbB',
 
-    # The pages to run the extension on
-    :targeturls => [
-        'http://play.goko.com/Dominion/gameClient.html',
-        'https://play.goko.com/Dominion/gameClient.html',
-        'http://beta.goko.com/Dominion/gameClient.html',
-        'https://beta.goko.com/Dominion/gameClient.html',
-    ],
-
-    # Domains to run the extension on (for Chrome)
-    :domains => [
-        'http://play.goko.com/',
-        'https://play.goko.com/',
-        'http://beta.goko.com/',
-        'https://beta.goko.com/',
-    ],
-
     # JS scripts for Goko to load, in order
     :js => [
+        'jquery-ui.js',
+        'angular.min.js',
         'utils.js',
-        'externals.js',
         'settings.js',
         'kingdom_generator.js',
         'settingsDialog.js',
@@ -61,6 +46,8 @@
         'automatchSeekPop.js',
         'automatch.js'
     ],
+
+    # CSS to be injected
     :css => [
         'logviewer.css',
         'jquery-gokocolors.css'
