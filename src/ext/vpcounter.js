@@ -111,8 +111,8 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
                 messageData.playerAddress
             ).get('playerName');
             handleChat(speaker, messageData.text);
+            updateVPCounter();
         }
-        updateVPCounter();
     });
 
     isMyT2 = function (logText) {
