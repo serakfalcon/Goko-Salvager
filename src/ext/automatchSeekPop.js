@@ -255,12 +255,12 @@
             visible = true;
         }
 
-        if (gs.AM.tableSettings === null) {
-            $('#seekPop').dialog(visible ? 'open' : 'close');
-            $('#seekhide').focus();
-        } else {
+        if (gs.AM.state.seek !== null && gs.AM.tableSettings !== null) {
             $('#seekAAPop').dialog(visible ? 'open' : 'close');
             $('#seekAAOkay').focus();
+        } else {
+            $('#seekPop').dialog(visible ? 'open' : 'close');
+            $('#seekhide').focus();
         }
     };
 }());

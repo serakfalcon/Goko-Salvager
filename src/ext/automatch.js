@@ -515,11 +515,11 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     gs.AM.cancelSeek = function (seek) {
         if (gs.AM.state.seek !== null) {
             gs.AM.state.seek.canceling = true;
-            gs.AM.tableSettings = null;
             gs.AM.ws.sendMessage('CANCEL_SEEK',
                 {seekid: gs.AM.state.seek.seekid},
                 function () { gs.AM.state.seek = null; });
         }
+        gs.AM.tableSettings = null;
     };
 
     gs.AM.acceptOffer = function (aoCallback) {
