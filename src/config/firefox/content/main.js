@@ -31,20 +31,19 @@ var myExtension = {
             // Load javascript files in Goko page context
             var scriptDir = "chrome://gokosalvager/content/";
             var scriptFiles = [
-                //'jquery-1.9.1.js',
-                'jquery-ui.js',
+                'jquery.ui.js',
                 'angular.min.js',
                 'utils.js',
                 'settings.js',
-                'avatars.js',
                 'kingdom_generator.js',
                 'settingsDialog.js',
                 'userSettings.js',
                 'tableState.js',
                 'autokick.js',
+                'avatars.js',
                 'blacklist.js',
+                'sidebar.js',
                 'logviewer.js',
-                'decktracker.js',
                 'vpcounter.js',
                 'lobby_ratings.js',
                 'alwaysStack.js',

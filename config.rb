@@ -26,10 +26,7 @@
 
     # JS scripts for Goko to load, in order
     :js => [
-        #'jquery.js',
-        #'fix_jquery_live.js',
         'jquery.ui.js',
-        #'jquery.layout.js',
         'angular.min.js',
         'utils.js',
         'settings.js',
@@ -42,7 +39,6 @@
         'blacklist.js',
         'sidebar.js',
         'logviewer.js',
-        #'decktracker.js',
         'vpcounter.js',
         'lobby_ratings.js',
         'alwaysStack.js',
