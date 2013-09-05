@@ -16,7 +16,7 @@
     :icon16 => 'salvager16.png',
     :icon48 => 'salvager48.png',
     :icon128 => 'salvager128.png',
-    :homepage => 'http://forum.dominionstrategy.com/index.php?topic=9063.0',
+    :homepage => 'https://github.com/aiannacc/Goko-Salvager/wiki',
     :license => 'MPL 2.0',
     :manifest_version => '2',
     :safarixtz_url => 'http://goo.gl/1SJmbB',
