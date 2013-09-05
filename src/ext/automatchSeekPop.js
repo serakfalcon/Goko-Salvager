@@ -18,9 +18,9 @@
         ].join(''));
 
         $('#seekAAPop').dialog({
-            modal: true,
+            modal: false,
             width: 500,
-            draggable: false,
+            draggable: true,
             resizeable: false,
             autoOpen: false
         });
@@ -149,9 +149,9 @@
         $('#seekPop select').css('top', 'auto');
 
         $('#seekPop').dialog({
-            modal: true,
+            modal: false,
             width: 550,
-            draggable: false,
+            draggable: true,
             resizeable: false,
             autoOpen: false
         });

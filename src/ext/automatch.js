@@ -106,9 +106,9 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                 //       I set ".ui-front {z-index: 1000}" in the included
                 //       JQuery "smoothness" style file.
                 $('#automatch-info-popup').dialog({
-                    modal: true,
+                    modal: false,
                     width: 500,
-                    draggable: false,
+                    draggable: true,
                     resizable: false
                 });
             });
