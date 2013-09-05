@@ -7,8 +7,14 @@ var createSidebar, resizeSidebar;
 resizeSidebar = function (gs) {
     "use strict";
 
+    // Hide sidebar if disabled in options
+    if (!gs.get_option('logviewer')) {
+        $('#sidebar').css('display', 'none');
+    }
+
     // Keep Goko play area in center
     if ($('#sidebar').css('display') === 'none') {
+        $('#goko-game').attr('style', 'left: 50% !important; margin-left: -512px !important');
         return;
     }
 

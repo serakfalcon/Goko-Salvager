@@ -11,6 +11,7 @@ window.GokoSalvager.createSettingsDialog = function () {
   <input type="checkbox" ng:model="us.generator" ng:click="save(us)" />Kingdom Generator<br />\
   <input type="checkbox" ng:model="us.proranks" ng:click="save(us)" />Display pro ratings<br />\
   <input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\
+  <input type="checkbox" ng:model="us.logviewer" ng:click="save(us)" />Show Prettified log and VP counter<br />\
   <input type="checkbox" ng:model="us.vp_request" ng:click="save(us)" />Always request VP counter (#vpon)<br />\
   <input type="checkbox" ng:model="us.vp_disallow" ng:click="save(us)" />Always refuse VP counter (#vpoff)<br />\
   <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>\

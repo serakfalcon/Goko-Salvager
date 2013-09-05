@@ -20,6 +20,7 @@
         proranks: true,
         sortrating: true,
         adventurevp: true,
+        logviewer: true,
         vp_request: true,
         vp_disallow: false,
         always_stack: false,
