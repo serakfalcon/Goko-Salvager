@@ -10,27 +10,22 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     // TODO: put somewhere more sensible
     gs.salvagerURL = 'github.com/aiannacc/Goko-Salvager';
 
-    var tablename;
-
-    var handleChat, handleLog, announceLock, isMyT1, sendChat, getScore, formatForChat,
-        deckVPValue, cardVPValue, cardTypes, sum, createVPCounter, updateVPCounter;
+    var tablename, handleChat, handleLog, announceLock, isMyT2, sendChat, getScore,
+        formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter,
+        updateVPCounter;
  
-    // TODO: UI displays VP counter if (s === true) or ((s === null) && (any(p)))
-    // TODO: synchronize
+    // TODO: synchronize <I'm not sure what I meant when I wrote this...>
 
     getScore = function (pname) {
         var deck = gs.cardCounts[pname];
         if (typeof deck === 'undefined') { return 0; }
         return _.keys(deck).map(function (card) {
-            //var v = cardVPValue(card, deck) * deck[card];
-            //var c = deck[card];
-            //console.log(card, deck, cardTypes, v,c);
             return cardVPValue(card, deck) * deck[card];
-        }).reduce(sum);
+        }).reduce(sum) + gs.vptokens[pname];
     };
 
-    formatForChat = function (scores) {
-        return _.keys(scores).map(function (pname) {
+    formatForChat = function () {
+        return _.keys(gs.cardCounts).map(function (pname) {
             return pname + ': ' + getScore(pname);
         }).join(', ');
     };
@@ -78,12 +73,10 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         }
     };
 
-    // TODO: do with angular instead (?)
-    // TODO: sort on update
-    // TODO: add this to the display
-
     updateVPCounter = function () {
         $('#vptable').empty();
+        if (!gs.vp.vpon) { return; }
+
         var i, pname, vps;
         for (i = 0; i < gs.vp.pnames.length; i += 1) {
             pname = gs.vp.pnames[i];
@@ -121,8 +114,8 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         }
     });
 
-    isMyT1 = function (logText) {
-        var m = logText.match(/^-+ (.*): turn 1 -+$/);
+    isMyT2 = function (logText) {
+        var m = logText.match(/^-+ (.*): turn 2 -+$/);
         return (m !== null) && (m[1] === mroom.localPlayer.get('playerName'));
     };
 
@@ -159,7 +152,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
                 gs.vp.humanCount += 1;
             }
 
-        } else if (isMyT1(text) && !gs.vp.lock) {
+        } else if (isMyT2(text) && !gs.vp.lock) {
             if (gs.get_option('vp_request')) {
                 sendChat('#vpon');
             }
@@ -184,7 +177,9 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
                     sendChat('Sorry, my VP counter is already locked to OFF.');
                 }
 
-            } else if (gs.get_option('vp_disallow')) {
+            } else if (gs.get_option('vp_disallow')
+                    && gs.vp.hasOwnProperty('humanCount')
+                    && gs.vp.humanCount > 1) {
                 // Automatically refuse if using vp_disallow option
                 sendChat('#vpoff');
 
@@ -226,7 +221,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
 
         } else if (text.match(/^#vp\?$/i)) {
             if (gs.vp.vpon) {
-                sendChat(formatForChat(getScores()));
+                sendChat(formatForChat());
             } else {
                 sendChat('Sorry, my VP counter is off.');
             }
