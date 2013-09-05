@@ -57,5 +57,17 @@
     :css => [
         'logviewer.css',
         'jquery-gokocolors.css'
+    ],
+
+    :img => [
+        'images/ui-icons_454545_256x240.png',
+        'images/ui-icons_222222_256x240.png',
+        'images/ui-bg_fine-grain_20_cbaa6e_60x60.png',
+        'images/ui-bg_glass_65_ffffff_1x400.png',
+        'images/ui-bg_glass_75_dadada_1x400.png',
+        'images/ui-bg_glass_75_e6e6e6_1x400.png',
+        'images/ui-icons_888888_256x240.png',
+        'images/ui-bg_flat_0_aaaaaa_40x100.png',
+        'images/ui-bg_fine-grain_10_c3c3c3_60x60.png'
     ]
 }

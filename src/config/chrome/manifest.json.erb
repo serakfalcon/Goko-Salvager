@@ -12,7 +12,8 @@
     "permissions": [ "webNavigation" ],
     "web_accessible_resources": [
         "<%= config[:js].join("\",\n        \"") %>",
-        "<%= config[:css].join("\",\n        \"") %>"
+        "<%= config[:css].join("\",\n        \"") %>",
+        "<%= config[:img].join("\",\n        \"") %>"
     ],
     "icons": {
         "16": "images/<%= config[:icon16] %>",
