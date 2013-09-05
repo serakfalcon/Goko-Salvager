@@ -47,7 +47,9 @@
     };
 
     gs.get_option = function (optName) {
-        return gs.get_options()[optName] || default_options[optName];
+        return gs.get_options().hasOwnProperty(optName)
+            ? gs.get_options()[optName]
+            : default_options[optName];
     };
 
     gs.set_option = function (optionName, optionValue) {
