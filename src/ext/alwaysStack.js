@@ -15,5 +15,5 @@ var loadAlwaysStackModule = function (gs, csp) {
 window.GokoSalvager.depWait(
     ['GokoSalvager',
      'FS.Cards.CardStackPanel'],
-    5000, loadAlwaysStackModule, this, 'Always Stack Module'
+    100, loadAlwaysStackModule, this, 'Always Stack Module'
 );

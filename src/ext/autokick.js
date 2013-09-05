@@ -69,5 +69,5 @@ var loadAutokickModule = function (gs, zch) {
 window.GokoSalvager.depWait(
     ['GokoSalvager',
      'FS.ZoneClassicHelper'],
-    5000, loadAutokickModule, this, 'Autokick module'
+    100, loadAutokickModule, this, 'Autokick module'
 );

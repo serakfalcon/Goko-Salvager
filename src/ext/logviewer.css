@@ -9,29 +9,40 @@
   font-weight: bold;
   color: #5baacb;
   cursor: pointer;
-  font-family: "TrajanPro", san-serif;
+  font-family: "TrajanPro", sanserif;
 }
 
-.prettylogview {
+#sidebar {
   position:absolute;
-  overflow:auto;
   background-color:white;
   z-index:-1;
 }
 
-.prettylogdiv {
+#prettylog {
   font-size:12px;
-  font-family:Helvetica, Arial;
+  font-family:Helvetica, Ariel;
   overflow:auto;
-  padding:195px 5px 5px 5px;
+  background-color: white;
+  padding:5px 5px 5px 5px;
+  visibility: inherit;
+  line-height: 140%;
 }
 
-table.logviewer {
+table.vptable {
+  padding: 2px;
+  background-color: gray;
   margin: 1px 1px;
+  visibility: inherit;
 }
 
-td.logviewer {
+tr.vptable {
+  visibility: inherit;
+  padding: 4px 4px;
+}
+
+td.vptable {
   padding: 1px 4px;
+  visibility: inherit;
 }
 
 h1.gameheader {

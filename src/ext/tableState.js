@@ -45,5 +45,5 @@ window.GokoSalvager.depWait(
     ['GokoSalvager',
      'FS.EditTableView',
      'FS.DominionEditTableView'],
-    5000, loadLogviewerModule, this, 'Logviewer Module'
+    100, loadTableSavingModule, this, 'Table Saving Module'
 );

@@ -93,5 +93,5 @@ window.GokoSalvager.depWait(
      'FS.RatingHelper',
      'FS.ClassicRoomView',
      'FS.MeetingRoomSetting'],
-    5000, loadLobbyRatingsModule, this, 'Lobby Ratings Module'
+    100, loadLobbyRatingsModule, this, 'Lobby Ratings Module'
 );

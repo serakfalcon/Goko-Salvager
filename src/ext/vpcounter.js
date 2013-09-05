@@ -12,22 +12,26 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
 
     var tablename;
 
-    var handleChat, handleLog, announceLock, isMyT1, sendChat, getScores, formatForChat,
+    var handleChat, handleLog, announceLock, isMyT1, sendChat, getScore, formatForChat,
         deckVPValue, cardVPValue, cardTypes, sum, createVPCounter, updateVPCounter;
  
     // TODO: UI displays VP counter if (s === true) or ((s === null) && (any(p)))
     // TODO: synchronize
 
-    // TODO
-    getScores = function () {
-        return {
-            // TODO
-        };
+    getScore = function (pname) {
+        var deck = gs.cardCounts[pname];
+        if (typeof deck === 'undefined') { return 0; }
+        return _.keys(deck).map(function (card) {
+            //var v = cardVPValue(card, deck) * deck[card];
+            //var c = deck[card];
+            //console.log(card, deck, cardTypes, v,c);
+            return cardVPValue(card, deck) * deck[card];
+        }).reduce(sum);
     };
 
     formatForChat = function (scores) {
         return _.keys(scores).map(function (pname) {
-            return pname + ': ' + scores[pname];
+            return pname + ': ' + getScore(pname);
         }).join(', ');
     };
 
@@ -68,38 +72,25 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
             return Math.floor(actionCardCount / 3);
         default:
             // Get VP from Goko's CardBuilder data.
-            return cardTypes.filter(function (c) {
+            return cdbc.filter(function (c) {
                 return c.name[0] === card;
             })[0].vp;
         }
     };
 
-    deckVPValue = function (deck) {
-        return deck.map(function (card) {
-            return cardVPValue(card, deck);
-        }).reduce(sum);
-    };
-
     // TODO: do with angular instead (?)
     // TODO: sort on update
     // TODO: add this to the display
-    createVPCounter = function () {
-        var i;
-        $('#vpdiv').remove();
-        $('<div id="vpdiv"/>').css('position', 'absolute')
-                              .css('padding', '2px')
-                              .css('background-color', 'gray')
-                              .appendTo($('#logview'));
-        $('<table id="vptable"/>').appendTo($('#vpdiv'));
-    };
 
     updateVPCounter = function () {
         $('#vptable').empty();
-        var i, pname;
+        var i, pname, vps;
         for (i = 0; i < gs.vp.pnames.length; i += 1) {
             pname = gs.vp.pnames[i];
-            $('<tr/>').append($('<td/>').addClass('vppname'))
-                      .append($('<td/>').attr('id', pname + 'VP'))
+            vps = getScore(pname);
+            $('<tr>').addClass('p' + (i+1))
+                      .append($('<td>').addClass('vptable').text(pname))
+                      .append($('<td>').addClass('vptable').text(vps))
                       .appendTo($('#vptable'));
         }
     };
@@ -120,6 +111,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         if (messageName === 'addLog') {
             if (messageData.hasOwnProperty('text')) {
                 handleLog(messageData.text);
+                updateVPCounter();
             }
         } else if (messageName === 'RoomChat') {
             var speaker = mroom.playerList.findByAddress(
@@ -135,7 +127,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     };
 
     handleLog = function (text) {
-        console.log(text);
+        //console.log(text);
 
         if (text.match(/^-+ Game Setup -+$/)) {
             // Initialize
@@ -166,9 +158,6 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
             if (!pname.match(/(Bottington| Bot)( [VI]+)?$/)) {
                 gs.vp.humanCount += 1;
             }
-
-        } else if (text.match(/^-+ (.*): turn 1 -+$/)) {
-            createVPCounter();
 
         } else if (isMyT1(text) && !gs.vp.lock) {
             if (gs.get_option('vp_request')) {
@@ -257,5 +246,5 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
 
 window.GokoSalvager.depWait(
     ['GokoSalvager', 'DominionClient', 'FS.Dominion.CardBuilder.Data.cards', 'mtgRoom'],
-    5000, loadVPCounterModule, this, 'VP Counter Module'
+    100, loadVPCounterModule, this, 'VP Counter Module'
 );

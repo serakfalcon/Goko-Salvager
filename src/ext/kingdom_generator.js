@@ -691,5 +691,5 @@ window.GokoSalvager.depWait(
      'FS.Dominion.DeckBuilder.Persistent',
      'FS.DominionEditTableView',
      'FS.Dominion.CardBuilder.Data.cards'],
-    5000, loadLogviewerModule, this, 'Logviewer Module'
+    100, loadKingdomGenerator, this, 'Kingdom Generator Module'
 );

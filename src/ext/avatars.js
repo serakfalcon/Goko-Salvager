@@ -55,5 +55,5 @@ window.GokoSalvager.depWait(
     ['GokoSalvager',
      'Goko.Player',
      'FS.Templates.LaunchScreen'],
-    5000, loadAvatarModule, this, 'Avatar Module'
+    100, loadAvatarModule, this, 'Avatar Module'
 );

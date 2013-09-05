@@ -3,53 +3,6 @@
 
 var loadLogviewerModule, createLogviewer, resizeLogviewer;
 
-// Add logviewer to GUI
-createLogviewer = function () {
-    "use strict";
-    $('<div>').attr('id', 'logview')
-              .addClass('prettylogview')
-              .appendTo($('#goko-game'));
-    $('<div>').attr('id', 'vpdiv')
-              .appendTo($('#logview'));
-    $('<table>').attr('id', 'vptable')
-                .appendTo($('#vpdiv'));
-    $('<div>').attr('id', 'logdiv')
-              .addClass('prettylogdiv')
-              .appendTo($('#logview'));
-
-    window.addEventListener('resize', function () {
-        setTimeout(resizeLogviewer, 100);
-    }, false);
-};
-
-// Resize and reposition the logviewer to match the new window size
-resizeLogviewer = function () {
-    "use strict";
-
-    // Move Goko play area to far left
-    var lshift = (-1) * Math.floor(window.innerWidth / 2);
-    window.document.getElementById('goko-game')
-                   .setAttribute('style', 'margin-left: ' + lshift + 'px !important');
-
-    // Calculate new logviewer size and position
-    var goko_canvas = document.getElementById("myCanvas");
-    var goko_w = goko_canvas.offsetWidth;
-    var goko_h = goko_canvas.offsetHeight;
-    var w = window.innerWidth - goko_w;
-    var t = goko_canvas.style.marginTop;
-
-    // Resize and reposition logviewer
-    $('#logview').css('left', goko_w + 'px')
-                 .css('margin-top', t)
-                 .css('width', w + 'px')
-                 .css('height', goko_h);
-    $('#logdiv').css('height', (goko_h - 200) + 'px')
-                .css('width', (w - 10) + 'px');
-
-    // Scroll to bottom of log
-    $('#logdiv').scrollTop($('#logdiv')[0].scrollHeight);
-};
-
 /*
  * Log viewer module
  */
@@ -63,9 +16,6 @@ loadLogviewerModule = function (gs, cdbc, lm, dw) {
 
     // Current player/phase
     var gamePhase, logPhase, possessed, gameStarted, gameOver;
-
-    // Create the HTML GUI widgets
-    createLogviewer();
 
     // "Listen" to game phase changes. These always precede the log messages
     // of the new phase.
@@ -81,8 +31,7 @@ loadLogviewerModule = function (gs, cdbc, lm, dw) {
         }
         if (opt.text) {
             parseLogLine(opt.text);
-            // Scroll to bottom of log
-            $('#logdiv').scrollTop($('#logdiv')[0].scrollHeight);
+            $('#prettylog').scrollTop($('#prettylog').height());
         }
     });
 
@@ -109,7 +58,7 @@ loadLogviewerModule = function (gs, cdbc, lm, dw) {
             $('<span/>').addClass('card')
                         .addClass(cardTypes[card])
                         .text(cardTitle)
-                        .appendTo($("#logdiv"));
+                        .appendTo($("#prettylog"));
             if (i < cardList.length - 1) {
                 logAppend(', ');
             }
@@ -121,7 +70,7 @@ loadLogviewerModule = function (gs, cdbc, lm, dw) {
     };
 
     logAppend = function (text) {
-        $('#logdiv').append(text);
+        $('#prettylog').append(text);
     };
 
     var setupPatt = new RegExp(/^-+ Game Setup -+$/);
@@ -135,11 +84,10 @@ loadLogviewerModule = function (gs, cdbc, lm, dw) {
         var m, pname, pindex;
 
         if (line.match(setupPatt)) {
-            $('#logdiv'.empty);
+            $('#prettylog').empty();
             pname2pindex = {};
             logAppend($('<h1/>').addClass('gameheader').text('Game Setup'));
             gameStarted = false;
-            resizeLogviewer();
 
         } else if ((m = line.match(supplyPatt)) !== null) {
             logAppend('Supply Cards: ');
@@ -217,5 +165,5 @@ window.GokoSalvager.depWait(
      'FS.Dominion.CardBuilder.Data.cards',
      'Dom.LogManager',
      'Dom.DominionWindow'],
-    5000, loadLogviewerModule, this, 'Logviewer Module'
+    100, loadLogviewerModule, this, 'Logviewer Module'
 );

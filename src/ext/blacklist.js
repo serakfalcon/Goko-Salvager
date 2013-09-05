@@ -49,5 +49,5 @@ window.GokoSalvager.depWait(
     ['GokoSalvager',
      'window.FS.MeetingRoom',
      'window.FS.ClassicTableView'],
-    5000, loadBlacklistModule, this, 'Blacklist Module'
+    100, loadBlacklistModule, this, 'Blacklist Module'
 );

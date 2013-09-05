@@ -99,15 +99,18 @@ var loadDecktracker = function (gs, domWindow, logManager, cdbc) {
 
         } else if ((m = line.match(trashPatt)) !== null) {
             actorName = m[1];
-            card = m[2];
-            if (possessed) {
-                if (actorName !== turnPlayerName) {
+            m[2].split(', ').map(function (card) {
+                console.log(m[2]);
+                console.log('trashed card: [' + card + ']');
+                if (possessed) {
+                    if (actorName !== turnPlayerName) {
+                        alterCardCount(actorName, card, -1);
+                    }
+                } else if (card !== 'Fortress') {
+                    // TODO: Does this handle Band of Misfits as Fortress correctly?
                     alterCardCount(actorName, card, -1);
                 }
-            } else if (card !== 'Fortress') {
-                // TODO: Does this handle Band of Misfits as Fortress correctly?
-                alterCardCount(actorName, card, -1);
-            }
+            });
 
         } else if ((m = line.match(bishopPatt)) !== null) {
             // Bishop's +1 VP doesn't show up in the live log
@@ -138,5 +141,5 @@ window.GokoSalvager.depWait(
      'Dom.DominionWindow',
      'Dom.LogManager',
      'FS.Dominion.CardBuilder.Data.cards'],
-    5000, loadDecktracker, this, 'Decktracker Module'
+    100, loadDecktracker, this, 'Decktracker Module'
 );
