@@ -22,8 +22,9 @@ var loadAutokickModule = function (gs, zch) {
     zch.prototype.onPlayerJoinTable = function (t, tp) {
         this.old_onPlayerJoinTable(t, tp);
         var p = tp.get('player');
+        var isBot = p.get('isBot');
 
-        if (gs.get_option('autokick') && this.isLocalOwner(t)) {
+        if (gs.get_option('autokick') && this.isLocalOwner(t) && !isBot) {
             var settings = JSON.parse(t.get("settings"));
             var pro = settings.ratingType === 'pro';
             var m = settings.name.toLowerCase().match(/\b(\d+)(\d{3}|k)\+/);
