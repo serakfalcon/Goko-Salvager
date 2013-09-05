@@ -7,42 +7,6 @@
 var loadAutokickModule = function (gs, zch) {
     "use strict";
 
-    // Parse numbers like 303 and 4.23k
-    var parseNum = function (str) {
-        try {
-            var m = str.match(/^([0-9.]+)([kK]?)$/);
-            return Math.floor(parseFloat(m[1]) * (m[2] !== '' ? 1000 : 1));
-        } catch (e) {
-            // Fail silently if unparseable strings get here
-            return null;
-        }
-    };
-
-    // Parse titles like X+, Y-, X-Y, and +/-Z
-    // Precedence: +/- > range > min thresh > max thresh
-    var parseRange = function (tablename, myRating) {
-        var m, minRating = null, maxRating = null;
-
-        if ((m = tablename.match(/(\d+(.\d+)?([kK])?)-/)) !== null) { 
-            minRating = null;
-            maxRating = parseNum(m[1]);
-        }
-        if ((m = tablename.match(/(\d+(.\d+)?([kK])?)\+/)) !== null) {
-            minRating = parseNum(m[1]);
-            maxRating = null;
-        }
-        if ((m = tablename.match(/(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)/)) !== null) {
-            minRating = parseNum(m[1]);
-            maxRating = parseNum(m[4]);
-        }
-        if ((m = tablename.match(/\+\/-(\d+(.\d+)?([kK])?)/)) !== null) {
-            minRating = myRating - parseNum(m[1]);
-            maxRating = myRating + parseNum(m[1]);
-        }
-
-        return [minRating, maxRating];
-    };
-
     var getProRating = function (gokoconn, playerId, callback) {
         gokoconn.getRating({
             playerId: playerId,
@@ -56,7 +20,7 @@ var loadAutokickModule = function (gs, zch) {
 
         // Asynchronously get my rating
         getProRating(gokoconn, gokoconn.connInfo.playerId, function (myRating) {
-            if (typeof myRating === 'undefied') {
+            if (typeof myRating === 'undefined') {
                 console.log('No pro rating found for me -- using 1000');
                 myRating = 1000;
             }
@@ -65,7 +29,7 @@ var loadAutokickModule = function (gs, zch) {
 
             // Determine my acceptable rating range
             var tablename = JSON.parse(table.get("settings")).name;
-            var range = parseRange(tablename, myRating);
+            var range = gs.parseRange(tablename, myRating);
             var minRating = range[0];
             var maxRating = range[1];
 
@@ -73,7 +37,7 @@ var loadAutokickModule = function (gs, zch) {
 
             // Asynchronously get joiner's rating
             getProRating(gokoconn, joiner.get('playerId'), function (hisRating) {
-                if (typeof hisRating === 'undefied') {
+                if (typeof hisRating === 'undefined') {
                     console.log('No pro rating found for ' + joiner.get('playerName') + ' -- using 1000');
                     hisRating = 1000;
                 }
