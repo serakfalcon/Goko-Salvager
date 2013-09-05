@@ -89,7 +89,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     };
 
     // Listen to log and chat messages
-    gs.alsoDo(dc, 'onIncomingMessage', function (messageName, messageData, message) {
+    gs.alsoDo(dc, 'onIncomingMessage', null, function (messageName, messageData, message) {
         // TODO: cache this somewhere more sensible
         gs.clientConnection = gs.clientConnection || this.clientConnection;
 
@@ -112,6 +112,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
             ).get('playerName');
             handleChat(speaker, messageData.text);
         }
+        updateVPCounter();
     });
 
     isMyT2 = function (logText) {
