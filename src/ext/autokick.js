@@ -56,6 +56,10 @@ var loadAutokickModule = function (gs, zch) {
 
         // Asynchronously get my rating
         getProRating(gokoconn, gokoconn.connInfo.playerId, function (myRating) {
+            if (typeof myRating === 'undefied') {
+                console.log('No pro rating found for me -- using 1000');
+                myRating = 1000;
+            }
 
             console.log('My rating: ' + myRating);
 
@@ -69,16 +73,18 @@ var loadAutokickModule = function (gs, zch) {
 
             // Asynchronously get joiner's rating
             getProRating(gokoconn, joiner.get('playerId'), function (hisRating) {
+                if (typeof hisRating === 'undefied') {
+                    console.log('No pro rating found for ' + joiner.get('playerName') + ' -- using 1000');
+                    hisRating = 1000;
+                }
                 console.log('Joiner rating: ' + hisRating);
 
                 var shouldKick = false;
 
                 if (gs.get_option('autokick')
                     && !joiner.get('isBot') 
-                    && typeof myRating !== 'undefined'
-                    && (typeof hisRating === 'undefined' 
-                        || (minRating !== null && hisRating < minRating)
-                        || (maxRating !== null && hisRating > maxRating))) {
+                    && ((minRating !== null && hisRating < minRating) || 
+                        (maxRating !== null && hisRating > maxRating))) {
 
                     // Kick if joiner is rated too high or too low
                     console.log('Outside my range... kicking');
