@@ -157,6 +157,9 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                 ratingSystemId: gs.AM.CASUAL_SYS_ID
             }, function (resp) {
                 gs.AM.player.rating.goko_casual_rating = resp.data.rating;
+                if (!gs.AM.player.rating.hasOwnProperty('goko_casual_rating')) {
+                    gs.AM.player.rating.goko_casual_rating = 1000;
+                }
                 if (typeof frCallback !== undefined) {
                     frCallback();
                 }
@@ -168,6 +171,9 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                 ratingSystemId: gs.AM.PRO_SYS_ID
             }, function (resp) {
                 gs.AM.player.rating.goko_pro_rating = resp.data.rating;
+                if (!gs.AM.player.rating.hasOwnProperty('goko_pro_rating')) {
+                    gs.AM.player.rating.goko_pro_rating = 1000;
+                }
                 if (typeof frCallback !== undefined) {
                     frCallback();
                 }
@@ -449,7 +455,8 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
             gs.AM.gokoconn.bind(gs.AM.ENTER_LOBBY, hostGame);
 
             // Go to room or just create the game if we're already there
-            if (gs.AM.zch.currentRoom.get('roomId') === gs.AM.state.game.roomid) {
+            if (gs.AM.zch.currentRoom.get('roomId')
+                    === gs.AM.state.game.roomid) {
                 hostGame();
             } else {
                 gs.AM.zch.changeRoom(gs.AM.state.game.roomid);
@@ -588,15 +595,15 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         console.log('rSystem: ' + rSystem);
 
         // Match title fragments like 5432+, 5k+, 5.4k+
-        console.log('Reading min rating req');
-        var m, minRating = null;
-        if ((m = tName.match(/(\d(\.\d+){0,1})[kK]\+/)) !== null) {
-            minRating = Math.floor(1000 * parseFloat(m[1], 10));
-        } else if ((m = tName.match(/(\d\d\d\d)\+/)) !== null) {
-            minRating = parseInt(m[1], 10);
-        }
+        console.log('Reading rating range requirement');
+
+        // TODO: use casual rating for casual/unrated games?
+        var range = gs.parseRange(tName, gs.AM.player.rating.goko_pro_rating);
+        var minRating = range[0];
+        var maxRating = range[1];
 
         // Do not automatch if looking for a particular opponent
+        var m;
         if ((m = tName.toLowerCase().match(/for\s*\S*/)) !== null) {
             console.log('Table is for a specific opp; no automatch');
         } else {
@@ -611,7 +618,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
 
             ar = {rclass: 'AbsoluteRating', props: {}};
             ar.props.min_pts = minRating;
-            ar.props.max_pts = null;
+            ar.props.max_pts = maxRating;
             ar.props.rating_system = rSystem;
 
             // Send seek request
