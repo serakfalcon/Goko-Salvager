@@ -95,7 +95,7 @@ var loadAutokickModule = function (gs, zch) {
                 playerAddress: joiner.get('playerAddress')
             });
         } else {
-            new Audio('sounds/startTurn.ogg').play();
+            gs.alertPlayer('Opponent joined', new Audio('sounds/startTurn.ogg'));
         }
     };
 

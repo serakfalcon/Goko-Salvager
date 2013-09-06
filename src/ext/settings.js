@@ -17,6 +17,8 @@
     var default_options = {
         autokick_by_rating: true,
         autokick_by_forname: true,
+        alert_popups: false,
+        alert_sounds: true,
         generator: true,
         proranks: true,
         sortrating: true,

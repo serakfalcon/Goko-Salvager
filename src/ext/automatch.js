@@ -452,7 +452,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         gs.AM.state.seek = null;
         gs.AM.state.offer = msg.offer;
         gs.AM.showOfferPop(true);
-        new Audio('sounds/startTurn.ogg').play();
+        gs.alertPlayer('Automatch found', new Audio('sounds/startTurn.ogg'));
     };
 
     rescindOffer = function (msg) {

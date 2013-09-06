@@ -113,4 +113,12 @@
         return [minRating, maxRating];
     };
 
+    window.GokoSalvager.alertPlayer = function (message, sound) {
+        if (window.GokoSalvager.get_option('alert_sounds')) {
+            sound.play();
+        }
+        if (window.GokoSalvager.get_option('alert_popups')) {
+            window.alert(message);
+        }
+    };
 }());
