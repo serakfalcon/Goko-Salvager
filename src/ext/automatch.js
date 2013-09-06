@@ -825,12 +825,19 @@ var loadGatewayListener = function (gs, mtgRoom, gokoconn) {
     "use strict";
     var loadAndUnbind = function () {
         if (mtgRoom.helpers.hasOwnProperty('ZoneClassicHelper')) {
+            // NOTE: this can break if currentRoomId gets set or gatewayConnect
+            //       gets triggered before the ZCH is instantiated. I'm pretty
+            //       sure this never happens though.
             loadAutomatchModule(gs, gokoconn, mtgRoom,
                 mtgRoom.helpers.ZoneClassicHelper);
         }
         gokoconn.unbind('gatewayConnect', loadAndUnbind);
     };
-    gokoconn.bind('gatewayConnect', loadAndUnbind);
+    if (mtgRoom.currentRoomId !== null) {
+        loadAndUnbind();
+    } else {
+        gokoconn.bind('gatewayConnect', loadAndUnbind);
+    }
 };
 
 // Automatch depends on the conn and mtgRoom objects, which never get created
@@ -843,8 +850,8 @@ loadConnWatcher = function (gs, fsc) {
     gs.alsoDo(fsc, 'trigger', function () {
         if (first) {
             window.GokoSalvager.depWait(
-                ['GokoSalvager', 'mtgRoom', 'conn'],
-                5000, loadGatewayListener, this, 'Automatch gateway listener'
+                ['GokoSalvager', 'mtgRoom', 'mtgRoom.conn'],
+                100, loadGatewayListener, this, 'Automatch gateway listener'
             );
             first = false;
         }
@@ -853,5 +860,5 @@ loadConnWatcher = function (gs, fsc) {
 
 window.GokoSalvager.depWait(
     ['GokoSalvager', 'FS.Connection'],
-    5000, loadConnWatcher, this, 'Automatch Connection Watcher'
+    100, loadConnWatcher, this, 'Automatch Connection Watcher'
 );

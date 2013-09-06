@@ -1,5 +1,5 @@
-/*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true, vars:true */
-/*global jQuery, $ */
+/*jslint browser: true, devel: true, indent: 4, maxlen: 100, es5: true, vars:true */
+/*global jQuery, $, angular */
 
 (function () {
     "use strict"; // JSList mode
@@ -9,20 +9,73 @@
 
     gs.AM.appendOfferPopup = function (viewport) {
         viewport.append([
-            '<div id="offerPop" title="Automatch Found">',
-            '  Host: <label id="offerhost" /><br>',
-            '  Guests:<br>',
-            '  <ul id="plist"> </ul>',
-            '  Sets: <label id="offersets" /><br>',
-            '  Rating: <label id="offerrating" /><br>',
-            //'  Room: <label id="offerroom" /><br>',
-            '  ',
-            '  <p id="offerwaitinfo" />',
+            '<div id="offerPop" title="Automatch Found"',
+            '    ng-app="offerApp" ng-controller=offerController">',
+            '  You have been matched with',
+            '  <table>',
+            '    <tbody>',
+            '      <tr ng-repeat="player in players">',
+            '        <td>',
+            '          {{player.acceptStatus}}',
+            '        </td>',
+            '        <td>',
+            '          <img width=100 url="{{player.icon}}">',
+            '        </td>',
+            '        <td>',
+            '          {{player.pname}}',
+            '        </td>',
+            '        <td>',
+            '          [{{ratingsystem}}: {{player.rating}}]',
+            '        </td>',
+            '        <td>',
+            '          <input type="button" value="Blacklist">',
+            '        </td>',
+            '      </tr>',
+            '    </tbody>',
+            '  </table>',
+            //'  Expansions: ',
+            '  <img ng-repeat="expansion in expansions" url="{{getExpansionIcon(expansion)}}">',
+            //'  <br>',
+            //'  Rating System: ',
+            '  <img url="{{getRatingIcon(ratingSystem)}}"><br>',
             '  ',
             '  <input type="button" id="offeracc" value="Accept" />',
-            '  <input type="button" id="offerdec" value="Decline/Cancel" />',
+            '  <input type="button" id="offerdec" value="Decline" />',
             '</div>'
         ].join('\n'));
+
+        // Only show info for opponents, not for self
+        angular.module('notmeFilter', []).filter('notme', function () {
+            return function (players, player) {
+                return player;
+            };
+        });
+
+        // TODO: make this non-global
+        window.offerController = ["$scope", function ($scope) {
+            $scope.players = [];
+            $scope.ratingSystem = null;
+            $scope.getRatingIcon = function (ratingSystem) {
+                var base = 'http://play.goko.com/Dominion/img-meeting-room/';
+                switch (ratingSystem) {
+                case 'pro':
+                    return base + 'MR_Pro_icon.png';
+                case 'casual':
+                    return base + 'MR_Casual_icon.png';
+                case 'unrated':
+                    return base + 'MR_nonranked_icon.png';
+                }
+            };
+            $scope.getExpansionIcon = function (expansionName) {
+                var base = 'http://gokologs.drunkensailor.org/static/img/expansion/';
+                return base + 'guilds.png';
+            };
+        }];
+
+        // Enable AngularJS for this popup
+        angular.module('offerApp', ['notmeFilter'])
+               .config(['$routeProvider', function ($routeProvider) {} ]);
+
 
         $('#offerPop').dialog({
             modal: false,
