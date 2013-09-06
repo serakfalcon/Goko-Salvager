@@ -46,7 +46,7 @@ var loadAutokickModule = function (gs, zch) {
         if (table !== null) {
             var tableSettings = table.get('settings');
             if (tableSettings !== null && tableSettings !== '') {
-                tablename = JSON.parse(tableSettings).name;
+                tablename = JSON.parse(tableSettings).name || tablename;
             }
         }
 
