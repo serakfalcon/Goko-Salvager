@@ -157,7 +157,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                 ratingSystemId: gs.AM.CASUAL_SYS_ID
             }, function (resp) {
                 gs.AM.player.rating.goko_casual_rating = resp.data.rating;
-                if (!gs.AM.player.rating.hasOwnProperty('goko_casual_rating')) {
+                if (typeof resp.data.rating === 'undefined') {
                     gs.AM.player.rating.goko_casual_rating = 1000;
                 }
                 if (typeof frCallback !== undefined) {
@@ -171,7 +171,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                 ratingSystemId: gs.AM.PRO_SYS_ID
             }, function (resp) {
                 gs.AM.player.rating.goko_pro_rating = resp.data.rating;
-                if (!gs.AM.player.rating.hasOwnProperty('goko_pro_rating')) {
+                if (typeof resp.data.rating === 'undefined') {
                     gs.AM.player.rating.goko_pro_rating = 1000;
                 }
                 if (typeof frCallback !== undefined) {
