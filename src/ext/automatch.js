@@ -28,10 +28,12 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     automatchInitStarted = false;
     gs.AM.tableSettings = null;
     gs.AM.wsFailCount = 0;
+    gs.AM.noreconnect = false;
     gs.AM.state = {seek: null, offer: null, game: null};
 
     // Goko constants
-    gs.AM.ENTER_LOBBY = "gatewayConnect";              // Fired on lobby enter
+    gs.AM.ENTER_LOBBY = "gatewayConnect";
+    gs.AM.LEAVE_LOBBY = "gatewayDisconnect";
     gs.AM.GAME_START = "gameServerHello";              // Fired on game start
     gs.AM.TABLE_STATE = "tableState";                  // Fired on table changes
     gs.AM.CASUAL_SYS_ID = '4fd6356ce0f90b12ebb0ff3a';  // Goko casual rating sys
@@ -132,9 +134,38 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         gs.AM.gokoconn.bind(gs.AM.GAME_START, gs.AM.gameStarted);
 
         // Refresh player's rating info after games
-        // TODO: no need to refresh on room changes.
+        // TODO: no need to refresh on room changes, only after games end.
         gs.AM.gokoconn.bind(gs.AM.ENTER_LOBBY, function () {
-            fetchOwnRatings(updateAMButton);
+            // Check whether we've entered a multiplayer meeting room
+            console.log('Entered lobby: ' + mtgRoom.currentRoomId);
+            if (mtgRoom.currentRoomId !== null) {
+
+                // Enable auto-reconnect and connect to automatch server
+                gs.AM.noreconnect = false;
+                if (typeof gs.AM.ws === 'undefined'
+                        || gs.AM.ws === null
+                        || gs.AM.ws.readyState !== 1) {
+                    connectToAutomatchServer();
+                }
+
+                // Refresh my ratings
+                fetchOwnRatings(updateAMButton);
+            }
+        });
+
+        gs.AM.gokoconn.bind(gs.AM.LEAVE_LOBBY, function () {
+            // Shut down automatch when players leaves meeting room lobby
+            if (mtgRoom.currentRoomId === null) {
+                gs.AM.state = {seek: null, offer: null, game: null};
+
+                // Disable auto-reconnect and disconnect from automatch server
+                gs.AM.noreconnect = true;
+                if (typeof gs.AM.ws === 'undefined'
+                        || gs.AM.ws === null
+                        || gs.AM.ws.readyState === 1) {
+                    gs.AM.ws.close();
+                }   
+            }
         });
     };
 
@@ -373,7 +404,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         gs.AM.state = {seek: null, offer: null, game: null};
         gs.AM.wsFailCount += 1;
 
-        debug('Automatch failed: ' + gs.AM.wsFailCount
+        debug('Automatch connection failure: ' + gs.AM.wsFailCount
                 + '/' + gs.AM.wsMaxFails);
 
         // Update UI
@@ -388,13 +419,13 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         }
 
         // Wait 15 seconds and attempt reconnect.
-        if (gs.AM.wsFailCount < gs.AM.wsMaxFails) {
+        if (!gs.AM.noreconnect && gs.AM.wsFailCount < gs.AM.wsMaxFails) {
             setTimeout(function () {
                 connectToAutomatchServer();
                 updateAMButton();
             }, 15000);
         } else {
-            debug('Too many Automatch failures. Giving up');
+            debug('Not attempting to reconnect to automatch server.');
         }
     };
 
