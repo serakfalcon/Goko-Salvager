@@ -96,8 +96,8 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         // TODO: figure out which messages actually contain the table name,
         //       rather than just being overcautious like this
         var tsettings = this.table.get("settings");
-        if (typeof tsettings !== 'undefined' && tsettings !== null) {
-            var tname = JSON.parse(this.table.get("settings")).name;
+        if (typeof tsettings !== 'undefined' && tsettings !== null && tsettings !== '') {
+            var tname = JSON.parse(tsettings).name;
             tablename = tname || tablename;
         }
 
