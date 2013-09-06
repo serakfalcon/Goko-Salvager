@@ -7,7 +7,9 @@ window.GokoSalvager.createSettingsDialog = function () {
     return $('\
 <div id="usDialog" title="User Settings" \
   ng:app ng:controller="gokoSalvagerUserSettingsController" >\
-  <input type="checkbox" ng:model="us.autokick" ng:click="save(us)" />Autokick<br />\
+  Autokick:<br>\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.autokick_by_rating" ng:click="save(us)" />using rating range in game title<br />\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.autokick_by_forname" ng:click="save(us)" />using "For X" in game title<br />\
   <input type="checkbox" ng:model="us.generator" ng:click="save(us)" />Kingdom Generator<br />\
   <input type="checkbox" ng:model="us.proranks" ng:click="save(us)" />Display pro ratings<br />\
   <input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\

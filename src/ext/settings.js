@@ -15,7 +15,8 @@
     var gs = window.GokoSalvager;
 
     var default_options = {
-        autokick: true,
+        autokick_by_rating: true,
+        autokick_by_forname: true,
         generator: true,
         proranks: true,
         sortrating: true,
