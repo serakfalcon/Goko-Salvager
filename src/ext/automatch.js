@@ -821,44 +821,26 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     initAutomatch(mtgRoom, conn, zch);
 };
 
-var loadGatewayListener = function (gs, mtgRoom, gokoconn) {
+// Don't loop-wait for dependencies. Listen for room join events instead.
+var loadGatewayListener = function (gs, eventDispatcher) {
     "use strict";
-    var loadAndUnbind = function () {
-        if (mtgRoom.helpers.hasOwnProperty('ZoneClassicHelper')) {
-            // NOTE: this can break if currentRoomId gets set or gatewayConnect
-            //       gets triggered before the ZCH is instantiated. I'm pretty
-            //       sure this never happens though.
-            loadAutomatchModule(gs, gokoconn, mtgRoom,
-                mtgRoom.helpers.ZoneClassicHelper);
-        }
-        gokoconn.unbind('gatewayConnect', loadAndUnbind);
-    };
-    if (mtgRoom.currentRoomId !== null) {
-        loadAndUnbind();
-    } else {
-        gokoconn.bind('gatewayConnect', loadAndUnbind);
-    }
-};
-
-// Automatch depends on the conn and mtgRoom objects, which never get created
-// if the user goes into Adventure mode instead of Multiplayer. Rather than
-// looping forever to see if these objects exist, we'll hijack connection
-// events, the first of which is proof that the conn object has been created.
-loadConnWatcher = function (gs, fsc) {
-    "use strict";
-    var first = true;
-    gs.alsoDo(fsc, 'trigger', function () {
-        if (first) {
-            window.GokoSalvager.depWait(
-                ['GokoSalvager', 'mtgRoom', 'mtgRoom.conn'],
-                100, loadGatewayListener, this, 'Automatch gateway listener'
-            );
-            first = false;
+    var alreadyLoaded = false;
+    gs.alsoDo(eventDispatcher, 'trigger', null, function (msg, evt) {
+        if (msg === 'gatewayConnect' && !alreadyLoaded) {
+            try { 
+                var mtgRoom = window.mtgRoom;
+                var conn = mtgRoom.conn;
+                var zch = mtgRoom.helpers.ZoneClassicHelper;
+                if (typeof conn !== 'undefined' && typeof zch !== 'undefined') {
+                    loadAutomatchModule(gs, conn, mtgRoom, zch);
+                    alreadyLoaded = true;
+                }
+            } catch (e) {}
         }
     });
 };
 
 window.GokoSalvager.depWait(
-    ['GokoSalvager', 'FS.Connection'],
-    100, loadConnWatcher, this, 'Automatch Connection Watcher'
+    ['GokoSalvager', 'FS.EventDispatcher'],
+    100, loadGatewayListener, this, 'Automatch Gateway Listener'
 );
