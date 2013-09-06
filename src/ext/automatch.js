@@ -1,4 +1,4 @@
-/*jslint browser: true, devel: true, indent: 4, maxlen: 80, es5: true, vars:true, white:true */
+/*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true, vars:true, white:true */
 /*global jQuery, $, WebSocket, Audio */
 
 var loadConnWatcher, loadAutomatchModule;
@@ -821,6 +821,18 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     initAutomatch(mtgRoom, conn, zch);
 };
 
+var loadGatewayListener = function (gs, mtgRoom, gokoconn) {
+    "use strict";
+    var loadAndUnbind = function () {
+        if (mtgRoom.helpers.hasOwnProperty('ZoneClassicHelper')) {
+            loadAutomatchModule(gs, gokoconn, mtgRoom,
+                mtgRoom.helpers.ZoneClassicHelper);
+        }
+        gokoconn.unbind('gatewayConnect', loadAndUnbind);
+    };
+    gokoconn.bind('gatewayConnect', loadAndUnbind);
+};
+
 // Automatch depends on the conn and mtgRoom objects, which never get created
 // if the user goes into Adventure mode instead of Multiplayer. Rather than
 // looping forever to see if these objects exist, we'll hijack connection
@@ -831,11 +843,8 @@ loadConnWatcher = function (gs, fsc) {
     gs.alsoDo(fsc, 'trigger', function () {
         if (first) {
             window.GokoSalvager.depWait(
-                ['GokoSalvager',
-                 'conn',
-                 'mtgRoom',
-                 'mtgRoom.helpers.ZoneClassicHelper'],
-                5000, loadAutomatchModule, this, 'Automatch Module'
+                ['GokoSalvager', 'mtgRoom', 'conn'],
+                5000, loadGatewayListener, this, 'Automatch gateway listener'
             );
             first = false;
         }
