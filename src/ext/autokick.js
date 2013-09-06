@@ -34,19 +34,24 @@ var loadAutokickModule = function (gs, zch) {
                     hisRating = 1000;
                 }
 
-                kickOrNotify2(gokoconn, JSON.parse(table.get('settings')).name,
-                    table.get('number'), myRating, hisRating,
-                    joiner.get('playerName'), joiner.get('isBot'),
-                    joiner.get('playerAddress'));
+                kickOrNotify2(gokoconn, table, joiner, myRating, hisRating);
             });
         });
     };
 
-    kickOrNotify2 = function (gokoconn, tablename, tableNum, myRating, hisRating, hisName, heIsBot, hisAddress) {
+    kickOrNotify2 = function (gokoconn, table, joiner, myRating, hisRating) {
         var shouldKick = false;
+        var hisName = joiner.get('playerName');
+        var tablename = null;
+        if (table !== null) {
+            var tableSettings = table.get('settings');
+            if (tableSettings !== null && tableSettings !== '') {
+                tablename = JSON.parse(tableSettings).name;
+            }
+        }
 
         // Kick players whose ratings are too high or too low for me
-        if (gs.get_option('autokick_by_rating') && !heIsBot) {
+        if (gs.get_option('autokick_by_rating') && tablename !== null) {
 
             var range = gs.parseRange(tablename, myRating);
             var minRating = range[0];
@@ -60,7 +65,7 @@ var loadAutokickModule = function (gs, zch) {
         }
         
         // Kick players not listed in "For X, Y, ..."
-        if (gs.get_option('autokick_by_forname')) {
+        if (gs.get_option('autokick_by_forname') && tablename !== null) {
             var m = tablename.toLowerCase().match(/for (.*)/);
             if (m && m[1].indexOf(hisName.toLowerCase()) < 0) {
                 console.log(hisName + 'is not my requested opponent... kicking');
@@ -77,11 +82,17 @@ var loadAutokickModule = function (gs, zch) {
             }
         }
 
+        // Never kick bots
+        if (joiner.get('isBot')) {
+            console.log(hisName + ' is a bot... not kicking.');
+            shouldKick = false;
+        } 
+
         // Kick joiner or play a sound to notify of successful join
         if (shouldKick) {
             gokoconn.bootTable({
-                table: tableNum,
-                playerAddress: hisAddress
+                table: table.get('number'),
+                playerAddress: joiner.get('playerAddress')
             });
         } else {
             new Audio('sounds/startTurn.ogg').play();
