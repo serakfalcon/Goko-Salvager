@@ -407,7 +407,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         debug('Receipt of message confirmed: ' + msg.msgid);
         var crCallback = gs.AM.ws.callbacks[msg.msgid];
         if (typeof crCallback !== 'undefined' && crCallback !== null) {
-            debug(crCallback);
+            //debug(crCallback);
             crCallback();
         }
         updateAMButton();
@@ -531,6 +531,13 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
 
     gs.AM.acceptOffer = function (aoCallback) {
         var msg = {matchid: gs.AM.state.offer.matchid};
+
+        // Close the Create Table dialog if it's open
+        var detv = mtgRoom.views.ClassicRoomsEditTable;
+        if (detv.isShow) {
+            detv.onClickCancel();
+        }
+
         gs.AM.ws.sendMessage('ACCEPT_OFFER', msg, aoCallback);
     };
 
