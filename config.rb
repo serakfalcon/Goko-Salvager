@@ -35,7 +35,7 @@
         'userSettings.js',
         'tableState.js',
         'autokick.js',
-        'avatars.js',
+        #'avatars.js',
         'blacklist.js',
         'sidebar.js',
         'logviewer.js',
