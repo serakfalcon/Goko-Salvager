@@ -41,18 +41,21 @@ resizeSidebar = function (gs) {
 // Add logviewer to GUI
 createSidebar = function (gs, logManager) {
     "use strict";
-    $('#goko-game').append(
-        ['<div id="sidebar">',
-         '  <table id="vptable" class="vptable">',
-         '    <tr>',
-         '      <td>Player 1</td>',
-         '      <td>500</td>',
-         '    </tr>',
-         '  </table>',
-         '  <div id="prettylog"></div>',
-         '</div>'
-        ].join('\n')
-    );
+    $('#goko-game')
+        .append($('<div>').attr('id', 'sidebar')
+            .append($('<table>').attr('id', 'vptable')
+                                .addClass('vptable')
+                                .attr('ng-app', 'vpApp')
+                                .attr('ng-controller', 'vpController')
+                                .attr('ng-hide', '{{!vpon}}')
+                .append($('<tbody>')
+                    // TODO: sort by vp count
+                    .append($('<tr>').attr('ng-repeat',
+                                           'player in players | orderBy:"vps":true')
+                        .addClass('{{player.pclass}}')
+                        .append($('<td>').text('{{player.pname}}'))
+                        .append($('<td>').text('{{player.vps}}')))))
+            .append($('<div>').attr('id', 'prettylog')));
 
     // Hide sidebar until first game message
     $('#sidebar').hide();

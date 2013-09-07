@@ -1,5 +1,5 @@
 /*jslint browser:true, devel:true, nomen:true, forin:true, vars:true, regexp:true, white:true */
-/*globals $, _ */
+/*globals $, _, angular */
 
 var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     "use strict";
@@ -78,19 +78,30 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         }
     };
 
-    updateVPCounter = function () {
-        $('#vptable').empty();
-        if (!gs.vp.vpon) { return; }
+    window.vpController = function ($scope) {
+        $scope.players = [];
+        $scope.vpon = true;
+        $scope.addPlayer = function (pname) {
+            $scope.players.push({
+                pname: pname,
+                pclass: 'p' + ($scope.players.length + 1),
+                vps: null
+            });
+        };
+        $scope.setVPs = function (pname, vps) {
+            $scope.players.filter(function (p) {
+                return p.pname === pname;
+            })[0].vps = vps;
+            $scope.$digest();
+        };
+    };
 
-        var i, pname, vps;
-        for (i = 0; i < gs.vp.pnames.length; i += 1) {
-            pname = gs.vp.pnames[i];
-            vps = getScore(pname);
-            $('<tr>').addClass('p' + (i+1))
-                      .append($('<td>').addClass('vptable').text(pname))
-                      .append($('<td>').addClass('vptable').text(vps))
-                      .appendTo($('#vptable'));
-        }
+    angular.bootstrap($('#vptable'));
+
+    updateVPCounter = function () {
+        gs.vp.pnames.map(function (pname) {
+            $('#vptable').scope().setVPs(pname, getScore(pname));
+        });
     };
 
     // Listen to log and chat messages
@@ -157,6 +168,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
             if (!pname.match(/(Bottington| Bot)( [VI]+)?$/)) {
                 gs.vp.humanCount += 1;
             }
+            $('#vptable').scope().addPlayer(pname);
 
         } else if (isMyT2(text) && !gs.vp.lock) {
             if (gs.get_option('vp_request')) {
