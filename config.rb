@@ -30,7 +30,7 @@
         'angular.min.js',
         'utils.js',
         'settings.js',
-        #'kingdom_generator.js',
+        'kingdom_generator.js',
         'settingsDialog.js',
         'userSettings.js',
         'tableState.js',
