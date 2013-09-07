@@ -234,7 +234,7 @@
             }
         });
 
-        angular.bootstrap(window.document);
+        angular.bootstrap(window.document.getElementById('seekPop'));
     };
 
     // Update and show/hide the dialog
