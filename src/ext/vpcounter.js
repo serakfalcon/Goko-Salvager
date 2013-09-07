@@ -6,13 +6,13 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
 
     // Namespace for VP Counter
     gs.vp = {};
+    gs.vp.pnames = [];
 
     // TODO: put somewhere more sensible
     gs.salvagerURL = 'github.com/aiannacc/Goko-Salvager';
 
     var tablename, handleChat, handleLog, announceLock, isMyT2, sendChat, getScore,
-        formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter,
-        updateVPCounter;
+        formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter;
  
     // Fix Goko's incorrct VP value for Farmland, Tunnel, and Dame Josephine
     ['Dame Josephine', 'Farmland', 'Tunnel'].map(function (cardname) {
@@ -79,30 +79,36 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     };
 
     window.vpController = function ($scope) {
-        $scope.players = [];
-        $scope.vpon = true;
-        $scope.addPlayer = function (pname) {
-            $scope.players.push({
-                pname: pname,
-                pclass: 'p' + ($scope.players.length + 1),
-                vps: null
-            });
+        // Sync scope to underlying model of players and their VPs
+        var sync = function () {
+            var i = 0;
+            if (gs.vp.vpon) {
+                $scope.players = gs.vp.pnames.map(function (pname) {
+                    i += 1;
+                    return {
+                        pname: pname,
+                        pclass: 'p' + i,
+                        vps: getScore(pname)
+                    };
+                });
+            } else {
+                $scope.players = [];
+            }
         };
-        $scope.setVPs = function (pname, vps) {
-            $scope.players.filter(function (p) {
-                return p.pname === pname;
-            })[0].vps = vps;
-            $scope.$digest();
+        sync();
+
+        // Update when:
+        // - VP counter toggled
+        // - players added
+        // - decks changed
+        // - VP tokens gained
+        var state = function () {
+            return [gs.vp.vpon, gs.vp.pnames, gs.cardCounts, gs.vptokens];
         };
+        $scope.$watch(state, sync, true);
     };
 
     angular.bootstrap($('#vptable'));
-
-    updateVPCounter = function () {
-        gs.vp.pnames.map(function (pname) {
-            $('#vptable').scope().setVPs(pname, getScore(pname));
-        });
-    };
 
     // Listen to log and chat messages
     gs.alsoDo(dc, 'onIncomingMessage', null, function (messageName, messageData, message) {
@@ -120,15 +126,16 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         if (messageName === 'addLog') {
             if (messageData.hasOwnProperty('text')) {
                 handleLog(messageData.text);
-                updateVPCounter();
             }
         } else if (messageName === 'RoomChat') {
             var speaker = mroom.playerList.findByAddress(
                 messageData.playerAddress
             ).get('playerName');
             handleChat(speaker, messageData.text);
-            updateVPCounter();
         }
+        
+        // Tell AngularJS that the vptable's model may have changed
+        $('#vptable').scope().$digest();
     });
 
     isMyT2 = function (logText) {
@@ -168,7 +175,6 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
             if (!pname.match(/(Bottington| Bot)( [VI]+)?$/)) {
                 gs.vp.humanCount += 1;
             }
-            $('#vptable').scope().addPlayer(pname);
 
         } else if (isMyT2(text) && !gs.vp.lock) {
             if (gs.get_option('vp_request')) {
