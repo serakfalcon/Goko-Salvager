@@ -1,5 +1,5 @@
-/*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true, vars:true, white:true */
-/*global jQuery, $, WebSocket, Audio */
+/*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true, vars:true, white:true, nomen:true */
+/*global jQuery, $, _, WebSocket, Audio */
 
 var loadConnWatcher, loadAutomatchModule;
 
@@ -546,6 +546,8 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     };
 
     gs.AM.submitSeek = function (seek) {
+        seek.blacklist = _.union(gs.get_option('blacklist'),
+                gs.get_option('automatch_blacklist'));
         gs.AM.state.seek = seek;
         gs.AM.ws.sendMessage('SUBMIT_SEEK', {seek: gs.AM.state.seek});
     };

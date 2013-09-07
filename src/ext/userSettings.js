@@ -46,6 +46,14 @@ loadUserSettingsModule = function (gs) {
         $scope.us = gs.get_options();
         console.log($scope.us);
 
+        $scope.add_to_automatch_blacklist = function (pname) {
+            if (pname) {
+                $scope.us.automatch_blacklist.push(pname);
+            }
+            $scope.temp_ambl = null;
+            $scope.save($scope.us);
+        };
+
         $scope.add_to_blacklist = function (pname) {
             if (pname) {
                 $scope.us.blacklist.push(pname);
@@ -54,8 +62,17 @@ loadUserSettingsModule = function (gs) {
             $scope.save($scope.us);
         };
 
+        $scope.rem_from_automatch_blacklist = function (pname) {
+            if (pname) {
+                $scope.us.automatch_blacklist =
+                    $scope.us.automatch_blacklist.filter(function (p) {
+                        return p !== pname;
+                    });
+            }
+            $scope.save($scope.us);
+        };
+
         $scope.rem_from_blacklist = function (pname) {
-            console.log('adding ' + pname + ' to blacklist.');
             if (pname) {
                 $scope.us.blacklist =
                     $scope.us.blacklist.filter(function (p) {

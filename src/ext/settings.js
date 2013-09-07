@@ -28,6 +28,7 @@
         vp_disallow: false,
         always_stack: false,
         blacklist: [],
+        automatch_blacklist: [],
         automatch_on_seek: true,
         automatch_min_players: 2,
         automatch_max_players: 2,
@@ -38,12 +39,21 @@
     };
 
     gs.get_options = function () {
+        var opts;
         try {
-            return JSON.parse(localStorage.salvagerOptions);
+            opts = JSON.parse(localStorage.salvagerOptions);
         } catch (e) {
             gs.set_options(default_options);
-            return gs.get_options();
+            opts = JSON.parse(localStorage.salvagerOptions);
         }
+
+        var optname;
+        for (optname in default_options) {
+            if (!opts.hasOwnProperty(optname)) {
+                opts[optname] = default_options[optname];
+            }
+        }
+        return opts;
     };
 
     gs.set_options = function (options) {
