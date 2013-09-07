@@ -14,7 +14,15 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter,
         updateVPCounter;
  
-    // TODO: synchronize <I'm not sure what I meant when I wrote this...>
+    // Fix Goko's incorrct VP value for Farmland
+    cdbc.filter(function (card) {
+        return card.name[0] === 'Farmland';
+    })[0].vp = 2;
+
+    // Fix Goko's incorrct VP value for Dame Josephine
+    cdbc.filter(function (card) {
+        return card.name[0] === 'Dame Josephine';
+    })[0].vp = 2;
 
     getScore = function (pname) {
         var deck = gs.cardCounts[pname];
