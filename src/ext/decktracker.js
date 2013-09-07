@@ -128,6 +128,9 @@ var loadDecktracker = function (gs, domWindow, logManager, cdbc) {
     };
 
     alterCardCount = function (pname, card, n) {
+        if (card === 'JackOfAllTrades') {
+            card = 'Jack of All Trades';
+        }
         gs.cardCounts[pname][card] = gs.cardCounts[pname][card] || 0;
         gs.cardCounts[pname][card] += n;
         if (gs.cardCounts[pname][card] === 0) {
