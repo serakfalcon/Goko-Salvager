@@ -1,24 +1,6 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
 /*global $, _, angular */
 
-var loadUserSettingsModule;
-(function () {
-    "use strict";
-
-    console.log('Preparing to load User Settings module');
-
-    // Wait (non-blocking) until the required objects have been instantiated
-    var waitLoop = setInterval(function () {
-        var gs, gso, ang;
-
-        console.log('Checking for User Settings dependencies');
-
-        try {
-            gs = window.GokoSalvager;
-            gso = gs.get_option;
-        } catch (e) {}
-
-        if ($('.fs-rs-logout-row').length > 0
                 && typeof gso !== 'undefined' && gso !== null
                 && typeof window.angular !== 'undefined'
                 && typeof $('div').dialog !== 'undefined') {

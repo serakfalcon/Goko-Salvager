@@ -1,40 +1,64 @@
 /*jslint browser:true, devel:true, white:true, es5:true */
 /*globals $ */
 
-window.GokoSalvager.createSettingsDialog = function () {
-    "use strict";
-
-    return $('\
-<div id="usDialog" title="User Settings" \
-  ng:app ng:controller="gokoSalvagerUserSettingsController" >\
-  Autokick:<br>\
-  &nbsp&nbsp<input type="checkbox" ng:model="us.autokick_by_rating" ng:click="save(us)" />using rating range in game title<br />\
-  &nbsp&nbsp<input type="checkbox" ng:model="us.autokick_by_forname" ng:click="save(us)" />using "For X" in game title<br />\
-  Alerts:<br>\
-  &nbsp&nbsp<input type="checkbox" ng:model="us.alert_sounds" ng:click="save(us)" />Use sounds<br />\
-  &nbsp&nbsp<input type="checkbox" ng:model="us.alert_popups" ng:click="save(us)" />Use popups (not recommended)<br />\
-  <input type="checkbox" ng:model="us.generator" ng:click="save(us)" />Kingdom Generator<br />\
-  <input type="checkbox" ng:model="us.proranks" ng:click="save(us)" />Display pro ratings<br />\
-  <input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\
-  <input type="checkbox" ng:model="us.logviewer" ng:click="save(us)" />Show Prettified log and VP counter<br />\
-  <input type="checkbox" ng:model="us.vp_request" ng:click="save(us)" />Always request VP counter (#vpon)<br />\
-  <input type="checkbox" ng:model="us.vp_disallow" ng:click="save(us)" />Always refuse VP counter (#vpoff)<br />\
-  <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>\
-    Stack duplicate cards<br />\
-  Blacklist (noplay + censor):\
-  <table>\
-    <tr ng:repeat="pname in us.blacklist">\
-      <td><label style="color:red" ng:click="rem_from_blacklist(pname)">X</label> </td>\
-      <td>{{pname}}</td>\
-      <td></td>\
-      <td></td>\
-    </tr>\
-    <tr>\
-      <td></td>\
-      <td><input type="text" ng:model="temp_bl" /></td>\
-      <td><button ng:click="add_to_blacklist(temp_bl)" >Add</button></td>\
-      <td><button onclick="$(\'#usDialog\').dialog(\'close\');">Close</td>\
-    <tr>\
-  </table>\
-</div>');
-};
+$('#viewport')
+    .append($('<div>').attr('id', 'settingsDialog')
+                      .attr('title', 'Extension Settings')
+                      .attr('ng-app', 'settingsApp')
+                      .attr('ng-controller', 'settingsController')
+        .append($('<div>').text('Autokick:'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'autokick_by_rating')
+                            .text('by rating range')
+                            .addClass('indented'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'autokick_by_forname')
+                            .text('by player name')
+                            .addClass('indented'))
+        .append($('<div>').text('Notifications:'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'alert_sounds')
+                            .text('using sounds')
+                            .addClass('indented'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'alert_popups')
+                            .text('using popups')
+                            .addClass('indented'))
+        .append($('<div>').text('Lobby Ratings:'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'sort_rating')
+                            .text('Sort players by rating')
+                            .addClass('indented'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'proranks')
+                            .text('Display pro ratings')
+                            .addClass('indented'))
+        .append($('<div>').text('VP Counter:'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'logviewer')
+                            .text('Show pretty log & VP counter'))
+                            .addClass('indented'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'vp_request')
+                            .text('Always request (#vpon)')
+                            .addClass('indented'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'vp_disallow')
+                            .text('Always refuse (#vpoff)')
+                            .addClass('indented'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'generator')
+                            .text('Kingdom Generator'))
+        .append($('<input>').attr('type', 'checkbox')
+                            .attr('ng-model', 'always_stack')
+                            .text('Stack duplicate cards'))
+        .append($('<div>').text('Blacklist:'))
+        .append($('<table>')
+            .append($('<tbody>')
+                .append($('<tr>').attr('ng-repeat', 'pname in blacklist')
+                    .append($('<td>').css('color', 'red')
+                                    .text('X'))
+                    .append($('<span>').text('{{pname}}')))));
+//      <td><input type="text" ng:model="temp_bl" /></td>\
+//      <td><button  >Add</button></td>\
+//      <td><button onclick="$(\'#usDialog\').dialog(\'close\');">Close</td>\
