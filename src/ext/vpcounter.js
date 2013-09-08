@@ -12,7 +12,8 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
     gs.salvagerURL = 'github.com/aiannacc/Goko-Salvager';
 
     var tablename, handleChat, handleLog, announceLock, isMyT2, sendChat, getScore,
-        formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter;
+        formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter,
+        vpToggle;
  
     // Fix Goko's incorrct VP value for Farmland, Tunnel, and Dame Josephine
     ['Dame Josephine', 'Farmland', 'Tunnel'].map(function (cardname) {
@@ -143,45 +144,84 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         return (m !== null) && (m[1] === mroom.localPlayer.get('playerName'));
     };
 
+    // Try to enable/disable, lock, and explain the VP counter
+    vpToggle = function (vpon, lock, announce, lockReason) {
+
+        if (!gs.vp.lock && gs.humanCount > 1) {
+            // Respect lock setting in multiplayer games
+            sendChat('Sorry, my VP counter is already locked to '
+                    + gs.vp.vpon ? 'ON' : 'OFF');
+            sendChat('It was locked because ' + lockReason);
+
+        } else if (gs.vp.humanCount === 1) {
+            // Never lock or announce in bot/adventure games
+            gs.vp.vpon = vpon;
+
+        } else {
+            // Multiplayer game; counter not already locked
+            gs.vp.vpon = vpon;
+            gs.vp.lock = lock;
+
+            if (lock) {
+                sendChat('My VP counter is now ' + (vpon ? 'ON' : 'OFF')
+                       + ' and locked because ' + lockReason);
+            } else if (vpon && announce && !gs.vp.announced) {
+                // Explain and request the VP counter
+                sendChat('I would like to use a VP Counter (' + gs.salvagerURL + '). '
+                       + 'Say "#vpon" to allow it, "#vpoff" to disallow it, or '
+                       + '"#vp?" any time to see the score in chat.');
+                sendChat('#vpon');
+            }
+        }
+    };
+
     handleLog = function (text) {
-        //console.log(text);
 
+        // TODO: handle this on gatway connect instead?
         if (text.match(/^-+ Game Setup -+$/)) {
-            // Initialize
-            gs.vp.humanCount = 0;
-            gs.vp.pnamesVPON = [];
-            gs.vp.pnames = [];
-            gs.vp.vpon = false;
-            gs.vp.lock = false;
 
-            // Handle table name #vpon/#vpoff commands
+            // Initialize
+            gs.vp = {
+                pnames: [],
+                pnamesVPON: [],
+                vpon: false,
+                lock: false,
+                announced: false,
+                guest: mroom.localPlayer.get('playerName')
+                                        .match(/^guest/i) !== null
+            };
+
+            // Collect player info
+            mroom.playerList.models.map(function (player) {
+                gs.vp.pnames.push(player.get('playerName'));
+                gs.vp.multiplayer = gs.vp.multiplayer || !player.get('isBot');
+            });
+
+            // Always enable VP counter in bot/adventure games
+            if (!gs.vp.multiplayer) {
+                vpToggle(true, false, false);
+            }
+
+            // Default #vpon option applies immediately and silently, but
+            // does not lock and is not allowed for guests.
+            if (gs.get_option('vp_request') && !gs.vp.guest) { 
+                vpToggle(true, false, false);
+            }
+
+            // #vpon/#vpoff in table name applies and locks immediately.
             if (typeof tablename !== 'undefined') {
                 if (tablename.match(/#vpon/i)) {
-                    gs.vp.vpon = true;
-                    gs.vp.lock = true;
-                    announceLock(true);
+                    vpToggle(true, true, true);
                 } else if (tablename.match(/#vpoff/i)) {
-                    gs.vp.vpon = false;
-                    gs.vp.lock = true;
-                    announceLock(true);
+                    vpToggle(false, true, true);
                 }
             }
 
-        } else if (text.match(/(.*) - starting cards/)) {
-            // Collect the player names
-            var m = text.match(/(.*) - starting cards/);
-            var pname = m[1];
-            gs.vp.pnames.push(pname);
-            if (!pname.match(/(Bottington| Bot)( [VI]+)?$/)) {
-                gs.vp.humanCount += 1;
-            }
+        
+        } else if (isMyT2(text) && gs.vp.vpon &&  && !gs.vp.announced && gs.vp.multiplayer) {
+            sendChat('#vpon');
 
-        } else if (isMyT2(text) && !gs.vp.lock) {
-            if (gs.get_option('vp_request')) {
-                sendChat('#vpon');
-            }
-
-        } else if (text.match(/^-+ (.*): turn 5 -+$/)) {
+        } else if (text.match(/^-+ (.*): turn 5 -+$/) && gs.vp.humanCount > 1) {
             // Lock counter on the first player's T5
             gs.vp.vpon = gs.vp.vpon || false;
             if (!gs.vp.lock && gs.vp.announced) {
@@ -195,7 +235,7 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
         console.log('Chat from ' + speaker + ': ' + text);
         if (text.match(/^#vpon$/i)) {
 
-            if (gs.vp.lock) {
+            if (gs.vp.lock && gs.vp.humanCount > 1) {
                 // Do nothing if already locked
                 if (!gs.vp.vpon) {
                     sendChat('Sorry, my VP counter is already locked to OFF.');
@@ -232,15 +272,17 @@ var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
             }
 
         } else if (text.match(/^#vpoff$/i)) {
-            if (gs.vp.lock) {
+            if (gs.vp.lock && gs.vp.humanCount > 1) {
                 // Do nothing if already locked
                 if (!gs.vp.vpoff) {
                     sendChat('Sorry, my VP counter is already locked to ON.');
                 }
             } else {
                 gs.vp.vpon = false;
-                gs.vp.lock = true;
-                announceLock(false);
+                if (gs.vp.humanCount > 1) {
+                    gs.vp.lock = true;
+                    announceLock(false);
+                }
             }
 
         } else if (text.match(/^#vp\?$/i)) {
