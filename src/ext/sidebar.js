@@ -47,9 +47,7 @@ createSidebar = function (gs, logManager) {
                                 .addClass('vptable')
                                 .attr('ng-app', 'vpApp')
                                 .attr('ng-controller', 'vpController')
-                                .attr('ng-hide', '{{!vpon}}')
                 .append($('<tbody>')
-                    // TODO: sort by vp count
                     .append($('<tr>').attr('ng-repeat',
                                            'player in players | orderBy:"vps":true')
                         .addClass('{{player.pclass}}')
