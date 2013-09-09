@@ -23,14 +23,14 @@ var loadAutokickModule = function (gs, zch) {
         // Asynchronously get my rating
         getProRating(gokoconn, gokoconn.connInfo.playerId, function (myRating) {
             if (typeof myRating === 'undefined') {
-                console.log('No pro rating found for me -- using 1000');
+                gs.debug('No pro rating found for me -- using 1000');
                 myRating = 1000;
             }
 
             // Asynchronously get joiner's rating
             getProRating(gokoconn, joiner.get('playerId'), function (hisRating) {
                 if (typeof hisRating === 'undefined') {
-                    console.log('No pro rating found for ' + joiner.get('playerName') + ' -- using 1000');
+                    gs.debug('No pro rating found for ' + joiner.get('playerName') + ' -- using 1000');
                     hisRating = 1000;
                 }
 
@@ -59,7 +59,7 @@ var loadAutokickModule = function (gs, zch) {
 
             if ((minRating && hisRating < minRating)
                     || (maxRating && hisRating > maxRating)) {
-                console.log(hisName + 'is outside my rating range... kicking');
+                gs.debug(hisName + 'is outside my rating range... kicking');
                 shouldKick = true;
             }
         }
@@ -68,7 +68,7 @@ var loadAutokickModule = function (gs, zch) {
         if (gs.get_option('autokick_by_forname') && tablename !== null) {
             var m = tablename.toLowerCase().match(/for (.*)/);
             if (m && m[1].indexOf(hisName.toLowerCase()) < 0) {
-                console.log(hisName + 'is not my requested opponent... kicking');
+                gs.debug(hisName + 'is not my requested opponent... kicking');
                 shouldKick = true;
             }
         }
@@ -77,14 +77,14 @@ var loadAutokickModule = function (gs, zch) {
         var i, blackList = gs.get_option('blacklist');
         for (i = 0; i < blackList.length; i += 1) {
             if (blackList[i].toLowerCase() === hisName.toLowerCase()) {
-                console.log(hisName + 'is on my blacklist... kicking');
+                gs.debug(hisName + 'is on my blacklist... kicking');
                 shouldKick = true;
             }
         }
 
         // Never kick bots
         if (joiner.get('isBot')) {
-            console.log(hisName + ' is a bot... not kicking.');
+            gs.debug(hisName + ' is a bot... not kicking.');
             shouldKick = false;
         } 
 

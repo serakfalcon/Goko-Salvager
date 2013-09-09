@@ -309,7 +309,7 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     }
 
     function myBuildDeck(avail, s) {
-        console.log('Entering myBuildDeck');
+        gs.debug('Entering myBuildDeck');
         var i, c;
         var chosen = {};
         var deck = new Array(11);
@@ -319,8 +319,8 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
                     break;
                 }
                 for (c in avail) {
-                    console.log("Sets:");
-                    console.log(sets);
+                    gs.debug("Sets:");
+                    gs.debug(sets);
                     if (!sets.cost2[c] && !sets.cost3[c]) {
                         chosen[c] = true;
                     }

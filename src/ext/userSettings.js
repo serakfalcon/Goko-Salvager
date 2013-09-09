@@ -44,7 +44,7 @@ loadUserSettingsModule = function (gs) {
     window.gokoSalvagerUserSettingsController = function ($scope) {
         // Load settings on initialization
         $scope.us = gs.get_options();
-        console.log($scope.us);
+        gs.debug($scope.us);
 
         $scope.add_to_blacklist = function (pname) {
             if (pname) {
@@ -55,7 +55,7 @@ loadUserSettingsModule = function (gs) {
         };
 
         $scope.rem_from_blacklist = function (pname) {
-            console.log('adding ' + pname + ' to blacklist.');
+            gs.debug('adding ' + pname + ' to blacklist.');
             if (pname) {
                 $scope.us.blacklist =
                     $scope.us.blacklist.filter(function (p) {
@@ -74,7 +74,7 @@ loadUserSettingsModule = function (gs) {
         };
 
         $scope.save = function (us) {
-            console.log(angular.copy(us));
+            gs.debug(angular.copy(us));
             gs.set_options(angular.copy(us));
         };
     };

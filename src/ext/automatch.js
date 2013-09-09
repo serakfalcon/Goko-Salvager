@@ -96,7 +96,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                                  .css('color', 'blue')
                                  .css('cursor', 'pointer')
                                  .click(function () {
-                console.log('clicked for AM info');
+                gs.debug('clicked for AM info');
                 if ($('#automatch-info-popup').length === 0) {
                     $('<div>').prop('id', 'automatch-info-popup')
                               .html(amInfo)
@@ -137,7 +137,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         // TODO: no need to refresh on room changes, only after games end.
         gs.AM.gokoconn.bind(gs.AM.ENTER_LOBBY, function () {
             // Check whether we've entered a multiplayer meeting room
-            console.log('Entered lobby: ' + mtgRoom.currentRoomId);
+            gs.debug('Entered lobby: ' + mtgRoom.currentRoomId);
             if (mtgRoom.currentRoomId !== null) {
 
                 // Enable auto-reconnect and connect to automatch server
@@ -611,12 +611,12 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
      * Send an auto-automatch request
      */
     sendAutoAutomatchSeekRequest = function () {
-        console.log('Creating auto-automatch request');
+        gs.debug('Creating auto-automatch request');
 
         var tSettings = JSON.parse(gs.AM.mtgRoom.views.ClassicRoomsEditTable
                                      .retriveDOM().settings);
-        console.log("Table Settings:");
-        console.log(tSettings);
+        gs.debug("Table Settings:");
+        gs.debug(tSettings);
 
         // Cache table settings so that we build the same game if we
         // end up making an automatch in Casual or Unrated.
@@ -628,12 +628,12 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         }).length;
         var rSystem = tSettings.ratingType;
 
-        console.log('tname: ' + tName);
-        console.log('pcount: ' + pCount);
-        console.log('rSystem: ' + rSystem);
+        gs.debug('tname: ' + tName);
+        gs.debug('pcount: ' + pCount);
+        gs.debug('rSystem: ' + rSystem);
 
         // Match title fragments like 5432+, 5k+, 5.4k+
-        console.log('Reading rating range requirement');
+        gs.debug('Reading rating range requirement');
 
         // TODO: use casual rating for casual/unrated games?
         var range = gs.parseRange(tName, gs.AM.player.rating.goko_pro_rating);
@@ -643,7 +643,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         // Do not automatch if looking for a particular opponent
         var m;
         if ((m = tName.toLowerCase().match(/for\s*\S*/)) !== null) {
-            console.log('Table is for a specific opp; no automatch');
+            gs.debug('Table is for a specific opp; no automatch');
         } else {
             var np, rs, ar;
 
@@ -664,14 +664,14 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                 player: gs.AM.player,
                 requirements: [np, rs, ar]
             };
-            console.log(seek);
+            gs.debug(seek);
 
             // TODO: wait for seek canceled confirmation
             if (gs.AM.state.seek !== null) {
                 gs.AM.cancelSeek(gs.AM.state.seek);
             }
 
-            console.log('Sending auto-automatch request');
+            gs.debug('Sending auto-automatch request');
             gs.AM.submitSeek(seek);
         }
     };
@@ -812,7 +812,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     // Print debugging messages to the JS console
     debug = function (str) {
         if (gs.AM.log_debugging_messages) {
-            console.log(str);
+            gs.debug(str);
         }
     };
 
