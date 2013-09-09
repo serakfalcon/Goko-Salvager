@@ -378,7 +378,9 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     dbp.prototype._old_getRandomCards = dbp.prototype.getRandomCards;
     dbp.prototype.getRandomCards = function (opts, callback) {
         this._old_getRandomCards(opts, function (x) {
-            if (gs.get_option('generator') && !hideKingdomGenerator && opts.useEternalGenerateMethod) {
+            if (gs.get_option('generator') && !hideKingdomGenerator 
+                    && (!gs.AM.hasOwnProperty('state') || gs.AM.state.game === null)
+                    && opts.useEternalGenerateMethod) {
                 sel.prompt(function (val) {
                     try {
                         var all = {};
