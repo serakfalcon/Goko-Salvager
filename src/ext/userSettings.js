@@ -65,6 +65,14 @@ loadUserSettingsModule = function (gs) {
             $scope.save($scope.us);
         };
 
+        $scope.saveVPReq = function (us) {
+            us.vp_refuse = us.vp_refuse && !us.vp_request;
+        };
+
+        $scope.saveVPRef = function (us) {
+            us.vp_request = us.vp_request && !us.vp_refuse;
+        };
+
         $scope.save = function (us) {
             console.log(angular.copy(us));
             gs.set_options(angular.copy(us));
@@ -80,7 +88,7 @@ loadUserSettingsModule = function (gs) {
                 // Initialize if necessary
                 if ($('#usDialog').length === 0) {
                     $('#viewport').append(gs.createSettingsDialog());
-                    angular.bootstrap(window.document);
+                    angular.bootstrap($('#usDialog'));
                 }
                 // Display as JQueryUI popup dialog
                 $('#usDialog').dialog({
