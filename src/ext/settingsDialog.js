@@ -10,16 +10,17 @@ window.GokoSalvager.createSettingsDialog = function () {
   Autokick:<br>\
   &nbsp&nbsp<input type="checkbox" ng:model="us.autokick_by_rating" ng:click="save(us)" />using rating range in game title<br />\
   &nbsp&nbsp<input type="checkbox" ng:model="us.autokick_by_forname" ng:click="save(us)" />using "For X" in game title<br />\
+  Lobby Ratings:<br>\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.proranks" ng:click="save(us)" />Display pro ratings<br />\
   Alerts:<br>\
   &nbsp&nbsp<input type="checkbox" ng:model="us.alert_sounds" ng:click="save(us)" />Use sounds<br />\
-  &nbsp&nbsp<input type="checkbox" ng:model="us.alert_popups" ng:click="save(us)" />Use popups (not recommended)<br />\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.alert_popups" ng:click="save(us)" />Use popups<br />\
   VP Counter:<br>\
   &nbsp&nbsp<input type="checkbox" ng:model="us.vp_request" ng:click="saveVPReq(us)" />Always request (#vpon)<br />\
   &nbsp&nbsp<input type="checkbox" ng:model="us.vp_refuse" ng:click="saveVPRef(us)" />Always refuse (#vpoff)<br />\
-  <input type="checkbox" ng:model="us.generator" ng:click="save(us)" />Kingdom Generator<br />\
-  <input type="checkbox" ng:model="us.proranks" ng:click="save(us)" />Display pro ratings<br />\
-  <input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\
   <input type="checkbox" ng:model="us.sidebar" ng:click="save(us)" />Show in-game sidebar (log and VP counter)<br />\
+  <input type="checkbox" ng:model="us.generator" ng:click="save(us)" />Kingdom Generator<br />\
   <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>Stack duplicate cards<br />\
   <input type="checkbox" ng:model="us.debug_mode" ng:click="save(us)"/>Debugging mode<br />\
   Blacklist (noplay + censor):\
