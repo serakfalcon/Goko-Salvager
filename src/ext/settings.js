@@ -36,7 +36,8 @@
         automatch_max_sets: 15,
         automatch_rSystem: 'pro',
         automatch_rdiff: 1500,
-        debug_mode: false
+        debug_mode: false,
+        lasttablename: 'My Table'
     };
 
     gs.get_options = function () {
