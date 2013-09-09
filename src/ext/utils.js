@@ -61,7 +61,14 @@
                     window.GokoSalvager.debug('Checking deps for ' + name);
                 }
                 x = argNames.map(function (argName) {
-                    return argName.split('.').reduce(index, window);
+                    switch (argName[0]) {
+                    case '#':
+                        return window.document.getElementById(argName.substr(1))[0];
+                    case '.':
+                        return window.document.getElementsByClassName(argName.substr(1))[0];
+                    default:
+                        return argName.split('.').reduce(index, window);
+                    }
                 });
             } catch (e) {
                 if (name) {
@@ -69,7 +76,7 @@
                 }
                 return;
             }
-                
+
             if (x.every(exists)) {
                 if (name) { window.GokoSalvager.debug('Found deps for ' + name); }
                 callback.apply(null, x);
