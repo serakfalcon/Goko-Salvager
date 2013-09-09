@@ -546,6 +546,8 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
     };
 
     gs.AM.submitSeek = function (seek) {
+        seek.blacklist = _.union(gs.get_option('blacklist'),
+                gs.get_option('automatch_blacklist'));
         gs.AM.state.seek = seek;
         gs.AM.ws.sendMessage('SUBMIT_SEEK', {seek: gs.AM.state.seek});
     };

@@ -70,7 +70,7 @@
                                     .attr('ng-model', 'so.debug_mode'))
                 .append('Extra logging (for error reports)<br>')
 
-                .append('Blacklist:<br>')
+                .append('Blacklist (noplay + censor):<br>')
                 .append($('<table>').addClass('indented')
                     .append($('<tbody>')
                         .append($('<tr>').attr('ng-repeat', 'pname in so.blacklist')
@@ -82,7 +82,21 @@
                                    .addClass('indented')
                     .append('Add:')
                     .append($('<input>').attr('type', 'text')
-                                        .attr('ng-model', 'newBlacklistee'))));
+                                        .attr('ng-model', 'newBlacklistee')))
+
+                .append('Automatch Blacklist (no-automatch):<br>')
+                .append($('<table>').addClass('indented')
+                    .append($('<tbody>')
+                        .append($('<tr>').attr('ng-repeat', 'pname in so.automatch_blacklist')
+                            .append($('<td>').css('color', 'red')
+                                             .attr('ng-click', 'amblRemove(pname)')
+                                             .text('X'))
+                            .append($('<td>').text('{{pname}}')))))
+                .append($('<form>').attr('ng-submit', 'amblAdd()')
+                                   .addClass('indented')
+                    .append('Add:')
+                    .append($('<input>').attr('type', 'text')
+                                        .attr('ng-model', 'newAMBlacklistee'))));
 
         // Make dialog into a JQueryUI popup
         $('#settingsDialog').dialog({
@@ -112,6 +126,17 @@
             };
             $scope.blRemove = function (pname) {
                 $scope.so.blacklist = $scope.so.blacklist.filter(function (pn) {
+                    return pn !== pname;
+                });
+            };
+            $scope.amblAdd = function () {
+                if ($scope.newAMBlacklistee) {
+                    $scope.so.automatch_blacklist.push($scope.newAMBlacklistee);
+                    $scope.newAMBlacklistee = '';
+                }
+            };
+            $scope.amblRemove = function (pname) {
+                $scope.so.automatch_blacklist = $scope.so.automatch_blacklist.filter(function (pn) {
                     return pn !== pname;
                 });
             };

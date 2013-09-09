@@ -28,6 +28,7 @@
         vp_refuse: false,
         always_stack: false,
         blacklist: [],
+        automatch_blacklist: [],
         automatch_on_seek: true,
         automatch_min_players: 2,
         automatch_max_players: 2,
