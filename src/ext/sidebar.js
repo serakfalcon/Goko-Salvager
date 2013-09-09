@@ -35,12 +35,6 @@ resizeSidebar = function (gs) {
                  .css('border-collapse', 'collapse');
     $('#prettylog').css('height', $('#sidebar').height() - $('#vptable').height() - 10);
 
-    //var goko_h = goko_canvas.offsetHeight;
-    //var t = goko_canvas.style.marginTop;
-    //newLog.setAttribute("style", "position:absolute; overflow:auto; left:" + goko_w + "px; width:" + w + "px; margin-top:" + t + "; height:" + goko_h + "px; background-color: white; z-index: -1");
-
-    //newLog.innerHTML = vp_div() + '<div id="newlogcontainer" style="overflow:auto;height:' + (goko_h - 200) + 'px;width:' + (w - 10) + 'px;padding:195px 5px 5px 5px">' + newLogText + "</div>";
-
     // Scroll to bottom of log
     $('#prettylog').scrollTop(99999999);
 };
