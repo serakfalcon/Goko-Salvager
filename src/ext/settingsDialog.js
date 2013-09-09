@@ -66,19 +66,23 @@
                                     .attr('ng-model', 'so.always_stack'))
                 .append('Stack duplicate cards<br>')
 
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.debug_mode'))
+                .append('Extra logging (for error reports)<br>')
+
                 .append('Blacklist:<br>')
-                .append($('<table>')
+                .append($('<table>').addClass('indented')
                     .append($('<tbody>')
                         .append($('<tr>').attr('ng-repeat', 'pname in so.blacklist')
                             .append($('<td>').css('color', 'red')
                                              .attr('ng-click', 'blRemove(pname)')
                                              .text('X'))
-                            .append($('<td>').text('{{pname}}')))
-                        .append($('<tr>')
-                            .append($('<td>').text('Add:')
-                            .append($('<input>').attr('type', 'text')
-                                                .attr('ng-model', 'newBlacklistee')
-                                                .attr('ng-blur', 'blAdd()')))))));
+                            .append($('<td>').text('{{pname}}')))))
+                .append($('<form>').attr('ng-submit', 'blAdd()')
+                                   .addClass('indented')
+                    .append('Add:')
+                    .append($('<input>').attr('type', 'text')
+                                        .attr('ng-model', 'newBlacklistee'))));
 
         // Make dialog into a JQueryUI popup
         $('#settingsDialog').dialog({
