@@ -80,7 +80,7 @@ loadUserSettingsModule = function (gs) {
                 // Initialize if necessary
                 if ($('#usDialog').length === 0) {
                     $('#viewport').append(gs.createSettingsDialog());
-                    angular.bootstrap(window.document);
+                    angular.bootstrap($('#usDailog'));
                 }
                 // Display as JQueryUI popup dialog
                 $('#usDialog').dialog({
