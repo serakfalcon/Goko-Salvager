@@ -1,311 +1,364 @@
 /*jslint browser:true, devel:true, nomen:true, forin:true, vars:true, regexp:true, white:true */
 /*globals $, _, angular */
 
-var loadVPCounterModule = function (gs, dc, cdbc, mroom) {
+(function () {
     "use strict";
 
-    // Namespace for VP Counter
-    gs.vp = {};
-    gs.vp.pnames = [];
+    // Helper functions for Array.reduce()
+    var sum = function (a, b) { return a + b; };
+    var or = function (a, b) { return a || b; };
+    var and = function (a, b) { return a && b; };
 
-    // TODO: put somewhere more sensible
-    gs.salvagerURL = 'github.com/aiannacc/Goko-Salvager';
+    var buildUI = function (gs) {
 
-    var tablename, handleChat, handleLog, announceLock, isMyT2, sendChat, getScore,
-        formatForChat, deckVPValue, cardVPValue, cardTypes, sum, createVPCounter,
-        vpToggle;
- 
-    // Fix Goko's incorrct VP value for Farmland, Tunnel, and Dame Josephine
-    ['Dame Josephine', 'Farmland', 'Tunnel'].map(function (cardname) {
-        cdbc.filter(function (card) {
-            return card.name[0] === cardname;
-        })[0].vp = 2;
-    });
+        // Build UI using jQuery
+        $('#vptable').attr('ng-app', 'vpApp')
+                     .attr('ng-controller', 'vpController')
+                     .attr('id', 'vptable')
+                     .addClass('vptable')
+                     .attr('ng-show', 'vp.vpon')
+            .append($('<tbody>')
+                .append($('<tr>').attr('ng-repeat',
+                                       'player in vp.players | orderBy:"vps":true')
+                    .addClass('{{player.pclass}}')
+                    .append($('<td>').text('{{player.pname}}'))
+                    .append($('<td>').attr('ng-show', 'debugMode')
+                                     .text('{{player.request}}'))
+                    .append($('<td>').attr('ng-show', 'debugMode')
+                                     .text('{{player.wantsChange}}'))
+                    .append($('<td>').text('{{player.vps}}')))
+                .append($('<tr>').attr('ng-show', 'debugMode')
+                    .append($('<td>').text('{{vp.locked}}'))));
 
-    getScore = function (pname) {
-        var deck = gs.cardCounts[pname];
-        if (typeof deck === 'undefined') { return 0; }
-        return _.keys(deck).map(function (card) {
-            return cardVPValue(card, deck) * deck[card];
-        }).reduce(sum) + gs.vptokens[pname];
+        // Bind UI to model using AngularJS
+        window.vpController = function ($scope) {
+            $scope.vp = gs.vp;
+            $scope.debug = gs.debugMode;
+        };
+        angular.bootstrap($('#vptable'));
     };
 
-    formatForChat = function () {
-        return _.keys(gs.cardCounts).map(function (pname) {
-            return pname + ': ' + getScore(pname);
-        }).join(', ');
-    };
+    // Calculate VPs from info provided by decktracker.js
+    var loadVPCalculator = function (gs, cdbc) {
 
-    cardTypes = {};
-    cdbc.map(function (card) {
-        cardTypes[card.name[0]] = card.type;
-    });
+        // A single card's VP, given the final deck
+        var cardVPValue = function (card, deck) {
 
-    sum = function (a, b) { return a + b; };
-    cardVPValue = function (card, cardCounts) {
-        var c, d = cardCounts;
-        switch (card) {
-        case 'Dame Josephine':
-            return 2; // Not in CardBuilder (Goko bug)
-        case 'Duke':
-            return d.Duchy || 0;
-        case 'Fairgrounds':
-            return 2 * Math.floor(_.size(d) / 5);
-        case 'Feodum':
-            return Math.floor((d.Silver || 0) / 3);
-        case 'Gardens':
-            return Math.floor(_.values(d).reduce(sum) / 10);
-        case 'Silk Road':
-            var vpCardCount = 0;
-            for (c in d) {
-                if (cardTypes[c].match(/victory/)) {
-                    vpCardCount += d[c];
-                }
-            }
-            return Math.floor(vpCardCount / 4);
-        case 'Vineyard':
-            var actionCardCount = 0;
-            for (c in d) {
-                if (cardTypes[c].match(/action/)) {
-                    actionCardCount += d[c];
-                }
-            }
-            return Math.floor(actionCardCount / 3);
-        default:
-            // Get VP from Goko's CardBuilder data.
-            return cdbc.filter(function (c) {
+            // goko's data on this card
+            var cardData = cdbc.filter(function (c) {
                 return c.name[0] === card;
-            })[0].vp;
-        }
-    };
+            })[0];
 
-    window.vpController = function ($scope) {
-        // Sync scope to underlying model of players and their VPs
-        var sync = function () {
-            var i = 0;
-            if (gs.vp.vpon) {
-                $scope.players = gs.vp.pnames.map(function (pname) {
-                    i += 1;
-                    return {
-                        pname: pname,
-                        pclass: 'p' + i,
-                        vps: getScore(pname)
-                    };
-                });
-            } else {
-                $scope.players = [];
+            var c, d = deck;
+            switch (card) {
+            case 'Duke':
+                return d.Duchy || 0;
+            case 'Fairgrounds':
+                return 2 * Math.floor(_.size(d) / 5);
+            case 'Feodum':
+                return Math.floor((d.Silver || 0) / 3);
+            case 'Gardens':
+                return Math.floor(_.values(d).reduce(sum) / 10);
+            case 'Silk Road':
+                var vpCardCount = 0;
+                for (c in d) {
+                    if (cardData.type.match(/victory/)) {
+                        vpCardCount += d[c];
+                    }
+                }
+                return Math.floor(vpCardCount / 4);
+            case 'Vineyard':
+                var actionCardCount = 0;
+                for (c in d) {
+                    if (cardData.type.match(/action/)) {
+                        actionCardCount += d[c];
+                    }
+                }
+                return Math.floor(actionCardCount / 3);
+            case 'Farmland':
+            case 'Tunnel':
+            case 'Dame Josephine':
+                return 2;
+            default:
+                // Use goko's data except for Farmland, Tunnel, and Dame J., 
+                // which they have wrong in Dominion.CardDuilder.Data.cards
+                return cardData.vp;
             }
         };
-        sync();
 
-        // Update when:
-        // - VP counter toggled
-        // - players added
-        // - decks changed
-        // - VP tokens gained
-        var state = function () {
-            return [gs.vp.vpon, gs.vp.pnames, gs.cardCounts, gs.vptokens];
+        // Sum of card VP values and vp tokens
+        gs.getVPTotal = function (pname) {
+            var deck = gs.cardCounts[pname];
+            if (typeof deck === 'undefined') { return 0; }
+            return _.keys(deck).map(function (card) {
+                return cardVPValue(card, deck) * deck[card];
+            }).reduce(sum) + gs.vptokens[pname];
         };
-        $scope.$watch(state, sync, true);
     };
 
-    angular.bootstrap($('#vptable'));
+    var loadVPToggle = function (gs, dc, mroom) {
+        var initialize,
+            onTurnStart,
+            onToggleChatRequest,
+            onMyToggleChatRequest,
+            onOppToggleChatRequest;
 
-    // Listen to log and chat messages
-    gs.alsoDo(dc, 'onIncomingMessage', null, function (messageName, messageData, message) {
-        // TODO: cache this somewhere more sensible
-        gs.clientConnection = gs.clientConnection || this.clientConnection;
+        var salvagerURL = 'github.com/aiannacc/Goko-Salvager';
+        var chatConn, myname;
 
-        // TODO: figure out which messages actually contain the table name,
-        //       rather than just being overcautious like this
-        var tsettings = this.table.get("settings");
-        if (typeof tsettings !== 'undefined' && tsettings !== null && tsettings !== '') {
-            var tname = JSON.parse(tsettings).name;
-            tablename = tname || tablename;
-        }
+        var sendChat = function (message) {
+            chatConn.send('sendChat', {text: message});
+        };
 
-        if (messageName === 'addLog') {
-            if (messageData.hasOwnProperty('text')) {
-                handleLog(messageData.text);
-            }
-        } else if (messageName === 'RoomChat') {
-            var speaker = mroom.playerList.findByAddress(
-                messageData.playerAddress
-            ).get('playerName');
-            handleChat(speaker, messageData.text);
-        }
-        
-        // Tell AngularJS that the vptable's model may have changed
-        $('#vptable').scope().$digest();
-    });
-
-    isMyT2 = function (logText) {
-        var m = logText.match(/^-+ (.*): turn 2 -+$/);
-        return (m !== null) && (m[1] === mroom.localPlayer.get('playerName'));
-    };
-
-    // Try to enable/disable, lock, and explain the VP counter
-    vpToggle = function (vpon, lock, announce, lockReason) {
-
-        if (!gs.vp.lock && gs.humanCount > 1) {
-            // Respect lock setting in multiplayer games
-            sendChat('Sorry, my VP counter is already locked to '
-                    + gs.vp.vpon ? 'ON' : 'OFF');
-            sendChat('It was locked because ' + lockReason);
-
-        } else if (gs.vp.humanCount === 1) {
-            // Never lock or announce in bot/adventure games
-            gs.vp.vpon = vpon;
-
-        } else {
-            // Multiplayer game; counter not already locked
-            gs.vp.vpon = vpon;
-            gs.vp.lock = lock;
-
-            if (lock) {
-                sendChat('My VP counter is now ' + (vpon ? 'ON' : 'OFF')
-                       + ' and locked because ' + lockReason);
-            } else if (vpon && announce && !gs.vp.announced) {
-                // Explain and request the VP counter
-                sendChat('I would like to use a VP Counter (' + gs.salvagerURL + '). '
-                       + 'Say "#vpon" to allow it, "#vpoff" to disallow it, or '
-                       + '"#vp?" any time to see the score in chat.');
-                sendChat('#vpon');
-            }
-        }
-    };
-
-    handleLog = function (text) {
-
-        // TODO: handle this on gatway connect instead?
-        if (text.match(/^-+ Game Setup -+$/)) {
-
-            // Initialize
-            gs.vp = {
-                pnames: [],
-                pnamesVPON: [],
-                vpon: false,
-                lock: false,
-                announced: false,
-                guest: mroom.localPlayer.get('playerName')
-                                        .match(/^guest/i) !== null
-            };
-
-            // Collect player info
-            mroom.playerList.models.map(function (player) {
-                gs.vp.pnames.push(player.get('playerName'));
-                gs.vp.multiplayer = gs.vp.multiplayer || !player.get('isBot');
+        // Show a message in my chat box without sending
+        var showChat = function (message) {
+            chatConn.trigger("addChat", {
+                playerName: '***',
+                text: message
             });
+        };
 
-            // Always enable VP counter in bot/adventure games
-            if (!gs.vp.multiplayer) {
-                vpToggle(true, false, false);
-            }
+        // Are there at least two human players?
+        var isMultiplayer = function () {
+            return _.pluck(gs.vp.players, 'isBot').filter(function (x) {
+                return !x;
+            }).length > 1;
+        };
 
-            // Default #vpon option applies immediately and silently, but
-            // does not lock and is not allowed for guests.
-            if (gs.get_option('vp_request') && !gs.vp.guest) { 
-                vpToggle(true, false, false);
-            }
+        var allWantOn = function () {
+            return _.values(gs.vp.players).every(function (p) {
+                return p.isBot || (p.request === true);
+            });
+        };
 
-            // #vpon/#vpoff in table name applies and locks immediately.
-            if (typeof tablename !== 'undefined') {
-                if (tablename.match(/#vpon/i)) {
-                    vpToggle(true, true, true);
-                } else if (tablename.match(/#vpoff/i)) {
-                    vpToggle(false, true, true);
-                }
-            }
+        var allWantChange = function () {
+            return _.values(gs.vp.players).every(function (p) {
+                return p.isBot || (p.wantsChange === true);
+            });
+        };
 
-        
-        } else if (isMyT2(text) && gs.vp.vpon &&  && !gs.vp.announced && gs.vp.multiplayer) {
-            sendChat('#vpon');
+        var reqcount = function () {
+            return _.values(gs.vp.players).map(function (p) {
+                return (p.request !== null) ? 1 : 0;
+            }).reduce(sum);
+        };
 
-        } else if (text.match(/^-+ (.*): turn 5 -+$/) && gs.vp.humanCount > 1) {
-            // Lock counter on the first player's T5
-            gs.vp.vpon = gs.vp.vpon || false;
-            if (!gs.vp.lock && gs.vp.announced) {
-                announceLock(false);
-            }
-            gs.vp.lock = true;
-        }
-    };
-
-    handleChat = function (speaker, text) {
-        console.log('Chat from ' + speaker + ': ' + text);
-        if (text.match(/^#vpon$/i)) {
-
-            if (gs.vp.lock && gs.vp.humanCount > 1) {
-                // Do nothing if already locked
-                if (!gs.vp.vpon) {
-                    sendChat('Sorry, my VP counter is already locked to OFF.');
+        // Handle VP toggle events from Goko server
+        gs.alsoDo(dc, 'onIncomingMessage', null, function (msgType, msgData) {
+            if (msgType === 'gameSetup') {
+                // Gather game and player info; set initial VP counter state
+                initialize(msgData, this);
+                
+            } else if (msgType === 'addLog') {
+                if (!msgData.hasOwnProperty('text')) { return; }
+                var m = msgData.text.match(/^-+ (.*): turn ([0-9]*)/);
+                if (m !== null) {
+                    onTurnStart(m[1], parseInt(m[2], 10));
                 }
 
-            } else if (gs.get_option('vp_disallow')
-                    && gs.vp.hasOwnProperty('humanCount')
-                    && gs.vp.humanCount > 1) {
-                // Automatically refuse if using vp_disallow option
-                sendChat('#vpoff');
-
-            } else {
-                // Otherwise enable without locking
-                gs.vp.vpon = true;
-
-                // If it's my own #vpon chat, explain it
-                if (speaker === mroom.localPlayer.get('playerName')
-                        && gs.vp.humanCount > 1) {
-                    sendChat('I would like to use a VP Counter (' + gs.salvagerURL + '). '
-                           + 'Say "#vpoff" before turn 5 to disallow it or '
-                           + '"#vp?" any time to see the score in chat.');
-                    gs.vp.announced = true;
+                // Update VP totals
+                var pname;
+                for (pname in gs.vp.players) {
+                    gs.vp.players[pname].vps = gs.getVPTotal(pname);
                 }
 
-                // Lock ON if all human players have requested #vpon
-                if (gs.vp.pnamesVPON.indexOf(speaker) === -1) {
-                    gs.vp.pnamesVPON.push(speaker);
-                    gs.vp.vpon = true;
-                    if (gs.vp.pnamesVPON.length === gs.vp.humanCount) {
-                        gs.vp.lock = true;
-                        announceLock(false);
+            } else if (msgType === 'RoomChat') {
+                var speaker = mroom.playerList.findByAddress(msgData.playerAddress)
+                                              .get('playerName');
+
+                if (msgData.text.match(/^#vpon$/i)) {
+                    if (speaker === myname) {
+                        onMyToggleChatRequest(true);
+                    } else {
+                        onOppToggleChatRequest(speaker, true);
+                    }
+
+                } else if (msgData.text.match(/^#vpoff$/i)) {
+                    if (speaker === myname) {
+                        onMyToggleChatRequest(false);
+                    } else {
+                        onOppToggleChatRequest(speaker, false);
+                    }
+
+                } else if (msgData.text.match(/^#vp\?$/i)) {
+                    if (gs.vp.vpon) {
+                        var vpMessage = _.values(gs.vp.players).map(function (p) {
+                            sendChat(p.pname + ': ' + p.vps);
+                        });
+                    } else if (speaker !== myname) {
+                        sendChat('Sorry, my VP counter is off');
+                    }
+
+                } else if (msgData.text.match(/^#vpx$/i)) {
+                    if (!gs.vp.locked) {
+                        if (speaker === myname) {
+                            showChat('Your VP counter is not locked. Use '
+                                   + '"#vpon" or "#vpoff" instead.');
+                        }
+                    } else {
+                        // Override lock only if all players request it.
+                        gs.vp.players[speaker].wantsChange = true;
+                        if (allWantChange()) {
+                            gs.vp.vpon = !gs.vp.vpon;
+                            sendChat('My VP counter is now ' + (gs.vp.vpon ? 'on' : 'off'));
+                            _.values(gs.vp.players).map(function (p) {
+                                p.wantsChange = false;
+                            });
+                        } else if (speaker === myname) {
+                            sendChat('My VP counter is locked to ' + (gs.vp.vpon ? 'on' : 'off')
+                                   + ', but I\'d like to turn it ' + (gs.vp.vpon ? 'off' : 'on')
+                                   + ' anyway. To allow, please say "#vpx"');
+                        }
                     }
                 }
             }
 
-        } else if (text.match(/^#vpoff$/i)) {
-            if (gs.vp.lock && gs.vp.humanCount > 1) {
-                // Do nothing if already locked
-                if (!gs.vp.vpoff) {
-                    sendChat('Sorry, my VP counter is already locked to ON.');
+            // Tell AngularJS that the vptable's model may have changed
+            $('#vptable').scope().$digest();
+        });
+
+        initialize = function (gameData, domClient) {
+            // Game info
+            chatConn = domClient.clientConnection;
+            myname = mroom.localPlayer.get('playerName');
+
+            // Player info
+            gs.vp.players = {};
+            gameData.playerInfos.map(function (pinfo) {
+                var pindex = pinfo.playerIndex - gameData.playerToMove;
+                pindex = (pindex + gameData.numPlayers) % gameData.numPlayers + 1;
+                gs.vp.players[pinfo.name] = {
+                    pname: pinfo.name,
+                    vps: null,
+                    request: null,
+                    wantsChange: false,
+                    isBot: pinfo.hasOwnProperty('bot') && pinfo.bot,
+                    pclass: 'p' + pindex
+                };
+            });
+
+            // Initial toggle state
+            gs.vp.locked = false;
+            if (isMultiplayer()) {
+                // Default from user settings
+                gs.vp.vpon = gs.get_option('vp_request');
+
+                // Tablename trumps user settings
+                try {
+                    var tablename = JSON.parse(mroom.getCurrentTable().get('settings')).name;
+                    if (tablename.match(/#vpon/i)) {
+                        gs.vp.vpon = true;
+                        gs.vp.locked = true;
+                    } else if (tablename.match(/#vpoff/i)) {
+                        gs.vp.vpon = false;
+                        gs.vp.locked = true;
+                    }
+                } catch (e) {
+                    // Bot and adventure games don't have table names
                 }
+            } else {
+                // Always enabled in bot games
+                gs.vp.vpon = true;
+            }
+        };
+
+        onTurnStart = function (pname, turnNumber) {
+
+            // Option "vp_request" automatcially chats "#vpon" on my Turn 2.
+            // We wait until T2 to be sure that all players have arrived.
+            if (turnNumber === 2 && pname === myname
+                    && gs.get_option('vp_request')
+                    && isMultiplayer()
+                    && reqcount() === 0
+                    && !gs.vp.locked) {
+                sendChat('#vpon');
+            }
+
+            // Lock on Turn 5
+            if (turnNumber === 5) {
+                gs.vp.locked = true;
+            }
+        };
+
+        onMyToggleChatRequest = function (vpon) {
+            gs.vp.players[myname].request = vpon;
+
+            if (!isMultiplayer()) {
+                gs.vp.vpon = vpon;
+
+            } else if (gs.vp.locked) {
+                // Explain how to override lock
+                if (vpon !== gs.vp.vpon) {
+                    showChat('Your VP counter is locked. Say "#vpx" to'
+                           + ' ask your opponent to let you change it.');
+                }
+
+            } else if (vpon) {
+                // Turn on counter. Lock if all have said #vpon or explain the
+                // counter if no opponent has said #vpon/#vpoff yet.
+                gs.vp.vpon = true;
+
+                if (allWantOn()) {
+                    gs.vp.locked = true;
+                } else {
+                    // Wait for auto-responses before sending explanation
+                    setTimeout(function () {
+                        if (reqcount() === 1) {
+                            sendChat('I\'d like to use a VP counter '
+                                   + '(See ' + salvagerURL + '). '
+                                   + 'You can say "#vpoff" before Turn 5 to disallow '
+                                   + 'it, or say "#vp?" to see the score in chat.');
+                        }
+                    }, 2000);
+                }
+
             } else {
                 gs.vp.vpon = false;
-                if (gs.vp.humanCount > 1) {
-                    gs.vp.lock = true;
-                    announceLock(false);
+                gs.vp.locked = true;
+            }
+        };
+
+        onOppToggleChatRequest = function (oppname, vpon) {
+            gs.vp.players[oppname].request = vpon;
+            if (gs.vp.locked) {
+                if (vpon !== gs.vp.vpon) {
+                    sendChat('Sorry. My VP counter is locked to '
+                           + (gs.vp.vpon ? 'on.' : 'off.'));
                 }
-            }
-
-        } else if (text.match(/^#vp\?$/i)) {
-            if (gs.vp.vpon) {
-                sendChat(formatForChat());
+            } else if (vpon) {
+                // Auto-reply to opponent's request
+                if (gs.vp.players[myname].request === null) {
+                    if (gs.get_option('vp_refuse')) {
+                        sendChat('#vpoff');
+                    } else if (gs.get_option('vp_request')) {
+                        sendChat('#vpon');
+                    }
+                }
+                gs.vp.locked = gs.vp.locked || (allWantOn() === true);
             } else {
-                sendChat('Sorry, my VP counter is off.');
+                sendChat('Ok, my VP counter is off.');
+                gs.vp.vpon = false;
+                gs.vp.locked = true;
             }
-        }
+        };
     };
 
-    announceLock = function (includeURL) {
-        var msg = 'My VP counter is now ' + (gs.vp.vpon ? 'on' : 'disabled') + ' and locked.';
-        if (includeURL) { msg += ' See ' + gs.salvagerURL; }
-        sendChat(msg);
+    // Initialize
+    window.GokoSalvager.vp = {
+        players: {},
+        vpon: false,
+        locked: false
     };
-
-    sendChat = function (message) {
-        gs.clientConnection.send('sendChat', {text: message});
-    };
-};
-
-window.GokoSalvager.depWait(
-    ['GokoSalvager', 'DominionClient', 'FS.Dominion.CardBuilder.Data.cards', 'mtgRoom'],
-    100, loadVPCounterModule, this, 'VP Counter Module'
-);
+    window.GokoSalvager.depWait(
+        ['GokoSalvager'], // TODO: also wait for $('#sidebar') element
+        100, buildUI, this, 'VP Table'
+    );
+    window.GokoSalvager.depWait(
+        ['GokoSalvager', 'DominionClient', 'mtgRoom'],
+        100, loadVPToggle, this, 'VP Toggle'
+    );
+    window.GokoSalvager.depWait(
+        ['GokoSalvager', 'FS.Dominion.CardBuilder.Data.cards'],
+        100, loadVPCalculator, this, 'VP Calculator'
+    );
+}());

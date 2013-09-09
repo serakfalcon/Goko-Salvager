@@ -65,6 +65,14 @@ loadUserSettingsModule = function (gs) {
             $scope.save($scope.us);
         };
 
+        $scope.saveVPReq = function (us) {
+            us.vp_refuse = us.vp_refuse && !us.vp_request;
+        };
+
+        $scope.saveVPRef = function (us) {
+            us.vp_request = us.vp_request && !us.vp_refuse;
+        };
+
         $scope.save = function (us) {
             console.log(angular.copy(us));
             gs.set_options(angular.copy(us));

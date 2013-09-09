@@ -13,14 +13,14 @@ window.GokoSalvager.createSettingsDialog = function () {
   Alerts:<br>\
   &nbsp&nbsp<input type="checkbox" ng:model="us.alert_sounds" ng:click="save(us)" />Use sounds<br />\
   &nbsp&nbsp<input type="checkbox" ng:model="us.alert_popups" ng:click="save(us)" />Use popups (not recommended)<br />\
+  VP Counter:<br>\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.vp_request" ng:click="saveVPReq(us)" />Always request (#vpon)<br />\
+  &nbsp&nbsp<input type="checkbox" ng:model="us.vp_refuse" ng:click="saveVPRef(us)" />Always refuse (#vpoff)<br />\
   <input type="checkbox" ng:model="us.generator" ng:click="save(us)" />Kingdom Generator<br />\
   <input type="checkbox" ng:model="us.proranks" ng:click="save(us)" />Display pro ratings<br />\
   <input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\
-  <input type="checkbox" ng:model="us.logviewer" ng:click="save(us)" />Show Prettified log and VP counter<br />\
-  <input type="checkbox" ng:model="us.vp_request" ng:click="save(us)" />Always request VP counter (#vpon)<br />\
-  <input type="checkbox" ng:model="us.vp_disallow" ng:click="save(us)" />Always refuse VP counter (#vpoff)<br />\
-  <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>\
-    Stack duplicate cards<br />\
+  <input type="checkbox" ng:model="us.sidebar" ng:click="save(us)" />Show in-game sidebar (log and VP counter)<br />\
+  <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>Stack duplicate cards<br />\
   Blacklist (noplay + censor):\
   <table>\
     <tr ng:repeat="pname in us.blacklist">\
