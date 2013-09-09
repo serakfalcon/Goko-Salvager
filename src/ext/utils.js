@@ -5,6 +5,13 @@
 
     window.GokoSalvager = window.GokoSalvager || {};
 
+    window.GokoSalvager.debugMode = false;
+    window.GokoSalvager.debug = function (text) {
+        if (this.debugMode) {
+            console.log(text);
+        }
+    };
+
     window.GokoSalvager.alsoDo = function (object, methodname, fnBefore, fnAfter) {
 
         // If we've already overridden this method, then override the
@@ -50,25 +57,29 @@
             var x;
 
             try {
-                if (name) { console.log('Checking deps for ' + name); }
+                if (name) {
+                    window.GokoSalvager.debug('Checking deps for ' + name);
+                }
                 x = argNames.map(function (argName) {
                     return argName.split('.').reduce(index, window);
                 });
             } catch (e) {
-                if (name) { console.log('Error while looking for deps for ' + name); }
+                if (name) {
+                    window.GokoSalvager.debug('Error while looking for deps for ' + name);
+                }
                 return;
             }
                 
             if (x.every(exists)) {
-                if (name) { console.log('Found deps for ' + name); }
+                if (name) { window.GokoSalvager.debug('Found deps for ' + name); }
                 callback.apply(null, x);
                 clearInterval(waitLoop);
-                if (name) { console.log('Found deps and ran ' + name); }
+                if (name) { window.GokoSalvager.debug('Found deps and ran ' + name); }
             } else if (name) {
                 var i;
                 for (i = 0; i < x.length; i += 1) {
                     if (!exists(x[i])) {
-                        console.log(name + ' is missing dependency: ' + argNames[i]);
+                        window.GokoSalvager.debug(name + ' is missing dependency: ' + argNames[i]);
                     }
                 }
             }
