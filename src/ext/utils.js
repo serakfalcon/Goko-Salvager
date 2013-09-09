@@ -7,7 +7,7 @@
 
     window.GokoSalvager.debugMode = false;
     window.GokoSalvager.debug = function (text) {
-        if (this.debugMode) {
+        if (this.get_option('debug_mode')) {
             console.log(text);
         }
     };

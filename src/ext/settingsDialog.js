@@ -21,6 +21,7 @@ window.GokoSalvager.createSettingsDialog = function () {
   <input type="checkbox" ng:model="us.sort_rating" ng:click="save(us)" />Sort by rating<br />\
   <input type="checkbox" ng:model="us.sidebar" ng:click="save(us)" />Show in-game sidebar (log and VP counter)<br />\
   <input type="checkbox" ng:model="us.always_stack" ng:click="save(us)"/>Stack duplicate cards<br />\
+  <input type="checkbox" ng:model="us.debug_mode" ng:click="save(us)"/>Debugging mode<br />\
   Blacklist (noplay + censor):\
   <table>\
     <tr ng:repeat="pname in us.blacklist">\

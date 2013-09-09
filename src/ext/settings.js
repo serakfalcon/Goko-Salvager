@@ -34,7 +34,8 @@
         automatch_min_sets: 1,
         automatch_max_sets: 15,
         automatch_rSystem: 'pro',
-        automatch_rdiff: 1500
+        automatch_rdiff: 1500,
+        debug_mode: false
     };
 
     gs.get_options = function () {
