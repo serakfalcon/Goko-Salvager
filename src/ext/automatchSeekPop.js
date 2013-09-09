@@ -159,7 +159,7 @@
         // Submit request
         $('#seekreq').click(function () {
             var np, ns, rr, rs;
-            console.log('requested seek');
+            gs.debug('requested seek');
 
             np = {rclass: 'NumPlayers', props: {}};
             np.props.min_players = parseInt($('#minPlayers').val(), 10);

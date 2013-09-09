@@ -132,6 +132,10 @@ h1.turnheader {
   background-color: white;
 }
 
+.indented {
+  margin-left: 20px;
+}
+
 .indent {
   padding-left: 20px;
 }

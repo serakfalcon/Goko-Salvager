@@ -23,9 +23,9 @@
         proranks: true,
         sortrating: true,
         adventurevp: true,
-        logviewer: true,
+        sidebar: true,
         vp_request: true,
-        vp_disallow: false,
+        vp_refuse: false,
         always_stack: false,
         blacklist: [],
         automatch_on_seek: true,
@@ -34,16 +34,21 @@
         automatch_min_sets: 1,
         automatch_max_sets: 15,
         automatch_rSystem: 'pro',
-        automatch_rdiff: 1500
+        automatch_rdiff: 1500,
+        debug_mode: false
     };
 
     gs.get_options = function () {
-        try {
-            return JSON.parse(localStorage.salvagerOptions);
-        } catch (e) {
-            gs.set_options(default_options);
-            return gs.get_options();
+        var optName, out = {};
+        if (localStorage.hasOwnProperty('salvagerOptions')) {
+            out = JSON.parse(localStorage.salvagerOptions);
         }
+        for (optName in default_options) {
+            if (!out.hasOwnProperty(optName)) {
+                out[optName] = default_options[optName];
+            }
+        }
+        return out;
     };
 
     gs.set_options = function (options) {
@@ -51,9 +56,7 @@
     };
 
     gs.get_option = function (optName) {
-        return gs.get_options().hasOwnProperty(optName)
-            ? gs.get_options()[optName]
-            : default_options[optName];
+        return gs.get_options()[optName];
     };
 
     gs.set_option = function (optionName, optionValue) {

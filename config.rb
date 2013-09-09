@@ -32,7 +32,6 @@
         'settings.js',
         'kingdom_generator.js',
         'settingsDialog.js',
-        'userSettings.js',
         'tableState.js',
         'autokick.js',
         'avatars.js',
