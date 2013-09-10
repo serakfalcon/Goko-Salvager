@@ -3,6 +3,8 @@
 (function () {
     "use strict";
 
+    window.alert('Chrome version 2.3.3');
+
     window.GokoSalvager = window.GokoSalvager || {};
 
     window.GokoSalvager.debugMode = false;
