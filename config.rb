@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.3.1',
+    :version => '2.3.3',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -23,11 +23,18 @@
     :targeturls => [
         '*.goko.com'
     ],
-    :updateURL => {
-        :firefox => 'http://www.andrewiannaccone.com/static/gokosalvager/firefox/update.rdf',
-        :chrome => 'http://www.andrewiannaccone.com/static/gokosalvager/chrome/whatever',
-        :safari => 'http://www.andrewiannaccone.com/static/gokosalvager/safari/whatever',
+    :hostServer => 'www.andrewiannaccone.com',
+    :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager/',
+    :hostPort => '8888',
+    :hostURLBase => '/gs/',
+    :extinfo => 'index.html',
+    :extupdate => {
+        :firefox => 'update_firefox.rdf',
+        :chrome => 'update_chrome.xml',
+        :safari => 'update_safari.plist'
     },
+    :firefox_minversion => '19.0',
+    :firefox_maxversion => '23.*',
 
     # JS scripts for Goko to load, in order
     :js => [
