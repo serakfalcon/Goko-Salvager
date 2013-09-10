@@ -10,6 +10,23 @@
         <!-- Each li is a different version of the same add-on -->
         <RDF:li>
           <RDF:Description>
+            <em:version>2.3.1</em:version>
+
+            <em:targetApplication>
+              <RDF:Description>
+                <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+                <em:minVersion>1.5</em:minVersion>
+                <em:maxVersion>2.0.0.*</em:maxVersion>
+                <em:updateLink>https://raw.github.com/aiannacc/Goko-Salvager/auto-updating/gokosalvager.xpi</em:updateLink>
+                <em:updateInfoURL>http://www.andrewiannaccone.com/static/gokosalvager/firefox/v2.3.1/updateinfo.html</em:updateInfoURL>
+              </RDF:Description>
+            </em:targetApplication>
+          </RDF:Description>
+        </RDF:li>
+
+        <!-- Each li is a different version of the same add-on -->
+        <RDF:li>
+          <RDF:Description>
             <em:version>2.3</em:version>
 
             <em:targetApplication>
