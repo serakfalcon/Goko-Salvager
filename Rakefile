@@ -18,6 +18,20 @@ def insert_set_parser_into_main_script(out_file_name)
   out.close
 end
 
+WRAPPER = 'src/dev/runInPageContext.js'
+
+def run_in_page_context(file)
+  f = File.read(file)
+  t = File.new(file, 'w')
+  File.open(WRAPPER) do |w|
+    w.each_line do |l|
+      t.write(l.strip == '// insert file here' ? f : l)
+    end
+  end
+  t.close
+end
+
+
 def fill_template(templatefile, property_hash)
     config = property_hash
     template = File.read(templatefile)

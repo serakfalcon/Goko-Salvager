@@ -26,6 +26,11 @@ namespace :safari do
         FileUtils.cp_r Dir.glob('src/ext/*.css'), build_dir
         FileUtils.cp Dir.glob('src/img/*.png'), build_dir
 
+        # Wrap JS scripts to be run in Goko's gameClient.html context
+        Dir.glob(build_dir + '*.js').each do |js_script|
+            run_in_page_context(js_script)
+        end
+
         puts 'Safari Extension assembled. Ready to build.'
     end
 

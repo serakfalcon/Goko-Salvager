@@ -3,9 +3,9 @@
 (function () {
     "use strict";
 
-    window.alert('Chrome version 2.3.3');
+    window.GokoSalvager = {};
 
-    window.GokoSalvager = window.GokoSalvager || {};
+    console.log('Running Goko Salvager v2.3.x');
 
     window.GokoSalvager.debugMode = false;
     window.GokoSalvager.debug = function (text) {
