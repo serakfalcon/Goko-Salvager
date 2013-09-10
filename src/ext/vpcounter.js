@@ -368,7 +368,4 @@
         ['GokoSalvager', 'FS.Dominion.CardBuilder.Data.cards'],
         100, loadVPCalculator, this, 'VP Calculator'
     );
-        "<%= config[:js].join("\",\n        \"") %>",
-        "<%= config[:js].join("\",\n        \"") %>",
-        "<%= config[:js].join("\",\n        \"") %>",
 }());
