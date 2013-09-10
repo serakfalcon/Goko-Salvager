@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.3.6',
+    :version => '2.3.8',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -42,10 +42,15 @@
     # AI's Safari Developer Certificate ID:
     :safari_dev_cert_id => '366P22F9M8',
 
+    # Internally-stored versions, so be loaded by Chrome and Firefox. Safari
+    # has to load external version.
+    :jslib => [
+        'jquery.ui.js',
+        'angular.min.js'
+    ],
+
     # JS scripts for Goko to load, in order
     :js => [
-        'jquery.ui.js',
-        'angular.min.js',
         'utils.js',
         'settings.js',
         'kingdom_generator.js',
