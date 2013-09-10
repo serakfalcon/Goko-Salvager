@@ -29,6 +29,7 @@ task :deploy => ['firefox:build', 'chrome:crx', 'safari:build'] do
     scpDir = props[:hostDir] + 'v' + props[:version] + '/'
     sh 'ssh ' + props[:hostServer] + ' "rm -rf ' + scpDir + '"'
     sh 'ssh ' + props[:hostServer] + ' "mkdir -p ' + scpDir + '"'
+    sh 'scp update/index.html ' + props[:hostServer] + ':' + scpDir
     sh 'scp build/*.* ' + props[:hostServer] + ':' + scpDir
     #sh 'scp -r build/* ' + props[:hostServer] + ':' + scpDir
    

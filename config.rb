@@ -21,7 +21,10 @@
     :manifest_version => '2',
     :safarixtz_url => 'http://goo.gl/1SJmbB',
     :targeturls => [
-        '*.goko.com'
+        'http://play.goko.com/Dominion/gameClient.html',
+        'https://play.goko.com/Dominion/gameClient.html',
+        'http://beta.goko.com/Dominion/gameClient.html',
+        'https://beta.goko.com/Dominion/gameClient.html'
     ],
     :hostServer => 'www.andrewiannaccone.com',
     :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager/',
