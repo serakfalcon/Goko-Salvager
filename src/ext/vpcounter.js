@@ -350,7 +350,7 @@
         locked: false
     };
     window.GokoSalvager.depWait(
-        ['GokoSalvager'], // TODO: also wait for $('#sidebar') element
+        ['GokoSalvager', 'jQuery', '#sidebar'],
         100, buildUI, this, 'VP Table'
     );
     window.GokoSalvager.depWait(
