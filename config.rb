@@ -3,7 +3,7 @@
     :name => 'gokosalvager',
     :version => '2.3',
     :title => 'Goko Dominion Salvager',
-    :desc => 'Enhance your Online Dominion experience!',
+    :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
     :contributors => [
         'philosophyguy',
@@ -23,6 +23,11 @@
     :targeturls => [
         '*.goko.com'
     ],
+    :updateURL => {
+        :firefox => 'http://www.andrewiannaccone.com/static/gokosalvager/firefox/update.rdf',
+        :chrome => 'http://www.andrewiannaccone.com/static/gokosalvager/chrome/whatever',
+        :safari => 'http://www.andrewiannaccone.com/static/gokosalvager/safari/whatever',
+    },
 
     # JS scripts for Goko to load, in order
     :js => [
