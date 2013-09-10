@@ -39,6 +39,9 @@
     :firefox_minversion => '19.0',
     :firefox_maxversion => '23.*',
 
+    # AI's Safari Developer Certificate ID:
+    :safari_dev_cert_id => '366P22F9M8',
+
     # JS scripts for Goko to load, in order
     :js => [
         'jquery.ui.js',
