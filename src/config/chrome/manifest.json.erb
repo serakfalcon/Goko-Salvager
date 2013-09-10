@@ -12,6 +12,7 @@
     }],
     "permissions": [ "webNavigation" ],
     "web_accessible_resources": [
+        "<%= config[:jslib].join("\",\n        \"") %>",
         "<%= config[:js].join("\",\n        \"") %>",
         "<%= config[:css].join("\",\n        \"") %>",
         "<%= config[:img].join("\",\n        \"") %>"
