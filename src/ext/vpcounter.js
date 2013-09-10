@@ -83,6 +83,7 @@
                 return Math.floor(actionCardCount / 3);
             case 'Farmland':
             case 'Tunnel':
+            case 'Nobles':
             case 'Dame Josephine':
                 return 2;
             default:
@@ -367,4 +368,7 @@
         ['GokoSalvager', 'FS.Dominion.CardBuilder.Data.cards'],
         100, loadVPCalculator, this, 'VP Calculator'
     );
+        "<%= config[:js].join("\",\n        \"") %>",
+        "<%= config[:js].join("\",\n        \"") %>",
+        "<%= config[:js].join("\",\n        \"") %>",
 }());
