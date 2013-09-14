@@ -338,14 +338,48 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     }
 
     var Kingdomsel = function (val) {
-        this.sel = document.createElement('div');
-        this.sel.setAttribute("style", "position:absolute;display:none;left:0px;top:0px;height:100%;width:100%;background:rgba(0,0,0,0.5);z-index:6000;");
-        this.sel.setAttribute("class", "newlog");
-        this.sel.innerHTML = '<div style="text-align:center;position:absolute;top:50%;left:50%;height:100px;margin-top:-50px;width:80%;margin-left:-40%;background:white;"><div style="margin-top:20px">Select a kingdom (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>):<br><form id="selform"><input id="selval" style="width:95%"><br><input type="submit" value="OK"></form></div></div>';
-        document.getElementById('viewport').appendChild(this.sel);
+        //this.sel = document.createElement('div');
+        //this.sel.setAttribute("style", "position:absolute;display:none;left:0px;top:0px;height:100%;width:100%;background:rgba(0,0,0,0.5);z-index:6000;");
+        //this.sel.setAttribute("class", "newlog");
+        //this.sel.innerHTML = '<div style="text-align:center;position:absolute;top:50%;left:50%;height:100px;margin-top:-50px;width:80%;margin-left:-40%;background:white;"><div style="margin-top:20px">Select a kingdom (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>):<br><form id="selform"><input id="selval" style="width:95%"><br><input type="submit" value="OK"></form></div></div>';
+        //document.getElementById('viewport').appendChild(this.sel);
+        //this.selval.value = 'All';
+
+        $('<div>').css('position', 'absolute')
+                  .css('display', 'none')
+                  .css('left', '0px')
+                  .css('top', '0px')
+                  .css('height', '100%')
+                  .css('width', '100%')
+                  .css('background', 'rgba(0,0,0,0,0.5)')
+                  .css('z-index', '6000')
+                  .addClass('newlog')
+            .append($('<div>').css('text-align', 'center')
+                              .css('position', 'absolute')
+                              .css('top', '50%')
+                              .css('left', '50%')
+                              .css('height', '100px')
+                              .css('margin-top', '50px')
+                              .css('width', '80%')
+                              .css('margin-left', '-40%')
+                              .css('background', 'white'))
+            .append($('<div>').css('margin-top', '20px'))
+            .append($('<span>').text('Selecte a kingdom (see '))
+            .append($('<a>').attr('target', '_blank')
+                            .attr('href', 'http://dom.retrobox.edu/kingdomgenerator.html'))
+            .append($('<span>').text('):'))
+            .append($('<br>'))
+            .append($('<form>').attr('id', 'selform')
+                .append($('<input>').attr('id', 'selval')
+                                    .css('width', '95%')
+                                    .val('All'))
+                .append($('<br>'))
+                .append($('<input>').attr('type', 'submit')
+                                    .attr('value', 'OK')))
+            .appendTo('#viewport');
+
         this.selform = document.getElementById('selform');
         this.selval = document.getElementById('selval');
-        this.selval.value = 'All';
     };
 
     Kingdomsel.prototype = {
@@ -378,7 +412,7 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     dbp.prototype._old_getRandomCards = dbp.prototype.getRandomCards;
     dbp.prototype.getRandomCards = function (opts, callback) {
         this._old_getRandomCards(opts, function (x) {
-            if (gs.get_option('generator') && !hideKingdomGenerator 
+            if (gs.get_option('generator') && !hideKingdomGenerator
                     && (!gs.AM.hasOwnProperty('state') || gs.AM.state.game === null)
                     && opts.useEternalGenerateMethod) {
                 sel.prompt(function (val) {
@@ -688,10 +722,11 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
 };
 
 window.GokoSalvager.depWait(
-    ['GokoSalvager',
+    ['GokoSalvager.get_option',
      'FS.Dominion.DeckBuilder',
      'FS.Dominion.DeckBuilder.Persistent',
      'FS.DominionEditTableView',
-     'FS.Dominion.CardBuilder.Data.cards'],
+     'FS.Dominion.CardBuilder.Data.cards',
+     'jQuery'],
     100, loadKingdomGenerator, this, 'Kingdom Generator Module'
 );
