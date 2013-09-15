@@ -1,7 +1,7 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true, white:true */
 /*global $, _ */
 
-var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
+var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
     "use strict";
 
     var set_parser;
@@ -689,6 +689,7 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
 
 window.GokoSalvager.depWait(
     ['GokoSalvager',
+     'GokoSalvager.get_option',
      'FS.Dominion.DeckBuilder',
      'FS.Dominion.DeckBuilder.Persistent',
      'FS.DominionEditTableView',
