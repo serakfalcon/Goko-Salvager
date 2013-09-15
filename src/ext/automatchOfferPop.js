@@ -29,14 +29,15 @@
             .append($('<input>').attr('type', 'button')
                                 .attr('id', 'offerdec')
                                 .attr('value', 'Decline/Cancel'))
+            .appendTo($('#viewport'));
+        $('#offerPop')
             .dialog({
                 modal: false,
                 width: 500,
                 draggable: true,
                 resizeable: false,
                 autoOpen: false
-            })
-            .appendTo($('#viewport'));
+            });
 
         $('#offeracc').click(function (evt) {
             gs.AM.state.offer.accepted = true;

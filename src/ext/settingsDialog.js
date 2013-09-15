@@ -118,6 +118,17 @@
 
         window.settingsController = function ($scope) {
             $scope.so = gs.get_options();
+            $scope.setCounts = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+            $scope.setCountsString = function (n) {
+                switch (n) {
+                case 1:
+                    return 'Base Only';
+                case 15:
+                    return 'All Cards';
+                default:
+                    return n.toString();
+                }
+            };
             $scope.blAdd = function () {
                 if ($scope.newBlacklistee) {
                     $scope.so.blacklist.push($scope.newBlacklistee);

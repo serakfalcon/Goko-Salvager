@@ -22,14 +22,15 @@
                                     + 'when it does.'))
                 .append($('<input>').attr('type', 'button')
                                     .attr('id', 'abortgame')
-                                    .attr('value', 'Abort'))
-                .dialog({
-                    modal: false,
-                    width: 500,
-                    draggable: true,
-                    resizeable: false,
-                    autoOpen: false
-                }));
+                                    .attr('value', 'Abort')));
+        $('#gamepop')
+            .dialog({
+                modal: false,
+                width: 500,
+                draggable: true,
+                resizeable: false,
+                autoOpen: false
+            });
 
         $('#abortgame').click(function (evt) {
             $('#abortgame').prop('disabled', true);

@@ -1,4 +1,4 @@
-/*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true */
+/*jslint browser: true, devel: true, indent: 4, maxlen: 100, es5: true */
 /*global jQuery, $, angular */
 
 (function () {
@@ -8,22 +8,22 @@
     gs.AM = gs.AM || {};
 
     gs.AM.appendSeekPopup = function (viewport) {
-        viewport.append([
-            '<div id="seekAAPop" title="Looking for Match">',
-            '<p>Automatch is looking for players whose ',
-            '   search criteria match your table.</p>',
-            '<button id="seekAAStop">Stop Looking</button>',
-            '<button id="seekAAOkay">Keep Looking</button>',
-            '</div>'
-        ].join(''));
-
-        $('#seekAAPop').dialog({
-            modal: false,
-            width: 500,
-            draggable: true,
-            resizeable: false,
-            autoOpen: false
-        });
+        $('<div>').attr('id', 'seekAAPop')
+                  .attr('title', 'Looking for Match')
+            .append($('<p>').text('Automatch is looking for players whose '
+                                + 'search criteria match your table.</p>'))
+            .append($('<button>').attr('id', 'seekAAStop')
+                                 .text('Stop Looking'))
+            .append($('<button>').attr('id', 'seekAAOkay')
+                                 .text('Keep Looking'))
+            .appendTo('#viewport')
+            .dialog({
+                modal: false,
+                width: 500,
+                draggable: true,
+                resizeable: false,
+                autoOpen: false
+            });
 
         $('#seekAAStop').click(function () {
             gs.AM.showSeekPop(false);
@@ -34,115 +34,69 @@
             gs.AM.showSeekPop(false);
         });
 
-        viewport.append([
-            '<div id="seekPop" title="Request Automatch" ng:app ',
-            '     ng:controller="settingsController">',
-            '  <table>',
-            '    <tr>',
-            '      <td colspan="2">',
-            '        <label>Min Players:</label>',
-            '        <select id="minPlayers" ng:model="so.automatch_min_players">',
-            '          <option value="2">2</option>',
-            '          <option value="3">3</option>',
-            '          <option value="4">4</option>',
-            '          <option value="5">5</option>',
-            '          <option value="6">6</option>',
-            '        </select>',
-            '      </td>',
-            '      <td colspan="2">',
-            '        <label>Min Sets:</label>',
-            '        <select id="minSets" ng:model="so.automatch_min_sets">',
-            '          <option selected value="1">Base Only</option>',
-            '          <option value="2">2</option>',
-            '          <option value="3">3</option>',
-            '          <option value="4">4</option>',
-            '          <option value="5">5</option>',
-            '          <option value="6">6</option>',
-            '          <option value="7">7</option>',
-            '          <option value="8">8</option>',
-            '          <option value="9">9</option>',
-            '          <option value="10">10</option>',
-            '          <option value="12">12</option>',
-            '          <option value="13">13</option>',
-            '          <option value="14">14</option>',
-            '          <option value="15">All Cards</option>',
-            '        </select>',
-            '      </td>',
-            '    </tr>',
-            '    <tr>',
-            '      <td colspan="2">',
-            '        <label>Max Players:</label>',
-            '        <select id="maxPlayers" ng:model="so.automatch_max_players">',
-            '          <option value="2">2</option>',
-            '          <option value="3">3</option>',
-            '          <option value="4">4</option>',
-            '          <option value="5">5</option>',
-            '          <option value="6">6</option>',
-            '        </select>',
-            '      </td>',
-            '      <td colspan="2">',
-            '        <label>Max Sets:</label>',
-            '        <select id="maxSets" ng:model="so.automatch_max_sets">',
-            '          <option value="1">Base Only</option>',
-            '          <option value="2">2</option>',
-            '          <option value="3">3</option>',
-            '          <option value="4">4</option>',
-            '          <option value="5">5</option>',
-            '          <option value="6">6</option>',
-            '          <option value="7">7</option>',
-            '          <option value="8">8</option>',
-            '          <option value="9">9</option>',
-            '          <option value="10">10</option>',
-            '          <option value="12">12</option>',
-            '          <option value="13">13</option>',
-            '          <option value="14">14</option>',
-            '          <option selected value="15">All Cards</option>',
-            '        </select>',
-            '      </td>',
-            '    </tr>',
-            '  </table>',
-            '  <table>',
-            '    <tr>',
-            '      <td colspan="1">',
-            '        <label>Rating +/-</label>',
-            '      </td>',
-            '      <td colspan="1">',
-            '        <input type="number" id="rdiff" value="2000" size="4"',
-            '               ng:model="so.automatch_rdiff"/>',
-            '      </td>',
-            '    </tr>',
-            '    <tr>',
-            '      <td colspan="1">',
-            '        <label>System</label>',
-            '      </td>',
-            '      <td colspan="1">',
-            '        <select id="ratingSystem" ng:model="so.automatch_rSystem">',
-            '          <option value="pro">Pro</option>',
-            '          <option value="casual">Casual</option>',
-            '          <option value="unrated">Unrated</option>',
-            '        </select>',
-            '      </td>',
-            '    </tr>',
-            '    <tr>',
-            '      <td colspan="1">',
-            '        <input type="submit" id="seekreq" value="Submit"',
-            '               ng:click="save(us)" />',
-            '      </td>',
-            '      <td colspan="1">',
-            '        <input type="submit" id="seekcan" value="Cancel" />',
-            '      </td>',
-            '      <td colspan="1">',
-            '        <input type="submit" id="seekhide" value="Hide" />',
-            '      </td>',
-            '    </tr>',
-            '    <tr>',
-            '      <td colspan="4">',
-            '        <div id="seekstatus"></div>',
-            '      </td>',
-            '    </tr>',
-            '  </table>',
-            '</div>'
-        ].join(''));
+        $('<div>').attr('id', 'seekPop')
+                  .attr('title', 'Seek Automatch')
+                  .attr('ng:app', 'amSettingsApp')
+                  .attr('ng:controller', 'settingsController')
+            .append($('<table>')
+                .append($('<tr>')
+                    .append($('<td>').attr('colspan', 2)
+                        .append('Min Players:')
+                        .append($('<select>').attr('id', 'minPlayers')
+                                             .attr('ng:model', 'so.automatch_min_players')
+                                             .attr('ng:options', 'i for i in [2,3,4,5,6]')))
+                    .append($('<td>').attr('colspan', 2)
+                        .append('Min Sets:')
+                        .append($('<select>').attr('id', 'minSets')
+                                             .attr('ng:model', 'so.automatch_min_sets')
+                                             .attr('ng:options',
+                                                   'setCountsString(i) for i in setCounts'))))
+                .append($('<tr>')
+                    .append($('<td>').attr('colspan', 2)
+                        .append('Max Players:')
+                        .append($('<select>').attr('id', 'maxPlayers')
+                                             .attr('ng:model', 'so.automatch_max_players')
+                                             .attr('ng:options',
+                                                   'i for i in [2,3,4,5,6]')))
+                    .append($('<td>').attr('colspan', 2)
+                        .append('Max Sets:')
+                        .append($('<select>').attr('id', 'maxSets')
+                                             .attr('ng:model', 'so.automatch_max_sets')
+                                             .attr('ng:options',
+                                                   'setCountsString(i) for i in setCounts')))))
+            .append($('<table>')
+                .append($('<tr>')
+                    .append($('<td>')
+                        .append('Rating +/-'))
+                    .append($('<td>')
+                        .append($('<input>').attr('type', 'number')
+                                            .attr('id', 'rdiff')
+                                            .attr('value', '2000')
+                                            .attr('size', '4')
+                                            .attr('ng:model', 'so.automatch_rdiff'))))
+                .append($('<tr>')
+                    .append($('<td>').text('System: '))
+                    .append($('<td>')
+                        .append($('<select>').attr('id', 'ratingSystem')
+                                             .attr('ng:model', 'so.automatch_rSystem')
+                            .append($('<option>').attr('value', 'pro').text('Pro'))
+                            .append($('<option>').attr('value', 'casual').text('Casual'))
+                            .append($('<option>').attr('value', 'unrated').text('Unrated')))))
+                .append($('<tr>')
+                    .append($('<td>')
+                        .append($('<input>').attr('type', 'submit')
+                                            .attr('id', 'seekreq')
+                                            .attr('value', 'Submit')
+                                            .attr('ng:click', 'save(us)'))
+                        .append($('<input>').attr('type', 'submit')
+                                            .attr('id', 'seekcan')
+                                            .attr('value', 'Cancel'))
+                        .append($('<input>').attr('type', 'submit')
+                                            .attr('id', 'seekhide')
+                                            .attr('value', 'Hide')))
+                    .append($('<td>').attr('colspan', 4)
+                        .append($('<div>').attr('id', 'seekstatus')))))
+            .appendTo($('#viewport'));
 
         // Override Goko's "hide select elements by default" css
         $('#seekPop select').css('visibility', 'inherit');
@@ -162,20 +116,20 @@
             gs.debug('requested seek');
 
             np = {rclass: 'NumPlayers', props: {}};
-            np.props.min_players = parseInt($('#minPlayers').val(), 10);
-            np.props.max_players = parseInt($('#maxPlayers').val(), 10);
+            np.props.min_players = gs.get_option('automatch_min_players');
+            np.props.max_players = gs.get_option('automatch_max_players');
 
             ns = {rclass: 'NumSets', props: {}};
-            ns.props.min_sets = parseInt($('#minSets').val(), 10);
-            ns.props.max_sets = parseInt($('#maxSets').val(), 10);
+            ns.props.min_sets = gs.get_option('automatch_min_sets');
+            ns.props.max_sets = gs.get_option('automatch_max_sets');
 
             rr = {rclass: 'RelativeRating', props: {}};
-            rr.props.pts_lower = parseInt($('#rdiff').val(), 10);
-            rr.props.pts_higher = parseInt($('#rdiff').val(), 10);
-            rr.props.rating_system = $('#ratingSystem').val();
+            rr.props.pts_lower = gs.get_option('automatch_rdiff');
+            rr.props.pts_higher = gs.get_option('automatch_rdiff');
+            rr.props.rating_system = gs.get_option('automatch_rSystem');
 
             rs = {rclass: 'RatingSystem', props: {}};
-            rs.props.rating_system = $('#ratingSystem').val();
+            rs.props.rating_system = gs.get_option('automatch_rSystem');
 
             // Clear any cached table information from an automatch request
             // that was generated through a table create.
