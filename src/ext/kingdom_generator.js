@@ -337,62 +337,29 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
         return deck;
     }
 
-    var Kingdomsel = function (val) {
-        $('<div>').css('position', 'absolute')
-                  .css('display', 'none')
-                  .css('left', '0px')
-                  .css('top', '0px')
-                  .css('height', '100%')
-                  .css('width', '100%')
-                  .css('background', 'rgba(0,0,0,0,0.5)')
-                  .css('z-index', '6000')
-                  .addClass('newlog')
-            .append($('<div>').css('text-align', 'center')
-                              .css('position', 'absolute')
-                              .css('top', '50%')
-                              .css('left', '50%')
-                              .css('height', '100px')
-                              .css('margin-top', '50px')
-                              .css('width', '80%')
-                              .css('margin-left', '-40%')
-                              .css('background', 'white'))
-            .append($('<div>').css('margin-top', '20px'))
-            .append($('<span>').text('Selecte a kingdom (see '))
+    $('<div>').attr('id', 'kingsel')
+              .attr('title', 'Kingdom Generator')
+        .append($('<div>')
+            .append('Selecte a kingdom ')
             .append($('<a>').attr('target', '_blank')
-                            .attr('href', 'http://dom.retrobox.edu/kingdomgenerator.html'))
-            .append($('<span>').text('):'))
-            .append($('<br>'))
-            .append($('<form>').attr('id', 'selform')
-                .append($('<input>').attr('id', 'selval')
-                                    .css('width', '95%')
-                                    .val('All'))
-                .append($('<br>'))
-                .append($('<input>').attr('type', 'submit')
-                                    .attr('value', 'OK')))
-            .appendTo('#viewport');
-        this.selform = document.getElementById('selform');
-        this.selval = document.getElementById('selval');
-    };
-
-    Kingdomsel.prototype = {
-        prompt: function (callback) {
-            var self = this;
-            this.sel.style.display = 'block';
-            this.selval.select();
-            this.selform.onsubmit = function () {
-                callback(this.selval.value);
-                self.sel.style.display = 'none';
-                self.selform.onsubmit = null;
-                return false;
-            };
-        }
-    };
+                            .attr('href', 'http://dom.retrobox.edu/kingdomgenerator.html')
+                            .text('Instructions')))
+        .append($('<input>').attr('id', 'selval')
+                            .css('width', '100%')
+                            .val('All'))
+        .append($('<input>').attr('type', 'submit')
+                            .attr('value', 'OK')
+                            .attr('id', 'kingdomsubmit'))
+        .appendTo('#viewport');
+    $('#kingsel').dialog({
+        modal: true,
+        width: 800,
+        draggable: false,
+        resizeable: false,
+        autoOpen: false
+    });
 
     var myCachedCards;
-    var sel = new Kingdomsel('All');
-    if (dbp.prototype._old_proRandomMethod) {
-        return;
-    }
 
     dbp.prototype._old_proRandomMethod = dbp.prototype._proRandomMethod;
     dbp.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
@@ -407,18 +374,21 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
             if (gs.get_option('generator') && !hideKingdomGenerator
                     && (!gs.AM.hasOwnProperty('state') || gs.AM.state.game === null)
                     && opts.useEternalGenerateMethod) {
-                sel.prompt(function (val) {
+                $('#kingsel').dialog('open');
+                $('#kingdomsubmit').click(function () {
                     try {
+                        var val = $('#selval').val();
                         var all = {};
                         myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
                         var myret = myBuildDeck(all, set_parser.parse(val));
                         if (myret) {
                             x = myret;
+                            $('#kingsel').dialog('close');
                         } else {
                             throw new Error('Cannot generate specified kingdom from the cards availiable');
                         }
                     } catch (e) {
-                        console.err(e);
+                        console.log(e);
                         alert('Error generating kingdom: ' + e);
                     }
                     callback(x);
