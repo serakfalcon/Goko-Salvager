@@ -7,29 +7,29 @@
     var gs = window.GokoSalvager;
     gs.AM = gs.AM || {};
 
-    gs.AM.appendGamePopup = function (viewport) {
-        viewport.append([
-            '<div id="gamepop" title="Creating Automatch Game">',
-            '  ',
-            '  Host: <div id="gamehost"></div><br>',
-            '  Guests: <ul id="gameguests"></ul><br>',
-            '  ',
-            '  <p>',
-            '    Automatch will create the game and seat you automatically.',
-            '    This dialog should disappear shortly.',
-            '  </p>',
-            '  ',
-            '  <input type="button" id="abortgame" value="Abort" />',
-            '</div>'
-        ].join('\n'));
-
-        $('#gamepop').dialog({
-            modal: false,
-            width: 500,
-            draggable: true,
-            resizeable: false,
-            autoOpen: false
-        });
+    gs.AM.appendGamePopup = function () {
+        $('#viewport')
+            .append($('<div>').attr('id', 'gamepop')
+                              .attr('title', 'Creating Automatch Game')
+                .append($('<div>')
+                    .append('Host: ')
+                    .append($('<span>').attr('id', 'gamehost')))
+                .append($('<div>')
+                    .append('Guest: ')
+                    .append($('<ul>').attr('id', 'gameguests')))
+                .append($('<p>').text('Automatch will create the game and seat you '
+                                    + 'automatically. This dialog should disappear '
+                                    + 'when it does.'))
+                .append($('<input>').attr('type', 'button')
+                                    .attr('id', 'abortgame')
+                                    .attr('value', 'Abort'))
+                .dialog({
+                    modal: false,
+                    width: 500,
+                    draggable: true,
+                    resizeable: false,
+                    autoOpen: false
+                }));
 
         $('#abortgame').click(function (evt) {
             $('#abortgame').prop('disabled', true);
@@ -44,12 +44,12 @@
             visible = true;
         }
 
-        $('#gamehost').html();
+        $('#gamehost').text('');
         $('#gameguests').empty();
 
         if (gs.AM.state.game !== null) {
             var hostname = gs.AM.state.game.hostname;
-            $('#gamehost').html(hostname);
+            $('#gamehost').text(hostname);
 
             // List guest names
             gs.AM.state.game.seeks.map(function (s) {
@@ -57,7 +57,7 @@
             }).filter(function (pname) {
                 return pname !== gs.AM.state.game.hostname;
             }).map(function (pname) {
-                $('#gameguests').append('<li>' + pname + '</li>');
+                $('#gameguests').append($('<li>').text(pname));
             });
 
             $('#abortgame').prop('disabled', false);

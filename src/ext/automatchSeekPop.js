@@ -249,7 +249,7 @@
         $('#seekreq').prop('disabled', seeking || canceling);
         $('#seekcan').prop('disabled', canceling);
         $('#seekhide').prop('disabled', false);
-        $('#seekstatus').html(seeking ? 'Looking for a match...' : '');
+        $('#seekstatus').text(seeking ? 'Looking for a match...' : '');
 
         if (typeof visible === "undefined") {
             visible = true;

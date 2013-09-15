@@ -69,10 +69,10 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         // Replace the "Play Now" button with an Automatch button
         $('.room-section-btn-find-table').remove();
         $('.room-section-header-buttons').append(
-            $('<button id="automatchButton" />')
-                .addClass('fs-mtrm-text-border')
-                .addClass('fs-mtrm-dominion-btn')
-                .click(gs.AM.showSeekPop)
+            $('<button>').attr('id', 'automatchButton')
+                         .addClass('fs-mtrm-text-border')
+                         .addClass('fs-mtrm-dominion-btn')
+                         .click(gs.AM.showSeekPop)
         );
 
         // Disable the butomatch button until the async init calls finish
@@ -80,9 +80,11 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
 
         // Add auto-automatch option to table create dialog
         $('.edit-table-lock-table').parent().after(
-            $('<div>').append('<input type="checkbox" id="am-onseek-box">')
-                      .append(' Use Automatch')
-                      .append(' <span id="automatch-info-span" />')
+            $('<div>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('id', 'am-onseek-box'))
+                .append(' Use Automatch')
+                .append($('<span>').attr('id', 'automatch-info-span'))
         );
         $('#am-onseek-box').attr('checked', gs.get_option('automatch_on_seek'));
 
@@ -93,14 +95,14 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
                      + '<p>This will not prevent players in this lobby from'
                      + ' joining your table.</p>'
                      + '<a href="' + amURL + '" target="_blank">More</a>';
-        $('#automatch-info-span').html(' (?)')
+        $('#automatch-info-span').text(' (?)')
                                  .css('color', 'blue')
                                  .css('cursor', 'pointer')
                                  .click(function () {
                 gs.debug('clicked for AM info');
                 if ($('#automatch-info-popup').length === 0) {
                     $('<div>').prop('id', 'automatch-info-popup')
-                              .html(amInfo)
+                              .text(amInfo)
                               .css('z-index', '6000')
                               .prop('title', 'Automatch Info')
                               .appendTo(".fs-mtrm-popup-edit-table");
@@ -421,7 +423,7 @@ loadAutomatchModule = function (gs, conn, mtgRoom, zch) {
         }
         $('#automatchButton').prop('disabled', !ready)
                              .css('color', buttonColor)
-                             .html(buttonText);
+                             .text(buttonText);
     };
 
     handleDisconnect = function () {

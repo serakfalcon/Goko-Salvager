@@ -8,29 +8,35 @@
     gs.AM = gs.AM || {};
 
     gs.AM.appendOfferPopup = function (viewport) {
-        viewport.append([
-            '<div id="offerPop" title="Automatch Found">',
-            '  Host: <label id="offerhost" /><br>',
-            '  Guests:<br>',
-            '  <ul id="plist"> </ul>',
-            '  Sets: <label id="offersets" /><br>',
-            '  Rating: <label id="offerrating" /><br>',
-            //'  Room: <label id="offerroom" /><br>',
-            '  ',
-            '  <p id="offerwaitinfo" />',
-            '  ',
-            '  <input type="button" id="offeracc" value="Accept" />',
-            '  <input type="button" id="offerdec" value="Decline/Cancel" />',
-            '</div>'
-        ].join('\n'));
-
-        $('#offerPop').dialog({
-            modal: false,
-            width: 500,
-            draggable: true,
-            resizeable: false,
-            autoOpen: false
-        });
+        $('<div>').attr('id', 'offerPop')
+                  .attr('title', 'Automatch Found')
+            .append($('<div>')
+                .append('Host: ')
+                .append($('<label>').attr('id', 'offerhost')))
+            .append($('<div>')
+                .append('Guests: ')
+                .append($('<ul>').attr('id', 'plist')))
+            .append($('<div>')
+                .append('Sets: ')
+                .append($('<label>').attr('id', 'offersets')))
+            .append($('<div>')
+                .append('Rating: ')
+                .append($('<label>').attr('id', 'offerrating')))
+            .append($('<p>').attr('id', 'offerwaitinfo'))
+            .append($('<input>').attr('type', 'button')
+                                .attr('id', 'offeracc')
+                                .attr('value', 'Accept'))
+            .append($('<input>').attr('type', 'button')
+                                .attr('id', 'offerdec')
+                                .attr('value', 'Decline/Cancel'))
+            .dialog({
+                modal: false,
+                width: 500,
+                draggable: true,
+                resizeable: false,
+                autoOpen: false
+            })
+            .appendTo($('#viewport'));
 
         $('#offeracc').click(function (evt) {
             gs.AM.state.offer.accepted = true;
@@ -74,7 +80,7 @@
                 // TODO: use casual rating if it's a casual game
                 var p = s.player.pname
                         + ' [Pro Rating: ' + s.player.rating.goko_pro_rating + ']';
-                $('#plist').append('<li>' + p + '</li>');
+                $('#plist').append($('<li>').text(p));
             });
 
             // List or count card sets
