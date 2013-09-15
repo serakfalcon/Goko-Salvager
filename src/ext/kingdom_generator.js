@@ -338,18 +338,21 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
     }
 
     $('<div>').attr('id', 'kingsel')
-              .attr('title', 'Kingdom Generator')
+              .css('display', 'none')
         .append($('<div>')
-            .append('Selecte a kingdom ')
+            .append('Select a kingdom: ')
             .append($('<a>').attr('target', '_blank')
-                            .attr('href', 'http://dom.retrobox.edu/kingdomgenerator.html')
-                            .text('Instructions')))
+                            .attr('href', 'http://dom.retrobox.eu/kingdomgenerator.html')
+                            .text('(Instructions)')
+                            .css('color', 'blue')))
         .append($('<input>').attr('id', 'selval')
                             .css('width', '100%')
                             .val('All'))
         .appendTo('#viewport');
     $('#kingsel').dialog({
+        title: 'Kingdom Generator',
         modal: true,
+        closeOnEscape: true,
         width: 800,
         draggable: false,
         resizeable: false,
@@ -368,37 +371,41 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
     dbp.prototype._old_getRandomCards = dbp.prototype.getRandomCards;
     dbp.prototype.getRandomCards = function (opts, callback) {
         this._old_getRandomCards(opts, function (x) {
-            if (gs.get_option('generator') && !hideKingdomGenerator
-                    && (!gs.AM.hasOwnProperty('state') || gs.AM.state.game === null)
-                    && opts.useEternalGenerateMethod) {
+            var useGokoKingdom = function() {
+                $('#kingsel').off('dialogbeforeclose', useGokoKingdom);
+                callback(x);
+            };
+
+            if (!gs.get_option('generator') || hideKingdomGenerator
+                    || (gs.AM.hasOwnProperty('state') && gs.AM.state.game !== null)
+                    || !opts.useEternalGenerateMethod) {
+                useGokoKingdom();
+            } else {
                 var buildKingdom = function () {
+                    var val = $('#selval').val();
+                    var all = {};
+                    myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
                     try {
-                        var val = $('#selval').val();
-                        var all = {};
-                        myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
                         var myret = myBuildDeck(all, set_parser.parse(val));
                         if (myret) {
-                            x = myret;
+                            $('#kingsel').off('dialogbeforeclose', useGokoKingdom);
                             $('#kingsel').dialog('close');
+                            callback(myret);
                         } else {
-                            throw new Error('Cannot generate specified kingdom from the cards availiable');
+                            alert('Cannot generate specified kingdom from the cards you own');
                         }
                     } catch (e) {
-                        console.log(e);
                         alert('Error generating kingdom: ' + e);
                     }
-                    callback(x);
                 };
-                $('#kingsel').dialog('open');
+
+                $('#kingsel').on('dialogbeforeclose', useGokoKingdom);
                 $('#selval').keyup(function(e) {
 	                if (e.keyCode === 13) {
                         buildKingdom();
 	                }
                 });
-
-                   
-            } else {
-                callback(x);
+                $('#kingsel').dialog('open');
             }
             hideKingdomGenerator = false;
         });
