@@ -338,13 +338,6 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
     }
 
     var Kingdomsel = function (val) {
-        //this.sel = document.createElement('div');
-        //this.sel.setAttribute("style", "position:absolute;display:none;left:0px;top:0px;height:100%;width:100%;background:rgba(0,0,0,0.5);z-index:6000;");
-        //this.sel.setAttribute("class", "newlog");
-        //this.sel.innerHTML = '<div style="text-align:center;position:absolute;top:50%;left:50%;height:100px;margin-top:-50px;width:80%;margin-left:-40%;background:white;"><div style="margin-top:20px">Select a kingdom (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>):<br><form id="selform"><input id="selval" style="width:95%"><br><input type="submit" value="OK"></form></div></div>';
-        //document.getElementById('viewport').appendChild(this.sel);
-        //this.selval.value = 'All';
-
         $('<div>').css('position', 'absolute')
                   .css('display', 'none')
                   .css('left', '0px')
@@ -377,7 +370,6 @@ var loadKingdomGenerator = function (gs, db, dbp, detv, cdbc) {
                 .append($('<input>').attr('type', 'submit')
                                     .attr('value', 'OK')))
             .appendTo('#viewport');
-
         this.selform = document.getElementById('selform');
         this.selval = document.getElementById('selval');
     };
