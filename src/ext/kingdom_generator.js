@@ -347,9 +347,6 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
         .append($('<input>').attr('id', 'selval')
                             .css('width', '100%')
                             .val('All'))
-        .append($('<input>').attr('type', 'submit')
-                            .attr('value', 'OK')
-                            .attr('id', 'kingdomsubmit'))
         .appendTo('#viewport');
     $('#kingsel').dialog({
         modal: true,
@@ -374,8 +371,7 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
             if (gs.get_option('generator') && !hideKingdomGenerator
                     && (!gs.AM.hasOwnProperty('state') || gs.AM.state.game === null)
                     && opts.useEternalGenerateMethod) {
-                $('#kingsel').dialog('open');
-                $('#kingdomsubmit').click(function () {
+                var buildKingdom = function () {
                     try {
                         var val = $('#selval').val();
                         var all = {};
@@ -392,7 +388,15 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
                         alert('Error generating kingdom: ' + e);
                     }
                     callback(x);
+                };
+                $('#kingsel').dialog('open');
+                $('#selval').keyup(function(e) {
+	                if (e.keyCode === 13) {
+                        buildKingdom();
+	                }
                 });
+
+                   
             } else {
                 callback(x);
             }
