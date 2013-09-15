@@ -1,9 +1,12 @@
 /*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
+/*globals GokoSalvager */
+
+GokoSalvager = {};
 
 (function () {
     "use strict";
 
-    var gs = window.GokoSalvager = {};
+    var gs = window.GokoSalvager;
     console.log('Running Goko Salvager v2.3.3');
 
     var default_options = {
@@ -66,20 +69,20 @@
         }
     };
 
-    window.GokoSalvager.alsoDo = function (object, methodname, fnBefore, fnAfter) {
+    window.GokoSalvager.alsoDo = function (obj, methodname, fnBefore, fnAfter) {
 
         // If we've already overridden this method, then override the
         // overriding method instead
         var methodname_o = '_' + methodname + '_orig';
-        if (object.prototype.hasOwnProperty(methodname_o)) {
-            return window.GokoSalvager.alsoDo(object, methodname_o, fnBefore, fnAfter);
+        if (obj.prototype.hasOwnProperty(methodname_o)) {
+            return window.GokoSalvager.alsoDo(obj, methodname_o, fnBefore, fnAfter);
         }
 
         // Cache original method
-        object.prototype[methodname_o] = object.prototype[methodname];
+        obj.prototype[methodname_o] = obj.prototype[methodname];
     
         // Replace original method with a method sandwich
-        object.prototype[methodname] = function () {
+        obj.prototype[methodname] = function () {
 
             // Run fnBefore
             if (typeof fnBefore !== 'undefined' && fnBefore !== null) {
