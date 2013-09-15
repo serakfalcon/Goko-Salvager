@@ -28,7 +28,7 @@ var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
                 if (gs.get_option('sortrating')) {
                     insertInPlace(playerElement);
                 }
-                if (gs.get_option('blacklist').indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
+                if (gs.get_option('blacklist').indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').textContent) > -1) {
                     $(playerElement).hide();
                 } else {
                     $(playerElement).show();
@@ -82,8 +82,8 @@ var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
     getSortablePlayerObjectFromElement = function (element) {
         var rankSpan = element.querySelector('.player-rank>span');
         return {
-            name: element.querySelector('.fs-mtrm-player-name>strong').innerHTML,
-            rating: rankSpan ? parseInt(rankSpan.innerHTML, 10) : -1
+            name: element.querySelector('.fs-mtrm-player-name>strong').textContent,
+            rating: rankSpan ? parseInt(rankSpan.textContent, 10) : -1
         };
     };
 };
