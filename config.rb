@@ -51,23 +51,24 @@
 
     # JS scripts for Goko to load, in order
     :js => [
-        'utils.js',
-        'kingdom_generator.js',
-        'settingsDialog.js',
-        'tableState.js',
-        'autokick.js',
-        'avatars.js',
-        'blacklist.js',
-        'sidebar.js',
-        'logviewer.js',
-        'vpcounter.js',
-        'lobby_ratings.js',
-        'alwaysStack.js',
-        'decktracker.js',
-        'automatchGamePop.js',
-        'automatchOfferPop.js',
-        'automatchSeekPop.js',
-        'automatch.js'
+        #'utils.js',
+        #'kingdom_generator.js',
+        #'settingsDialog.js',
+        #'tableState.js',
+        #'autokick.js',
+        #'avatars.js',
+        #'blacklist.js',
+        #'sidebar.js',
+        #'logviewer.js',
+        #'vpcounter.js',
+        #'lobby_ratings.js',
+        #'alwaysStack.js',
+        #'decktracker.js',
+        #'automatchGamePop.js',
+        #'automatchOfferPop.js',
+        #'automatchSeekPop.js',
+        #'automatch.js',
+        'module_loader.js'
     ],
 
     # CSS to be injected
