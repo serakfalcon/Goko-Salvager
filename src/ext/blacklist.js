@@ -45,8 +45,8 @@ var loadBlacklistModule = function (gs, mr, ctv) {
     };
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'window.FS.MeetingRoom',
      'window.FS.ClassicTableView'],
     100, loadBlacklistModule, this, 'Blacklist Module'

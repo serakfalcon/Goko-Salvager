@@ -687,9 +687,9 @@ var loadKingdomGenerator = function (gs, gso, db, dbp, detv, cdbc) {
     })();
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
-     'GokoSalvager.get_option',
+window.GS.depWait(
+    ['GS',
+     'GS.get_option',
      'FS.Dominion.DeckBuilder',
      'FS.Dominion.DeckBuilder.Persistent',
      'FS.DominionEditTableView',

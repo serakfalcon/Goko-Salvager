@@ -4,7 +4,7 @@
 (function () {
     "use strict";
 
-    var gs = window.GokoSalvager;
+    var gs = window.GS;
     gs.AM = gs.AM || {};
 
     gs.AM.appendGamePopup = function (viewport) {

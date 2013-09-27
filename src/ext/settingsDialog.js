@@ -156,8 +156,8 @@
         angular.bootstrap($('#settingsDialog'));
     };
 
-    window.GokoSalvager.depWait(
-        ['GokoSalvager', 'GokoSalvager.get_option',
+    window.GS.depWait(
+        ['GS', 'GS.get_option',
          'jQuery', 'angular',
          '#viewport', '.fs-rs-logout-row'],
         100, createSettingsDialog, this, 'User Settings Dialog'

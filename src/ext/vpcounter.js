@@ -351,21 +351,21 @@
     };
 
     // Initialize
-    window.GokoSalvager.vp = {
+    window.GS.vp = {
         players: {},
         vpon: false,
         locked: false
     };
-    window.GokoSalvager.depWait(
-        ['GokoSalvager', 'jQuery', '#sidebar', 'angular'],
+    window.GS.depWait(
+        ['GS', 'jQuery', '#sidebar', 'angular'],
         100, buildUI, this, 'VP Table'
     );
-    window.GokoSalvager.depWait(
-        ['GokoSalvager', 'DominionClient', 'mtgRoom'],
+    window.GS.depWait(
+        ['GS', 'DominionClient', 'mtgRoom'],
         100, loadVPToggle, this, 'VP Toggle'
     );
-    window.GokoSalvager.depWait(
-        ['GokoSalvager', 'FS.Dominion.CardBuilder.Data.cards'],
+    window.GS.depWait(
+        ['GS', 'FS.Dominion.CardBuilder.Data.cards'],
         100, loadVPCalculator, this, 'VP Calculator'
     );
 }());

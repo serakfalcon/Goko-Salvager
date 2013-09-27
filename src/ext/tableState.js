@@ -26,8 +26,8 @@ var loadTableSavingModule = function (gs, editTableView, domEditTableView) {
     });
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'FS.EditTableView',
      'FS.DominionEditTableView'],
     100, loadTableSavingModule, this, 'Table Settings Module'

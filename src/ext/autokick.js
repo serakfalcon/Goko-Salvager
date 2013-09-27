@@ -106,8 +106,8 @@ var loadAutokickModule = function (gs, zch) {
     });
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'FS.ZoneClassicHelper'],
     100, loadAutokickModule, this, 'Autokick module'
 );

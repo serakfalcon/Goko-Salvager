@@ -860,7 +860,7 @@ var loadGatewayListener = function (gs, eventDispatcher) {
     });
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager', 'FS.EventDispatcher'],
+window.GS.depWait(
+    ['GS', 'FS.EventDispatcher'],
     100, loadGatewayListener, this, 'Automatch Gateway Listener'
 );

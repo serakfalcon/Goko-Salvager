@@ -139,8 +139,8 @@ var loadDecktracker = function (gs, domWindow, logManager, cdbc) {
     };
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'Dom.DominionWindow',
      'Dom.LogManager',
      'FS.Dominion.CardBuilder.Data.cards'],

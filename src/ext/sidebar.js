@@ -66,8 +66,8 @@ createSidebar = function (gs, logManager) {
     }, false);
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'Dom.LogManager'],
     100, createSidebar, this, 'Sidebar'
 );

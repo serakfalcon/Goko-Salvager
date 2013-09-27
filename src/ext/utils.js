@@ -3,7 +3,7 @@
 (function () {
     "use strict";
 
-    var gs = window.GokoSalvager = {};
+    var gs = window.GS = {};
     console.log('Running Goko Salvager v2.3.3');
 
     var default_options = {
@@ -59,20 +59,20 @@
         gs.set_options(opts);
     };
 
-    window.GokoSalvager.debugMode = false;
-    window.GokoSalvager.debug = function (text) {
+    window.GS.debugMode = false;
+    window.GS.debug = function (text) {
         if (this.get_option('debug_mode')) {
             console.log(text);
         }
     };
 
-    window.GokoSalvager.alsoDo = function (object, methodname, fnBefore, fnAfter) {
+    window.GS.alsoDo = function (object, methodname, fnBefore, fnAfter) {
 
         // If we've already overridden this method, then override the
         // overriding method instead
         var methodname_o = '_' + methodname + '_orig';
         if (object.prototype.hasOwnProperty(methodname_o)) {
-            return window.GokoSalvager.alsoDo(object, methodname_o, fnBefore, fnAfter);
+            return window.GS.alsoDo(object, methodname_o, fnBefore, fnAfter);
         }
 
         // Cache original method
@@ -99,7 +99,7 @@
         };
     };
 
-    window.GokoSalvager.depWait = function (argNames, waitPeriod, callback, context, name) {
+    window.GS.depWait = function (argNames, waitPeriod, callback, context, name) {
         function index(obj, i) { return obj[i]; }
         if (typeof name === 'undefined') { name = null; }
 
@@ -112,7 +112,7 @@
 
             try {
                 if (name) {
-                    window.GokoSalvager.debug('Checking deps for ' + name);
+                    window.GS.debug('Checking deps for ' + name);
                 }
                 x = argNames.map(function (argName) {
                     switch (argName[0]) {
@@ -126,21 +126,21 @@
                 });
             } catch (e) {
                 if (name) {
-                    window.GokoSalvager.debug('Error while looking for deps for ' + name);
+                    window.GS.debug('Error while looking for deps for ' + name);
                 }
                 return;
             }
 
             if (x.every(exists)) {
-                if (name) { window.GokoSalvager.debug('Found deps for ' + name); }
+                if (name) { window.GS.debug('Found deps for ' + name); }
                 clearInterval(waitLoop);
                 callback.apply(null, x);
-                if (name) { window.GokoSalvager.debug('Found deps and ran ' + name); }
+                if (name) { window.GS.debug('Found deps and ran ' + name); }
             } else if (name) {
                 var i;
                 for (i = 0; i < x.length; i += 1) {
                     if (!exists(x[i])) {
-                        window.GokoSalvager.debug(name + ' is missing dependency: ' + argNames[i]);
+                        window.GS.debug(name + ' is missing dependency: ' + argNames[i]);
                     }
                 }
             }
@@ -150,7 +150,7 @@
     };
 
     // Parse numbers like 303 and 4.23k
-    window.GokoSalvager.parseNum = function (str) {
+    window.GS.parseNum = function (str) {
         try {
             var m = str.match(/^([0-9.]+)([kK]?)$/);
             return Math.floor(parseFloat(m[1]) * (m[2] !== '' ? 1000 : 1));
@@ -162,7 +162,7 @@
 
     // Parse titles like X+, Y-, X-Y, and +/-Z
     // Precedence: +/- > range > min thresh > max thresh
-    window.GokoSalvager.parseRange = function (tablename, myRating) {
+    window.GS.parseRange = function (tablename, myRating) {
         var m, minRating = null, maxRating = null;
 
         if ((m = tablename.match(/(\d+(.\d+)?([kK])?)-/)) !== null) {
@@ -185,11 +185,11 @@
         return [minRating, maxRating];
     };
 
-    window.GokoSalvager.alertPlayer = function (message, sound) {
-        if (window.GokoSalvager.get_option('alert_sounds')) {
+    window.GS.alertPlayer = function (message, sound) {
+        if (window.GS.get_option('alert_sounds')) {
             sound.play();
         }
-        if (window.GokoSalvager.get_option('alert_popups')) {
+        if (window.GS.get_option('alert_popups')) {
             window.alert(message);
         }
     };

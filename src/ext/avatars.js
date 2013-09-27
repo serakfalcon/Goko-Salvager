@@ -51,8 +51,8 @@ var loadAvatarModule = function (gs, gp, ls) {
             '"');
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'Goko.Player',
      'FS.Templates.LaunchScreen'],
     100, loadAvatarModule, this, 'Avatar Module'

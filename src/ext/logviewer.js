@@ -171,8 +171,8 @@ loadLogviewerModule = function (gs, cdbc, lm, dw, dc) {
     };
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'FS.Dominion.CardBuilder.Data.cards',
      'Dom.LogManager',
      'Dom.DominionWindow',

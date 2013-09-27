@@ -88,8 +88,8 @@ var loadLobbyRatingsModule = function (gs, rh, crv, mrs) {
     };
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'FS.RatingHelper',
      'FS.ClassicRoomView',
      'FS.MeetingRoomSetting'],

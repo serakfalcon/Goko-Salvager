@@ -12,8 +12,8 @@ var loadAlwaysStackModule = function (gs, csp) {
     });
 };
 
-window.GokoSalvager.depWait(
-    ['GokoSalvager',
+window.GS.depWait(
+    ['GS',
      'FS.Cards.CardStackPanel'],
     100, loadAlwaysStackModule, this, 'Always Stack Module'
 );
