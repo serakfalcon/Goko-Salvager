@@ -1,12 +1,10 @@
 /*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
 /*globals mtgRoom */
 
-window.GokoSalvager = {};
+GokoSalvager = {};
 
 (function () {
     "use strict";
-
-    var GokoSalvager = window.GokoSalvager;
 
     console.log('Running Goko Salvager');
 
@@ -132,6 +130,7 @@ window.GokoSalvager = {};
                 if (name) {
                     GokoSalvager.debug('Error while looking for deps for ' + name);
                 }
+                throw e;
                 return;
             }
 

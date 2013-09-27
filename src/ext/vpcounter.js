@@ -1,5 +1,5 @@
 /*jslint browser:true, devel:true, nomen:true, forin:true, vars:true, regexp:true, white:true */
-/*globals $, _, angular, FS, mtgRoom */
+/*globals $, _, angular, FS */
 
 (function () {
     "use strict";
@@ -18,9 +18,9 @@
            + 'counter can only be toggled if all players agree by saying '
            + '#vpx.');
     vpinfo.push('The counter will also be immediately locked if any player '
-           + '#vpoff, or if all players have said #vpon, or if the host has '
-           + 'announced it in advance by putting #vpon or #vpoff in the game '
-           + 'title.');
+           + 'says #vpoff, or if all players have said #vpon, or if the host '
+           + 'has announced it in advance by putting #vpon or #vpoff in the '
+           + 'game title.');
 
     // Helper functions for Array.reduce()
     var sum = function (a, b) { return a + b; };
@@ -49,7 +49,7 @@
                     .append($('<td>').text('{{vp.locked}}'))));
 
         // Bind UI to model using AngularJS
-        window.vpController = function ($scope) {
+        vpController = function ($scope) {
             $scope.vp = gs.vp;
             $scope.playerList = _.values(gs.vp.players);
             $scope.debug = gs.debugMode;
@@ -129,7 +129,7 @@
         };
     };
 
-    var loadVPToggle = function (gs, logManager) {
+    var loadVPToggle = function (gs, mr) {
 
         // Event handlers
         var onGameSetup, onRoomChat, onAddLog, onTurnStart, handleMyChat, handleOppChat,
@@ -139,7 +139,6 @@
         var formatScores, isMultiplayer, allWantOn, allWantChange, reqcount;
 
         onGameSetup = function (gameData, domClient) {
-
             // Initialize player info
             gs.vp.players = {};
             gameData.playerInfos.map(function (pinfo) {
@@ -238,7 +237,7 @@
         };
 
         onRoomChat = function (data) {
-            var speaker = mtgRoom.playerList
+            var speaker = mr.playerList
                                  .findByAddress(data.data.playerAddress)
                                  .get('playerName');
             if (speaker === gs.getMyName()) {
@@ -437,8 +436,8 @@
         };
 
         // Listen to VP toggle events in room chat and when the game starts
-        mtgRoom.conn.bind('roomChat', onRoomChat);
-        mtgRoom.conn.bind('gameServerHello', function (msg) {
+        mr.conn.bind('roomChat', onRoomChat);
+        mr.conn.bind('gameServerHello', function (msg) {
             gs.getGameClient().bind('incomingMessage:gameSetup', onGameSetup);
             gs.getGameClient().bind('incomingMessage:addLog', onAddLog);
             gs.getGameClient().bind('incomingMessage', checkGameOver);
@@ -459,20 +458,24 @@
     };
 
     // Initialize
-    window.GokoSalvager.vp = {
+    GokoSalvager.vp = {
         players: {},
         vpon: false,
         locked: false
     };
-    window.GokoSalvager.depWait(
+
+    GokoSalvager.depWait(
         ['GokoSalvager', 'jQuery', '#sidebar', 'angular', 'GokoSalvager.vp'],
         100, buildUI, this, 'VP Table'
     );
-    window.GokoSalvager.depWait(
-        ['GokoSalvager', 'Dom.LogManager', 'DominionClient', 'FS.MeetingRoomEvents', 'mtgRoom', 'GokoSalvager.vp', 'mtgRoom.conn'],
+    GokoSalvager.depWait(
+        ['GokoSalvager', 'mtgRoom.conn'],
+        ['GokoSalvager', 'Dom.LogManager', 'DominionClient',
+         'FS.MeetingRoomEvents', 'mtgRoom', 'GokoSalvager.vp',
+         'mtgRoom.conn'],
         100, loadVPToggle, this, 'VP Toggle'
     );
-    window.GokoSalvager.depWait(
+    GokoSalvager.depWait(
         ['GokoSalvager', 'FS.Dominion.CardBuilder.Data.cards', 'GokoSalvager.vp'],
         100, loadVPCalculator, this, 'VP Calculator'
     );
