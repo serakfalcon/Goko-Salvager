@@ -11,6 +11,7 @@
         'settingsDialog',
         'decktracker',
         'tableState', 
+        'autokick',
         'kingdomGenerator',
         'alwaysStack'
     ];
