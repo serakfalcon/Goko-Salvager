@@ -60,7 +60,7 @@
         'avatars.js',
         'blacklist.js',
         'sidebar.js',
-        #'logviewer.js',
+        'logviewer.js',
         #'vpcounter.js',
         #'lobby_ratings.js',
         'alwaysStack.js',

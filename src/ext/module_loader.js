@@ -16,6 +16,7 @@
         'avatars',
         'kingdomGenerator',
         'sidebar',
+        'logviewer',
         'alwaysStack'
     ];
 
