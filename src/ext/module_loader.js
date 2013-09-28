@@ -12,6 +12,7 @@
         'decktracker',
         'tableState', 
         'autokick',
+        'avatars',
         'kingdomGenerator',
         'alwaysStack'
     ];
