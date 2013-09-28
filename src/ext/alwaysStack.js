@@ -1,19 +1,16 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true, white:true */
-/*global $, _ */
+/*global $, _, GS, FS */
 
-// Always Stack module
-//
-var loadAlwaysStackModule = function (gs, csp) {
+(function () {
     "use strict";
-    gs.alsoDo(csp, 'addView', null, function (view, index) {
-        if (gs.get_option('always_stack') && this.autoStackCards) {
-            this.stackCards = true;
-        }
-    });
-};
 
-window.GS.depWait(
-    ['GS',
-     'FS.Cards.CardStackPanel'],
-    100, loadAlwaysStackModule, this, 'Always Stack Module'
-);
+    var mod = GS.modules.alwaysStack = new GS.Module('Always Stack');
+    mod.dependencies = ['GS', 'FS.Cards.CardStackPanel'];
+    mod.load = function () {
+        GS.alsoDo(FS.Cards.CardStackPanel, 'addView', null, function (view, index) {
+            if (GS.get_option('always_stack') && this.autoStackCards) {
+                this.stackCards = true;
+            }
+        });
+    };
+}());
