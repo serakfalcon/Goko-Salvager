@@ -17,6 +17,9 @@
         'kingdomGenerator',
         'sidebar',
         'logviewer',
+        'vpcalculator',
+        'vptoggle',
+        'vpcounterui',
         'alwaysStack'
     ];
 

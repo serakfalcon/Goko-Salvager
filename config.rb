@@ -61,7 +61,7 @@
         'blacklist.js',
         'sidebar.js',
         'logviewer.js',
-        #'vpcounter.js',
+        'vpcounter.js',
         #'lobby_ratings.js',
         'alwaysStack.js',
         'decktracker.js',
