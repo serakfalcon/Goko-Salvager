@@ -10,6 +10,7 @@
     var modNames = [
         'settingsDialog',
         'decktracker',
+        'tableState', 
         'kingdomGenerator',
         'alwaysStack'
     ];
