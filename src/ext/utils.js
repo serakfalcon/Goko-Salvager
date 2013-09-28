@@ -1,80 +1,24 @@
 /*jslint browser: true, devel: true, indent: 4, es5: true, vars: true, nomen: true, regexp: true, forin: true */
-/*globals mtgRoom */
-
-GokoSalvager = {};
+/*globals GS, mtgRoom */
 
 (function () {
     "use strict";
 
-    console.log('Running Goko Salvager');
+    console.log('Loading Utils');
 
-    var default_options = {
-        autokick_by_rating: true,
-        autokick_by_forname: true,
-        alert_popups: false,
-        alert_sounds: true,
-        generator: true,
-        proranks: true,
-        sortrating: true,
-        adventurevp: true,
-        sidebar: true,
-        vp_request: true,
-        vp_refuse: false,
-        always_stack: false,
-        blacklist: [],
-        automatch_blacklist: [],
-        automatch_on_seek: true,
-        automatch_min_players: 2,
-        automatch_max_players: 2,
-        automatch_min_sets: 1,
-        automatch_max_sets: 15,
-        automatch_rSystem: 'pro',
-        automatch_rdiff: 1500,
-        debug_mode: false,
-        lasttablename: 'My Table'
-    };
-
-    GokoSalvager.get_options = function () {
-        var optName, out = {};
-        if (localStorage.hasOwnProperty('salvagerOptions')) {
-            out = JSON.parse(localStorage.salvagerOptions);
-        }
-        for (optName in default_options) {
-            if (!out.hasOwnProperty(optName)) {
-                out[optName] = default_options[optName];
-            }
-        }
-        return out;
-    };
-
-    GokoSalvager.set_options = function (options) {
-        localStorage.salvagerOptions = JSON.stringify(options);
-    };
-
-    GokoSalvager.get_option = function (optName) {
-        return GokoSalvager.get_options()[optName];
-    };
-
-    GokoSalvager.set_option = function (optionName, optionValue) {
-        var opts = GokoSalvager.get_options();
-        opts[optionName] = optionValue;
-        GokoSalvager.set_options(opts);
-    };
-
-    GokoSalvager.debugMode = false;
-    GokoSalvager.debug = function (text) {
-        if (this.get_option('debug_mode')) {
+    GS.debug = function (text) {
+        if (GS.get_option('debug_mode')) {
             console.log(text);
         }
     };
 
-    GokoSalvager.alsoDo = function (object, methodname, fnBefore, fnAfter) {
+    GS.alsoDo = function (object, methodname, fnBefore, fnAfter) {
 
         // If we've already overridden this method, then override the
         // overriding method instead
         var methodname_o = '_' + methodname + '_orig';
         if (object.prototype.hasOwnProperty(methodname_o)) {
-            return GokoSalvager.alsoDo(object, methodname_o, fnBefore, fnAfter);
+            return GS.alsoDo(object, methodname_o, fnBefore, fnAfter);
         }
 
         // Cache original method
@@ -101,59 +45,8 @@ GokoSalvager = {};
         };
     };
 
-    GokoSalvager.depWait = function (argNames, waitPeriod, callback, context, name) {
-        function index(obj, i) { return obj[i]; }
-        if (typeof name === 'undefined') { name = null; }
-
-        var waitLoop;
-        var exists = function (y) {
-            return typeof y !== 'undefined' && y !== null;
-        };
-        var depTry = function () {
-            var x;
-
-            try {
-                if (name) {
-                    GokoSalvager.debug('Checking deps for ' + name);
-                }
-                x = argNames.map(function (argName) {
-                    switch (argName[0]) {
-                    case '#':
-                        return document.getElementById(argName.substr(1));
-                    case '.':
-                        return document.getElementsByClassName(argName.substr(1))[0];
-                    default:
-                        return argName.split('.').reduce(index, window);
-                    }
-                });
-            } catch (e) {
-                if (name) {
-                    GokoSalvager.debug('Error while looking for deps for ' + name);
-                }
-                throw e;
-                return;
-            }
-
-            if (x.every(exists)) {
-                if (name) { GokoSalvager.debug('Found deps for ' + name); }
-                clearInterval(waitLoop);
-                callback.apply(null, x);
-                if (name) { GokoSalvager.debug('Found deps and ran ' + name); }
-            } else if (name) {
-                var i;
-                for (i = 0; i < x.length; i += 1) {
-                    if (!exists(x[i])) {
-                        GokoSalvager.debug(name + ' is missing dependency: ' + argNames[i]);
-                    }
-                }
-            }
-
-        };
-        waitLoop = setInterval(depTry, waitPeriod);
-    };
-
     // Parse numbers like 303 and 4.23k
-    GokoSalvager.parseNum = function (str) {
+    GS.parseNum = function (str) {
         try {
             var m = str.match(/^([0-9.]+)([kK]?)$/);
             return Math.floor(parseFloat(m[1]) * (m[2] !== '' ? 1000 : 1));
@@ -165,7 +58,7 @@ GokoSalvager = {};
 
     // Parse titles like X+, Y-, X-Y, and +/-Z
     // Precedence: +/- > range > min thresh > max thresh
-    GokoSalvager.parseRange = function (tablename, myRating) {
+    GS.parseRange = function (tablename, myRating) {
         var m, minRating = null, maxRating = null;
 
         if ((m = tablename.match(/(\d+(.\d+)?([kK])?)-/)) !== null) {
@@ -188,16 +81,7 @@ GokoSalvager = {};
         return [minRating, maxRating];
     };
 
-    GokoSalvager.alertPlayer = function (message, sound) {
-        if (GokoSalvager.get_option('alert_sounds')) {
-            sound.play();
-        }
-        if (GokoSalvager.get_option('alert_popups')) {
-            alert(message);
-        }
-    };
-
-    GokoSalvager.getTableName = function () {
+    GS.getTableName = function () {
         try {
             return JSON.parse(mtgRoom.getCurrentTable().get('settings')).name;
         } catch (e) {
@@ -205,11 +89,11 @@ GokoSalvager = {};
         }
     };
 
-    GokoSalvager.getMyName = function () {
+    GS.getMyName = function () {
         return mtgRoom.localPlayer.get('playerName');
     };
 
-    GokoSalvager.getGameClient = function () {
+    GS.getGameClient = function () {
         if (typeof mtgRoom !== 'undefined') {
             var roomId = mtgRoom.currentRoomId;
             if (roomId !== null) {
@@ -222,19 +106,19 @@ GokoSalvager = {};
         return null;
     };
     
-    GokoSalvager.sendRoomChat = function (message) {
-        var gc = GokoSalvager.getGameClient();
+    GS.sendRoomChat = function (message) {
+        var gc = GS.getGameClient();
         gc.clientConnection.send('sendChat', {text: message});
     };
 
     // Show a message in my chat box without sending
-    GokoSalvager.showRoomChat = function (message) {
-        var gc = GokoSalvager.getGameClient();
+    GS.showRoomChat = function (message) {
+        var gc = GS.getGameClient();
         gc.clientConnection.trigger("addChat", {
             playerName: '**',
             text: message
         });
     };
 
-    GokoSalvager.url = 'www.gokosalvager.com';
+    GS.url = 'www.gokosalvager.com';
 }());
