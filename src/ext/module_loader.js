@@ -4,6 +4,8 @@
 (function () {
     "use strict";
 
+    console.log("Loading Module Loader");
+
     // How many times each module has failed to find its dependencies
     var failCounts = {};
 

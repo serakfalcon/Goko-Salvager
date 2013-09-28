@@ -4,6 +4,8 @@
 (function () {
     "use strict";
 
+    console.log('Loading Kingdom Generator');
+
     GS.modules.kingdomGenerator = new GS.Module('Kingdom Generator');
     GS.modules.kingdomGenerator.dependencies =
         ['FS.Dominion.DeckBuilder.Persistent', 'FS.DominionEditTableView',

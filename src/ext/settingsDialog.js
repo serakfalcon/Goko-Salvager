@@ -4,6 +4,8 @@
 (function () {
     "use strict";
 
+    console.log('Loading Settings Dialog');
+
     GS.modules.settingsDialog = new GS.Module('User Settings Dialog');
     GS.modules.settingsDialog.dependencies =
         ['$', 'angular', '#viewport', '.fs-rs-logout-row'];

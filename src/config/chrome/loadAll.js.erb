@@ -1,16 +1,27 @@
 /*jslint browser:true, devel:true */
 /*globals chrome */
-var i, s, JS, cssNode;
+var i, j, s, JS, cssNode;
 
 var scripts =  [
     "<%= config[:jslib].join("\",\n    \"") %>",
     "<%= config[:js].join("\",\n    \"") %>"
 ];
-for (i = 0; i < scripts.length; i += 1) {
-    JS = document.createElement('script');
-    JS.src = chrome.extension.getURL(scripts[i]);
-    document.body.appendChild(JS);
-}
+console.log(scripts);
+j = 0;
+setTimeout(function () {
+    intvl = setInterval(function () {
+    //for (j = 0; j < scripts.length; j += 1) {
+        JS = document.createElement('script');
+        console.log('Appending ' + scripts[j])
+        JS.src = chrome.extension.getURL(scripts[j]);
+        document.body.appendChild(JS);
+        j += 1;
+        if (j == scripts.length) {
+            clearInterval(intvl);
+        }
+    //}
+    }, 100);
+}, 5000);
 
 var styles =  [
     "<%= config[:css].join("\",\n    \"") %>"

@@ -4,6 +4,8 @@
 (function () {
     "use strict";
 
+    console.log('Loading Utils');
+
     GS.debug = function (text) {
         if (GS.get_option('debug_mode')) {
             console.log(text);
