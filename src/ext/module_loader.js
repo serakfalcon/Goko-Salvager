@@ -12,6 +12,7 @@
         'decktracker',
         'tableState', 
         'autokick',
+        'blacklist',
         'avatars',
         'kingdomGenerator',
         'alwaysStack'

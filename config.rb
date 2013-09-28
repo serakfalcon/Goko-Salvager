@@ -58,7 +58,7 @@
         'tableState.js',
         'autokick.js',
         'avatars.js',
-        #'blacklist.js',
+        'blacklist.js',
         #'sidebar.js',
         #'logviewer.js',
         #'vpcounter.js',
