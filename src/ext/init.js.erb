@@ -8,6 +8,7 @@
     console.log('Running Goko Salvager <%= config[:version] %>');
 
     // Global namespace
+    // TODO: deal with possibility that a modules runs before this code
     window.GS = {
         modules: {}
     };
@@ -66,6 +67,7 @@
     };
 
     // Generic module with name, dependency-checking, and a loader function
+    // TODO: deal with possibility that a modules runs before this code
     GS.Module = function (moduleName) {
         this.name = moduleName;
 
