@@ -73,17 +73,11 @@
         this.dependencies = [];
 
         // To be defined in subclasses
-        this.loader = function () {
+        this.load = function () {
             throw 'No loader defined for module ' + moduleName;
         };
 
-        this.loaded = false;
-        this.load = function () {
-            this.loader.apply(this, []);
-            this.loaded = true;
-        };
-
-        this.getUnreadyDeps = function () {
+        this.getMissingDeps = function () {
             var index = function (obj, i) { return obj[i]; };
             return this.dependencies.filter(function (depName) {
                 var dep;
@@ -103,7 +97,7 @@
         };
 
         this.hasAllDeps = function () {
-            return this.getUnreadyDeps().length === 0;
+            return this.getMissingDeps().length === 0;
         };
     };
 }());

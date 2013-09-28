@@ -55,7 +55,7 @@
         'settings.js',
         'utils.js',
         'settingsDialog.js',
-        #'kingdom_generator.js',
+        'kingdom_generator.js',
         #'tableState.js',
         #'autokick.js',
         #'avatars.js',
