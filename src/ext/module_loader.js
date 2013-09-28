@@ -6,37 +6,39 @@
 
     console.log("Loading Module Loader");
 
-    // How many times each module has failed to find its dependencies
-    var failCounts = {};
+    // Module load order
+    var modNames = [
+        'settingsDialog',
+        'kingdomGenerator',
+        'alwaysStack'
+    ];
 
-    // Track which modules have been loaded
-    var loaded = [];
-
-    // Try to load all not-yet-loaded modules.
-    // Keep looping indefinitely in case this runs before all modules
-    // have been defined.
-    var intvl = setInterval(function () {
-        // List of GS modules still waiting for their dependencies
-        var toLoad = Object.keys(GS.modules).map(function(key){
-            return GS.modules[key];
-        }).filter(function (mod) {
-            return loaded.indexOf(mod.name) === -1;
-        });
-
-        var i, mod, missing;
-        for (i = 0; i < toLoad.length; i += 1) {
-            mod = toLoad[i];
-            missing = mod.getMissingDeps();
+    var loadModule = function (i) {
+        var failCount = 0;
+        var mod = GS.modules[modNames[i]];
+        var intvl = setInterval(function () {
+            var missing = mod.getMissingDeps();
             if (missing.length === 0) {
+                clearInterval(intvl);
+                console.log('Starting module ' + mod.name);
                 mod.load();
-                loaded.push(mod.name);
+                i += 1;
+                if (i !== modNames.length) {
+                    loadModule(i);
+                }
             } else {
-                failCounts[mod.name] += 1;
-                if (failCounts[mod.name] % 10 === 0) {
-                    GS.debug('Module ' + mod.name + ' is missing dependencies:');
-                    GS.debug(missing);
+                failCount += 1;
+                if (failCount % 10 === 0) {
+                    console.log('Module ' + mod.name + ' is missing dependencies:');
+                    console.log(missing);
+                }
+                if (failCount === 60) {
+                    alert('Goko Salvager could not load. Module ' + mod.name
+                        + ' could not find its Goko object dependencies.');
                 }
             }
-        }
-    }, 500);
-} ());
+        }, 250);
+    };
+
+    loadModule(0);
+}());
