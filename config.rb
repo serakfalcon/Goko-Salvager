@@ -62,7 +62,7 @@
         'sidebar.js',
         'logviewer.js',
         'vpcounter.js',
-        #'lobby_ratings.js',
+        'lobby_ratings.js',
         'alwaysStack.js',
         'decktracker.js',
         #'automatchGamePop.js',
