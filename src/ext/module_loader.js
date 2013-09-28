@@ -15,6 +15,7 @@
         'blacklist',
         'avatars',
         'kingdomGenerator',
+        'sidebar',
         'alwaysStack'
     ];
 
@@ -37,12 +38,12 @@
                     console.log('Module ' + mod.name + ' is missing dependencies:');
                     console.log(missing);
                 }
-                if (failCount === 60) {
+                if (failCount === 300) {
                     alert('Goko Salvager could not load. Module ' + mod.name
                         + ' could not find its Goko object dependencies.');
                 }
             }
-        }, 250);
+        }, 100);
     };
 
     loadModule(0);

@@ -59,7 +59,7 @@
         'autokick.js',
         'avatars.js',
         'blacklist.js',
-        #'sidebar.js',
+        'sidebar.js',
         #'logviewer.js',
         #'vpcounter.js',
         #'lobby_ratings.js',
