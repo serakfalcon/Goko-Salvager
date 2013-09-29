@@ -112,7 +112,7 @@
                 this.vpon = true;
                 this.locked = false;
                 this.whyLocked = null;
-                GS.showRoomChat('The VP Counter is ON because your "VP Counter:'
+                GS.showRoomChat('The VP Counter is ON because your "VP Counter: '
                               + 'Always Request" option is enabled.');
                 GS.showRoomChat('Say "#vphelp" for more info.');
 
@@ -120,7 +120,7 @@
                 this.vpon = false;
                 this.locked = false;
                 this.whyLocked = null;
-                GS.showRoomChat('The VP Counter is OFF because your "VP Counter:'
+                GS.showRoomChat('The VP Counter is OFF because your "VP Counter: '
                               + 'Always Refuse" option is enabled.');
                 GS.showRoomChat('Say "#vphelp" for more info.');
 
@@ -202,7 +202,8 @@
                         GS.sendRoomChat('I\'d like to use a VP counter '
                                + '(See gokosalvager.com). '
                                + 'You can say "#vpoff" before Turn 5 to disallow '
-                               + 'it, or say "#vp?" to see the score in chat.');
+                               + 'it, or "#vp?" to see the score in chat. Say '
+                               + '"#vphelp" for more info.');
                     }
                 }, 2000);
             }
@@ -326,7 +327,7 @@
 
             // Lock on Turn 5
             if (turnNumber === 5 && this.beforeT5) {
-                if (!this.locked) {
+                if (!this.locked && this.isMultiplayer()) {
                     this.locked = true;
                     this.whyLocked = 'it is after Turn 5';
                     GS.showRoomChat('The VP counter is now LOCKED. You can still '

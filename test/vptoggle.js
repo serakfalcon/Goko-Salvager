@@ -33,6 +33,17 @@
         GS.sendRoomChat('me: 5, opp: 7');
     };
 
+    var botSetup = function (request, refuse, title) {
+        log('---');
+        if (typeof title === 'undefined') {
+            title = 'my game';
+        }
+        toggle = new GS.VPToggle(request, refuse, title, 'me', ['me', 'opp'], [false, true]);
+        toggle.shownChat = [];
+        toggle.sentChat = [];
+        toggle.init();
+    };
+
     var humanSetup = function (request, refuse, title) {
         log('---');
         if (typeof title === 'undefined') {
@@ -217,9 +228,11 @@
     });
 
     test("request - init", function () {
+        consoleLogging = true;
         humanSetup(true, false);
         state(true, false, null);
         shownChats(/is ON/, /#vphelp/);
+        consoleLogging = false;
     });
 
     test("request - Opp #vpon", function () {
@@ -459,5 +472,53 @@
         setState(true, false, 'reason');
         toggle.onOppChat('opp', '#vp?');
         sentChats(/me:.*opp:.*/);
+    });
+
+    test("vs Bots, default - My #vpon/#vpoff", function () {
+        botSetup(false, false);
+        state(true, false, null);
+        toggle.onMyChat("#vpoff");
+        state(false, false, null);
+        toggle.onMyChat("#vpon");
+        state(true, false, null);
+        toggle.onMyChat("#vpoff");
+        state(false, false, null);
+    });
+
+    test("vs Bots, request - My #vpon/#vpoff", function () {
+        botSetup(true, false);
+        state(true, false, null);
+        toggle.onMyChat("#vpoff");
+        state(false, false, null);
+        toggle.onMyChat("#vpon");
+        state(true, false, null);
+        toggle.onMyChat("#vpoff");
+        state(false, false, null);
+    });
+
+    test("vs Bots, refuse - My #vpon/#vpoff", function () {
+        botSetup(false, true);
+        state(true, false, null);
+        toggle.onMyChat("#vpoff");
+        state(false, false, null);
+        toggle.onMyChat("#vpon");
+        state(true, false, null);
+        toggle.onMyChat("#vpoff");
+        state(false, false, null);
+    });
+
+    test("vs Bots, request - Turn 2", function () {
+        botSetup(true, false);
+        var n = toggle.shownChat.length;
+        toggle.onTurn('me', 2);
+        equal(toggle.shownChat.length, n);
+    });
+
+    test("vs Bots - Turn 5", function () {
+        botSetup(true, false);
+        var n = toggle.shownChat.length;
+        toggle.onTurn('me', 5);
+        equal(toggle.shownChat.length, n);
+        state(true, false, null);
     });
 }());
