@@ -120,5 +120,14 @@
         });
     };
 
+    GS.alertPlayer = function (message, sound) {
+        if (GS.get_option('alert_sounds')) {
+            sound.play();
+        }
+        if (GS.get_option('alert_popups')) {
+            window.alert(message);
+        }
+    };
+
     GS.url = 'www.gokosalvager.com';
 }());
