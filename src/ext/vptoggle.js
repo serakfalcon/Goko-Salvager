@@ -1,6 +1,8 @@
 /*jslint vars:true, nomen:true, forin:true, regexp:true, browser:true, devel:true */
 /*globals _, $, GS, FS, mtgRoom */
 
+// TODO: Immediately send Turn 2 messages when opponents have all joined the game.
+
 (function () {
     "use strict";
 
@@ -23,8 +25,8 @@
            + 'says #vpoff, or if all players have said #vpon, or if the host '
            + 'has announced it in advance by putting #vpon or #vpoff in the '
            + 'game title.');
-
-    var VPToggle = function (always_request, always_refuse, gameTitle, myName, pnames, isBots) {
+    
+    GS.VPToggle = function (always_request, always_refuse, gameTitle, myName, pnames, isBots) {
         this.always_request = always_request;
         this.always_refuse = always_refuse;
         this.gameTitle = gameTitle;
@@ -39,13 +41,14 @@
                 request: null,
                 wantsChange: false,
                 isBot: isBots[i],
-                pclass: 'p' + i
+                pclass: 'p' + i,
+                joined: false
             };
         }
     };
 
     // Are there at least two human players?
-    VPToggle.prototype = {
+    GS.VPToggle.prototype = {
         isMultiplayer: function () {
             return _.pluck(this.players, 'isBot').filter(function (x) {
                 return !x;
@@ -74,9 +77,11 @@
         },
 
         init: function () {
-            GS.debug('init');
-
             this.alreadyResponded = false;
+            
+            if (this.isMultiplayer()) {
+                GS.sendRoomChat('I have joined the game.');
+            }
 
             // Initialize toggle state and explain commands
             if (!this.isMultiplayer()) {
@@ -92,14 +97,14 @@
                 // #vpoff in table name disables and locks
                 this.vpon = false;
                 this.locked = true;
-                this.whyLocked = 'the table name cointained "#vpoff"';
+                this.whyLocked = 'the table name contained "#vpoff"';
                 GS.showRoomChat('The VP Counter is OFF and LOCKED because ' + this.whyLocked);
                 GS.showRoomChat('Say "#vphelp" for more info.');
 
             } else if (this.gameTitle.match(/#vpon/i)) {
                 this.vpon = true;
                 this.locked = true;
-                this.whyLocked = 'the table name cointained "#vpon"';
+                this.whyLocked = 'the table name contained "#vpon"';
                 GS.showRoomChat('The VP Counter is ON and LOCKED because ' + this.whyLocked);
                 GS.showRoomChat('Say "#vphelp" for more info.');
 
@@ -140,7 +145,7 @@
                 break;
             case '#vp?':
                 if (this.vpon) {
-                    GS.vp.sendScores();
+                    GS.sendScores();
                 } else {
                     GS.showRoomChat('Cannot show scores. Your VP counter is off.');
                 }
@@ -150,17 +155,16 @@
                     GS.showRoomChat('Your VP counter is not locked. Say #vpon '
                                   + 'or #vpoff instead. Say #vphelp for more info.');
                 } else {
-                    this.players[GS.getMyName()].wantsChange = true;
+                    this.players[this.myName].wantsChange = true;
                     if (this.allWantChange()) {
                         this.vpon = !this.vpon;
                         _.values(this.players).map(function (p) {
                             p.wantsChange = false;
                         });
+                        this.whyLocked = 'all players said #vpx';
                         GS.sendRoomChat('My VP counter is now '
-                                     + (this.vpon ? 'on' : 'off'));
-                        this.whyLock = 'all players changed it to '
-                                      + (this.vpon ? 'on' : 'off')
-                                      + ' using #vpx';
+                                     + (this.vpon ? 'on' : 'off')
+                                     + ' because ' + this.whyLocked);
                     } else {
                         GS.sendRoomChat('My VP counter is locked to '
                                      + (this.vpon ? 'on' : 'off')
@@ -177,7 +181,7 @@
         },
 
         handleMyVPON: function () {
-            this.players[GS.getMyName()].request = true;
+            this.players[this.myName].request = true;
             if (!this.isMultiplayer()) {
                 this.vpon = true;
             } else if (this.locked && !this.vpon) {
@@ -187,12 +191,14 @@
             } else if (this.allWantOn()) {
                 this.vpon = true;
                 this.locked = true;
-                this.whyLocked = 'all players requested #vpon';
+                this.whyLocked = 'all players said #vpon';
+                GS.showRoomChat('The VP counter is now locked to ON because ' + this.whyLocked);
             } else {
                 this.vpon = true;
                 // Wait for auto-responses before sending explanation
+                var that = this;
                 setTimeout(function () {
-                    if (this.reqcount() === 1) {
+                    if (that.reqcount() === 1) {
                         GS.sendRoomChat('I\'d like to use a VP counter '
                                + '(See gokosalvager.com). '
                                + 'You can say "#vpoff" before Turn 5 to disallow '
@@ -203,17 +209,22 @@
         },
 
         handleMyVPOFF: function () {
-            this.players[GS.getMyName()].request = false;
+            this.players[this.myName].request = false;
             if (!this.isMultiplayer()) {
                 this.vpon = false;
             } else if (this.locked && this.vpon) {
-                GS.showRoomChat('Your VP counter is locked to ON because '
+                GS.showRoomChat('Sorry. Your VP counter is locked to ON because '
                               + this.whyLocked + '. Say "#vpx" to'
                               + ' ask your opponent to let you change it.');
             } else {
+                if (this.vpon || !this.locked) {
+                    this.whyLocked = this.myName + ' said #vpoff';
+                    GS.showRoomChat('Your VP counter is now locked to OFF.');
+                } else {
+                    GS.showRoomChat('Your VP counter is already off.');
+                }
                 this.vpon = false;
                 this.locked = true;
-                this.whyLocked = GS.getMyName() + ' said #vpoff';
             }
         },
 
@@ -240,8 +251,10 @@
                     _.values(this.players).map(function (p) {
                         p.wantsChange = false;
                     });
+                    this.whyLocked = 'all players said #vpx';
                     GS.sendRoomChat('My VP counter is now '
-                                 + (this.vpon ? 'on' : 'off'));
+                                 + (this.vpon ? 'on' : 'off')
+                                 + ' because ' + this.whyLocked);
                 }
                 break;
             case '#vphelp':
@@ -255,16 +268,25 @@
             if (this.locked && !this.vpon) {
                 GS.sendRoomChat('Sorry. My VP counter is locked to OFF '
                               + 'because ' + this.whyLocked + '. ');
-            } else if (this.players[GS.getMyName()].request === null
-                    && !this.alreadyResponded) {
-                // Only respond if we have something new to say
-                if (GS.get_option('always_request') || (this.vpon && this.locked)) {
-                    this.vpon = true;
-                    GS.sendRoomChat('#vpon');
-                    this.alreadyResponded = true;
-                } else if (GS.get_option('always_refuse')) {
-                    GS.sendRoomChat('#vpoff');
-                    this.alreadyResponded = true;
+            } else {
+                this.vpon = true;
+                if (this.allWantOn()) {
+                    this.locked = true;
+                    this.whyLocked = 'all players said #vpon';
+                    GS.showRoomChat('The VP counter is now locked to ON because ' + this.whyLocked);
+                }
+                if (this.players[this.myName].request === null
+                        && !this.locked
+                        && !this.alreadyResponded) {
+                    // Only respond if we have something new to say
+                    if (this.always_request || (this.vpon && this.locked)) {
+                        this.vpon = true;
+                        GS.sendRoomChat('#vpon');
+                        this.alreadyResponded = true;
+                    } else if (this.always_refuse) {
+                        GS.sendRoomChat('#vpoff');
+                        this.alreadyResponded = true;
+                    }
                 }
             }
         },
@@ -274,11 +296,15 @@
             if (this.locked && this.vpon) {
                 GS.sendRoomChat('Sorry. My VP counter is locked to ON '
                               + 'because ' + this.whyLocked + '. ');
-            } else if (this.vpon) {
+            } else {
+                if (this.vpon || !this.locked) {
+                    GS.sendRoomChat('Ok, my VP counter is off and locked.');
+                    this.whyLocked = speaker + ' said #vpoff';
+                } else {
+                    GS.sendRoomChat('My VP counter is already off and locked.');
+                }
                 this.vpon = false;
                 this.locked = true;
-                this.whyLocked = speaker + ' said #vpoff';
-                this.sendRoomChat('Ok, my VP counter is off.');
             }
         },
 
@@ -312,8 +338,7 @@
     };
 
     // Initial blank value -- to not confuse angularjs before any game starts
-    GS.vp.toggle = new VPToggle(GS.get_option('vp_request'), GS.get_option('vp_refuse'),
-                                'My Table', '', [], []);
+    GS.vp.toggle = new GS.VPToggle(false, false, 'My Table', '', [], []);
 
     GS.modules.vptoggle = new GS.Module('VP Toggle');
     GS.modules.vptoggle.dependencies = ['DominionClient', 'mtgRoom', '#vptable'];
@@ -330,7 +355,7 @@
         };
 
         onGameSetup = function (gameData, domClient) {
-            GS.vp.toggle = new VPToggle(
+            GS.vp.toggle = new GS.VPToggle(
                 GS.get_option('vp_request'),
                 GS.get_option('vp_refuse'),
                 GS.getTableName(),
