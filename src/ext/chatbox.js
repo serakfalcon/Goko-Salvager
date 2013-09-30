@@ -33,7 +33,8 @@
             .append($('<textarea>').attr('id', 'chatarea')
                                    .attr('readonly', 'readonly'))
             .append($('<input>').attr('id', 'chatline')
-                                .attr('type', 'text'));
+                                .attr('type', 'text')
+                                .attr('autofocus', 'autofocus'));
 
         $('#chatline').on('keyup', function (e) {
             if (e.which === 13) {
