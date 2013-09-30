@@ -30,8 +30,7 @@
 	    };
 
         $('#chatdiv')
-            .append($('<textarea>').attr('id', 'chatarea')
-                                   .attr('readonly', 'readonly'))
+            .append($('<div>').attr('id', 'chatarea'))
             .append($('<input>').attr('id', 'chatline')
                                 .attr('type', 'text')
                                 .attr('autofocus', 'autofocus'));
@@ -63,9 +62,11 @@
                                  .findByAddress(data.data.playerAddress)
                                  .get('playerName');
             GS.debug("Room Chat: " + speaker + ': ' + data.data.text);
-            var oldText = $('#chatarea').val();
-            var newText = oldText + '\n' + speaker + ': ' + data.data.text;
-            $('#chatarea').val(newText);
+            $('#chatarea')
+                .append($('<span>').addClass(pname2pclass[speaker])
+                                   .text(speaker))
+                .append($('<span>').text(' ' + data.data.text))
+                .append($('<br>'));
             $('#chatarea').scrollTop(99999999);
         };
 
