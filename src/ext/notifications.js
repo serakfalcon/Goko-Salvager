@@ -4,6 +4,9 @@
 (function () {
     "use strict";
 
+    var chromeUnblock = 'Settings/advanced settings/Privacy/Content Settings/Notifications/Manage Exceptions/';
+    var firefoxUnblock = 'Tools/Page Info/Permissions/Show Notifications';
+
     console.log('Loading Notifications Module');
 
     GS.modules.notifications = new GS.Module('Notifications');
@@ -38,7 +41,7 @@
                     return 0;
                 case 'default':
                     return 1;
-                case 'blocked':
+                case 'denied':
                     return 2;
                 default:
                     throw 'Impossible Firefox Notification.permission value: '
@@ -64,6 +67,8 @@
                         + 'notifications from play.goko.com. You must '
                         + 'remove this block manually before enabling '
                         + 'Salvager desktop notifications.');
+                    GS.set_option('desktop_notifications', false);
+                    $('#settingsDialog').scope().$digest();
                 }
             }
         });
@@ -140,6 +145,8 @@
                         + 'notifications from play.goko.com. You must '
                         + 'remove this block manually before enabling '
                         + 'Salvager desktop notifications.');
+                    GS.set_option('desktop_notifications', false);
+                    $('#settingsDialog').scope().$digest();
                 } else {
                     throw 'Impossible permission setting: ' + p;
                 }
