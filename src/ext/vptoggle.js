@@ -271,7 +271,7 @@
                               + 'because ' + this.whyLocked + '. ');
             } else {
                 this.vpon = true;
-                if (this.allWantOn()) {
+                if (this.allWantOn() && !this.locked) {
                     this.locked = true;
                     this.whyLocked = 'all players said #vpon';
                     GS.showRoomChat('The VP counter is now locked to ON because ' + this.whyLocked);
