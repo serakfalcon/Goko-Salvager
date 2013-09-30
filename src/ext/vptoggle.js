@@ -135,7 +135,6 @@
         },
 
         onMyChat: function (text) {
-            GS.debug('my chat: ' + text);
             switch (text) {
             case '#vpon':
                 this.handleMyVPON();
@@ -230,7 +229,6 @@
         },
 
         onOppChat: function (speaker, text) {
-            GS.debug('opp chat: ' + speaker + ', ' + text);
             switch (text) {
             case '#vpon':
                 this.handleOppVPON(speaker);
@@ -310,7 +308,6 @@
         },
 
         onTurn: function (playerName, turnNumber) {
-            GS.debug('on turn: ' + playerName + ', ' + turnNumber);
 
             // Announce VP counter at the start of our Turn 2.
             if (turnNumber === 2 && playerName === this.myName
@@ -353,6 +350,7 @@
                 p.vps = GS.vp.getVPTotal(p.pname);
             });
             $('#vptable').scope().$digest();
+            GS.resizeSidebar();
         };
 
         onGameSetup = function (gameData, domClient) {
