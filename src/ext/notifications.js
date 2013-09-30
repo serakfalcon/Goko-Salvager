@@ -24,7 +24,10 @@
                 window.webkitNotifications.requestPermission();
                 break;
             case 'Safari':
-                throw 'Not implemented for Safari.';
+                GS.set_option('desktop_notifications', false);
+                $('#settingsDialog').scope().$digest();
+                alert('Sorry. Safari does not support HTML5 desktop notifications yet.');
+                break;
             default:
                 throw 'Unknown browser ' + GS.getBrowser();
             }
@@ -50,7 +53,7 @@
             case 'Chrome':
                 return window.webkitNotifications.checkPermission();
             case 'Safari':
-                throw 'Not implemented for Safari.';
+                return 1;
             default:
                 throw 'Unknown browser ' + GS.getBrowser();
             }
@@ -111,7 +114,7 @@
                         'Goko Salvager', message).show();
                 break;
             case 'Safari':
-                throw 'Not implemented for Safari.';
+                break;
             default:
                 throw 'Unknown browser ' + GS.getBrowser();
             }
