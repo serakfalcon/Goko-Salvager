@@ -18,6 +18,13 @@
 
         var onGameSetup, onRoomChat, checkGameOver;
 
+        GS.showRoomChat = function (message) {
+            $('#chatarea')
+                .append($('<span>').text('***'))
+                .append($('<span>').text(' ' + message))
+                .append($('<br>'));
+        };
+
         Dom.DominionWindow.prototype._createChatManager = function () {
 		    var dominionWindow = this;
 		    var chatManager = {
