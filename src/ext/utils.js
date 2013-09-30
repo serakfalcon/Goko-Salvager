@@ -135,5 +135,6 @@
         return out;
     };
 
+    GS.salvagerIconURL = 'http://gokologs.drunkensailor.org/static/img/salvager128.png';
     GS.url = 'www.gokosalvager.com';
 }());

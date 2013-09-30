@@ -12,27 +12,59 @@
     ];
     GS.modules.notifications.load = function () {
 
-        GS.requestNotificationPermission = function () {
-            Notification.requestPermission(function (status) {
-                // This allows to use Notification.permission with Chrome/Safari
-                if (Notification.permission !== status) {
-                    Notification.permission = status;
-                    if (Notification.permission === 'denied') {
-                        alert('Your browser settings block desktop '
-                            + 'notifications from play.goko.com. You must '
-                            + 'remove this block manually before enabling '
-                            + 'Salvager desktop notifications.');
-                        GS.set_option('desktop_notifications', false);
-                        $('#settingsDialog').scope().$digest();
-                    }
+        var requestNotificationPermission = function () {
+            switch (GS.getBrowser()) {
+            case 'Firefox':
+                Notification.requestPermission();
+                break;
+            case 'Chrome':
+                window.webkitNotifications.requestPermission();
+                break;
+            case 'Safari':
+                throw 'Not implemented for Safari.';
+            default:
+                throw 'Unknown browser ' + GS.getBrowser();
+            }
+        };
+
+        var ALLOWED = 0;
+        var NOT_SET = 1;
+        var BLOCKED = 2;
+        var getNotificationPermission = function () {
+            switch (GS.getBrowser()) {
+            case 'Firefox':
+                switch (Notification.permission) {
+                case 'granted':
+                    return 0;
+                case 'default':
+                    return 1;
+                case 'blocked':
+                    return 2;
+                default:
+                    throw 'Impossible Firefox Notification.permission value: '
+                        + Notification.permission;
                 }
-            });
+            case 'Chrome':
+                return window.webkitNotifications.checkPermission();
+            case 'Safari':
+                throw 'Not implemented for Safari.';
+            default:
+                throw 'Unknown browser ' + GS.getBrowser();
+            }
         };
 
         $('#desktopnotificationcheckbox').click(function () {
             console.log('clicked');
             if ($(this).is(':checked')) {
-                GS.requestNotificationPermission();
+                var p = getNotificationPermission();
+                if (p === NOT_SET) {
+                    $('#notificationdialog').dialog('open');
+                } else if (p === BLOCKED) {
+                    alert('Your browser settings block desktop '
+                        + 'notifications from play.goko.com. You must '
+                        + 'remove this block manually before enabling '
+                        + 'Salvager desktop notifications.');
+                }
             }
         });
 
@@ -53,7 +85,9 @@
                 autoOpen: false
             });
         $('#yesnotifications').click(function () {
-            GS.requestNotificationPermission();
+            GS.set_option('desktop_notifications', true);
+            $('#settingsDialog').scope().$digest();
+            requestNotificationPermission();
             $('#notificationdialog').dialog('close');
         });
         $('#nonotifications').click(function () {
@@ -62,6 +96,22 @@
             $('#notificationdialog').dialog('close');
         });
 
+        var createDesktopNotification = function (message) {
+            switch (GS.getBrowser()) {
+            case 'Firefox':
+                var n = new Notification(message);
+                break;
+            case 'Chrome':
+                window.webkitNotifications.createNotification(GS.salvagerIconURL,
+                        'Goko Salvager', message).show();
+                break;
+            case 'Safari':
+                throw 'Not implemented for Safari.';
+            default:
+                throw 'Unknown browser ' + GS.getBrowser();
+            }
+        };
+
         var n;
         GS.notifyUser = function (message, sound) {
             if (GS.get_option('audio_notifications')) {
@@ -69,20 +119,30 @@
                     sound.play();
                 }
             }
-            if (GS.get_option('desktop_notifications')) {
-                GS.requestNotificationPermission();
-                if (typeof Notification.permission !== 'undefined'
-                        && Notification.permission === 'granted') {
-                    n = new Notification(message);
+            if (GS.get_option('popup_notifications')) {
+                if (GS.get_option('audio_notifications')) {
+                    setTimeout(function () {
+                        alert(message);
+                    }, 500);
                 } else {
-                    $('#notificationdialog').dialog('open');
-                }
-            }
-            if (!GS.get_option('desktop_notifications')
-                    && GS.get_option('popup_notifications')) {
-                setTimeout(function () {
                     alert(message);
-                }, 500);
+                }
+            } else if (GS.get_option('desktop_notifications')) {
+                var p = getNotificationPermission();
+                if (p === ALLOWED) {
+                    createDesktopNotification(message);
+                } else if (p === NOT_SET) {
+                    GS.set_option('desktop_notifications', false);
+                    $('#settingsDialog').scope().$digest();
+                    $('#notificationdialog').dialog('open');
+                } else if (p === BLOCKED) {
+                    alert('Your browser settings block desktop '
+                        + 'notifications from play.goko.com. You must '
+                        + 'remove this block manually before enabling '
+                        + 'Salvager desktop notifications.');
+                } else {
+                    throw 'Impossible permission setting: ' + p;
+                }
             }
         };
     };
