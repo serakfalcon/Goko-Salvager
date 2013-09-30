@@ -121,13 +121,18 @@
         gc.clientConnection.send('sendChat', {text: message});
     };
 
-    GS.alertPlayer = function (message, sound) {
-        if (GS.get_option('alert_sounds')) {
-            sound.play();
+    GS.getBrowser = function () {
+        var out;
+        if (navigator.appVersion.search('Chrome') !== -1) {
+            out = 'Chrome';
+        } else if (navigator.appVersion.search('Firefox') !== -1) {
+            out = 'Firefox';
+        } else if (navigator.appVersion.search('Safari') !== -1) {
+            out = 'Safari';
+        } else {
+            out = 'Unknown';
         }
-        if (GS.get_option('alert_popups')) {
-            window.alert(message);
-        }
+        return out;
     };
 
     GS.url = 'www.gokosalvager.com';
