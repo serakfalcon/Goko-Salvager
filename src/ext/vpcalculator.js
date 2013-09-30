@@ -69,7 +69,7 @@
         };
 
         // Format scores for display in chat
-        GS.vp.sendScores = function () {
+        GS.sendScores = function () {
             var scoreString = _.values(GS.vp.players).map(function (p) {
                 return p.pname + ': ' + p.vps;
             }).join('\n');
