@@ -125,12 +125,10 @@
         var out;
         if (navigator.appVersion.search('Chrome') !== -1) {
             out = 'Chrome';
-        } else if (navigator.appVersion.search('Firefox') !== -1) {
-            out = 'Firefox';
         } else if (navigator.appVersion.search('Safari') !== -1) {
             out = 'Safari';
         } else {
-            out = 'Unknown';
+            out = 'Firefox';
         }
         return out;
     };

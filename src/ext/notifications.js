@@ -99,7 +99,7 @@
         var createDesktopNotification = function (message) {
             switch (GS.getBrowser()) {
             case 'Firefox':
-                var n = new Notification(message);
+                var n = new Notification(message, {icon: GS.salvagerIconURL});
                 break;
             case 'Chrome':
                 window.webkitNotifications.createNotification(GS.salvagerIconURL,
