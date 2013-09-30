@@ -6,7 +6,6 @@
 (function () {
     "use strict";
 
-    var pname2pclass;
 
     GS.modules.chatbox = new GS.Module('Chat Box');
     GS.modules.chatbox.dependencies = [
@@ -16,7 +15,9 @@
     ];
     GS.modules.chatbox.load = function () {
 
-        var onGameSetup, onRoomChat, checkGameOver;
+        var onGameSetup, onRoomChat;
+        var pname2pclass;
+        var gameClient;
 
         var chatHistory = [];
 
@@ -97,15 +98,13 @@
         // Listen to VP toggle events in room chat and when the game starts
         mtgRoom.conn.bind('roomChat', onRoomChat);
         mtgRoom.conn.bind('gameServerHello', function (msg) {
-            GS.getGameClient().bind('incomingMessage:gameSetup', onGameSetup);
-            GS.getGameClient().bind('incomingMessage', checkGameOver);
+            // Stop listening to the old game client
+            if (typeof gameClient !== 'undefined' && gameClient !== null) {
+                gameClient.unbind('incomingMessage:gameSetup', onGameSetup);
+            }
+            // Start listening to the new one
+            gameClient = GS.getGameClient();
+            gameClient.bind('incomingMessage:gameSetup', onGameSetup);
         });
-
-        // Stop listening at the end of the game
-        checkGameOver = function (msg) {
-            if (msg !== 'gameOver') { return; }
-            GS.getGameClient().unbind('incomingMessage:gameSetup', onGameSetup);
-            GS.getGameClient().unbind('incomingMessage', checkGameOver);
-        };
     };
 }());
