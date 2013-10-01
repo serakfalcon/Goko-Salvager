@@ -198,7 +198,7 @@
                 // Wait for auto-responses before sending explanation
                 var that = this;
                 setTimeout(function () {
-                    if (that.reqcount() === 1 && that.announced) {
+                    if (that.reqcount() === 1 && !that.announced) {
                         GS.sendRoomChat('I\'d like to use a VP counter '
                                + '(See gokosalvager.com). '
                                + 'You can say "#vpoff" before Turn 5 to disallow '
