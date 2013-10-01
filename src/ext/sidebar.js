@@ -46,7 +46,7 @@
 
             var logheight = $('#sidebar').height() - 20
                 - ($('#vptable').is(':visible') ? $('#vptable').height() : 0)
-                - ($('#chatdiv').is(':visible') ? $('#chatdiv').height() : 0);
+                - (GS.get_option('sidebar_chat') ? $('#chatdiv').height() : 0);
             $('#prettylog').css('height', logheight);
         
             // Scroll to bottom of log
