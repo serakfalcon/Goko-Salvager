@@ -1,5 +1,5 @@
 /*jslint browser:true, devel:true, white:true, es5:true */
-/*globals $, angular, GS */
+/*globals $, angular, GS, FS, mtgRoom */
 
 (function () {
     "use strict";
@@ -8,7 +8,7 @@
 
     GS.modules.settingsDialog = new GS.Module('User Settings Dialog');
     GS.modules.settingsDialog.dependencies =
-        ['$', 'angular', '#viewport', '.fs-rs-logout-row'];
+        ['$', 'angular', '#viewport', '.fs-rs-logout-row', 'mtgRoom', 'FS'];
     GS.modules.settingsDialog.load = function () {
 
         // Create dialog
@@ -123,13 +123,21 @@
             autoOpen: false
         });
 
-        // Add link to open dialog
-        $('.fs-rs-logout-row').append(
-            $('<div>').addClass('fs-lg-settings-btn')
-                      .text('User Settings')
-                      .click(function () {
-                          $('#settingsDialog').dialog('open');
-                      }));
+        var addSettingsLink = function () {
+            // Add link to open dialog if necessary
+            if ($('#userSettingsLink').length === 0) {
+                $('.fs-rs-logout-row').append(
+                    $('<div>').addClass('fs-lg-settings-btn')
+                              .attr('id', 'userSettingsLink')
+                              .text('User Settings')
+                              .click(function () {
+                                  $('#settingsDialog').dialog('open');
+                              }));
+            }
+        };
+        mtgRoom.bind(FS.MeetingRoomEvents.MEETING_ROOM.CORE_GET_CONNECTION_SUCCESS,
+                     addSettingsLink);
+        addSettingsLink();
 
         window.settingsController = function ($scope) {
             $scope.so = GS.get_options();
