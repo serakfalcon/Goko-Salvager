@@ -110,8 +110,10 @@
             });
         };
 
-        GS.alsoDo(FS.LaunchScreen.View.LoadingFinished.prototype._init, null, setLoginScreenAvatar);
-        GS.alsoDo(FS.LaunchScreen.View.LoadingFinished.prototype._init, null, addChangeAvatarLink);
+        GS.alsoDo(FS.LaunchScreen.View.Container, '_gameBackgroundCallback',
+                  null, setLoginScreenAvatar);
+        GS.alsoDo(FS.LaunchScreen.View.Container, '_gameBackgroundCallback',
+                  null, addChangeAvatarLink);
         try {
             addChangeAvatarLink();
             setLoginScreenAvatar();

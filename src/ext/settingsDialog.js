@@ -135,7 +135,8 @@
                               }));
             }
         };
-        GS.alsoDo(FS.LaunchScreen.View.LoadingFinished.prototype._init, null, addSettingsLink);
+        GS.alsoDo(FS.LaunchScreen.View.Container, '_gameBackgroundCallback',
+                  null, addSettingsLink);
         addSettingsLink();
 
         window.settingsController = function ($scope) {
