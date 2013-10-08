@@ -10,7 +10,8 @@
         'Goko.Player.AvatarLoader',
         'Goko.Player.preloader',
         'FS.AvatarHelper',
-        '.fs-rs-logout-row'
+        '.fs-rs-logout-row',
+        'FS.LaunchScreen.View.Container'
     ];
     mod.load = function () {
 
