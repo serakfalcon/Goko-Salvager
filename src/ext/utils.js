@@ -95,7 +95,7 @@
 
     GS.getGameClient = function () {
         if (typeof mtgRoom !== 'undefined') {
-            var roomId = mtgRoom.currentRoomId;
+            var roomId = mtgRoom.getCurrentTable().get('room').get('roomId');
             if (roomId !== null) {
                 var table = mtgRoom.getCurrentTable();
                 var tableNo = table !== null ? table.get('number') : 0;
