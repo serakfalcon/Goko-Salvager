@@ -1,4 +1,4 @@
-/*jslint browser:true, devel:true, white:true, es5:true */
+/*jslint browser:true, devel:true, white:true, es5:true, nomen:true */
 /*globals $, angular, GS, FS, mtgRoom */
 
 (function () {
@@ -135,8 +135,7 @@
                               }));
             }
         };
-        mtgRoom.bind(FS.MeetingRoomEvents.MEETING_ROOM.CORE_GET_CONNECTION_SUCCESS,
-                     addSettingsLink);
+        GS.alsoDo(FS.LaunchScreen.View.LoadingFinished.prototype._init, null, addSettingsLink);
         addSettingsLink();
 
         window.settingsController = function ($scope) {

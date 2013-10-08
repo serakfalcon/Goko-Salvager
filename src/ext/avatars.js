@@ -1,55 +1,120 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true, white:true */
-/*global $, _, GS, Goko, FS */
+/*global $, _, GS, Goko, FS, mtgRoom */
 
 (function () {
 
     "use strict";
 
     var mod = GS.modules.avatars = new GS.Module('Avatars');
-    mod.dependencies = ['Goko.Player', 'FS.Templates.LaunchScreen'];
+    mod.dependencies = [
+        'Goko.Player.AvatarLoader',
+        'Goko.Player.preloader',
+        'FS.AvatarHelper',
+        '.fs-rs-logout-row'
+    ];
     mod.load = function () {
+
+        // Create helper objects for resizing images
         var myCanvas = document.createElement("canvas");
         var myContext = myCanvas.getContext("2d");
-        Goko.Player.old_AvatarLoader = Goko.Player.AvatarLoader;
-        Goko.Player.AvatarLoader = function (userdata, callback) {
-            function loadImage() {
-                var img = new Image();
+
+        // Cache goko's avatar loading method
+        var gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
+
+        // Define our own avatar loading method
+        var customAvatarLoader = function (playerId, which, callback) {
+            var size = [50, 100, 256][which];
+            var img = new Image();
+            img.onerror = function () {
+                // When no URL for a custom avatar can be found
+                gokoAvatarLoader(playerId, which, callback);
+            };
+            img.onload = function() {
+                // When custom avatar is found
+
+                // Draw a resized version
+                myCanvas.width = size;
+                myCanvas.height = size;
+                myContext.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
+                
                 var img2 = new Image();
-                img.onerror = img2.onerror = function () {
-                    Goko.Player.old_AvatarLoader(userdata, callback);
+                // Convert the resized version to a URL
+                img2.onload = function () {
+                    console.log('Found avatar for ' + playerId);
+                    var user = {};
+                    user.playerid = playerId;
+                    user.image = img2;
+                    callback(user);
                 };
-                img.onload = function () {
-                    try {
-                        var size = [50, 100, 256][userdata.which];
-                        myCanvas.width = size;
-                        myCanvas.height = size;
-                        myContext.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
-                        img2.onload = function () { callback(img2); };
-                        img2.src = myCanvas.toDataURL("image/png");
-                    } catch (e) {
-                        GS.debug(e);
-                        alert(e.toString());
-                        Goko.Player.old_AvatarLoader(userdata, callback);
-                    }
-                };
-                img.crossOrigin = "Anonymous";
-                img.src = "http://dom.retrobox.eu/avatars/" + userdata.player.id + ".png";
-            }
-            if (userdata.which < 3) {
-                loadImage();
+                img2.src = myCanvas.toDataURL("image/png");
+            };
+            img.crossOrigin = "Anonymous";
+            img.src = "http://dom.retrobox.eu/avatars/" + playerId + ".png";
+        };
+
+        // Let Goko handle the large avatar images ('which' >=3). I believe
+        // this is just the one on the login screen, the full-body image.
+        FS.AvatarHelper.loadAvatarImage = function (playerId, which, callback) {
+            if (which >= 3) {
+                gokoAvatarLoader(playerId, which, callback);
             } else {
-                Goko.Player.old_AvatarLoader(userdata, callback);
+                customAvatarLoader(playerId, which, callback);
             }
         };
-    
-        Goko.Player.preloader = function (ids, which) {};
-    
-        FS.Templates.LaunchScreen.MAIN = FS.Templates.LaunchScreen.MAIN.replace('<div id="fs-player-pad-avatar"',
-                '<div style="display:none"><form id="uploadAvatarForm" method="post" action="http://dom.retrobox.eu/setavatar.php"><input type="text" id="uploadAvatarId" name="id" value="x"/></form></div>' +
-                '<div id="fs-player-pad-avatar" onClick="' +
-                'document.getElementById(\'uploadAvatarId\').setAttribute(\'value\',Goko.ObjectCache.getInstance().conn.connInfo.playerId);' +
-                'document.getElementById(\'uploadAvatarForm\').submit();' +
-                '"');
-    };
 
+        // This is leftover from nutki's original GreaseMonkey script. I'm
+        // scared to touch it.
+        Goko.Player.preloader = function (ids, which) {};
+
+        var addChangeAvatarLink = function () {
+            // Add link to open dialog if necessary
+            if ($('changeAvatarLink').length === 0) {
+                $('.fs-rs-logout-row').append(
+                    $('<form>').attr('id', 'changeAvatarForm')
+                               .attr('method', 'post')
+                               .attr('action', 'http://dom.retrobox.eu/setavatar.php')
+                                .append(
+                        $('<div>').addClass('fs-lg-settings-btn')
+                                  .attr('id', 'changeAvatarLink')
+                                  .text('Change Avatar')
+                                  .click(function () {
+                                      $('#changeAvatarId').val(mtgRoom.conn.connInfo.playerId);
+                                      $('#changeAvatarForm').submit();
+                                  })
+                               .append(
+                        $('<input>').attr('type', 'text')
+                                    .attr('hidden', 'true')
+                                    .attr('name', 'id')
+                                    .attr('id', 'changeAvatarId')
+                                    .attr('value', 'x'))
+                                  ));
+            }
+        };
+
+        var setLoginScreenAvatar = function () {
+            var myPlayerId = mtgRoom.conn.connInfo.playerId;
+            var myAvatarURL = "http://dom.retrobox.eu/avatars/" + myPlayerId + ".png";
+            $.ajax({
+                url: myAvatarURL,
+                type: 'HEAD',
+                error: function() {
+                    myAvatarURL = null;
+                    console.log('User does not have a custom avatar');
+                },
+                success: function() {
+                    $('#fs-player-pad-avatar img').attr('src', myAvatarURL);
+                    $('.player-info-avatar img').attr('src', myAvatarURL);
+                    console.log('Settings custom avatar');
+                    console.log($('#fs-player-pad-avatar img').attr('src'));
+                }
+            });
+        };
+
+        GS.alsoDo(FS.LaunchScreen.View.LoadingFinished.prototype._init, null, setLoginScreenAvatar);
+        GS.alsoDo(FS.LaunchScreen.View.LoadingFinished.prototype._init, null, addChangeAvatarLink);
+        try {
+            addChangeAvatarLink();
+            setLoginScreenAvatar();
+        } catch (e) { }
+    };
 }());
