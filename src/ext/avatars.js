@@ -40,7 +40,7 @@
                 var img2 = new Image();
                 // Convert the resized version to a URL
                 img2.onload = function () {
-                    console.log('Found avatar for ' + playerId);
+                    //console.log('Found avatar for ' + playerId);
                     var user = {};
                     user.playerid = playerId;
                     user.image = img2;
@@ -99,13 +99,13 @@
                 type: 'HEAD',
                 error: function() {
                     myAvatarURL = null;
-                    console.log('User does not have a custom avatar');
+                    //console.log('User does not have a custom avatar');
                 },
                 success: function() {
                     $('#fs-player-pad-avatar img').attr('src', myAvatarURL);
                     $('.player-info-avatar img').attr('src', myAvatarURL);
-                    console.log('Settings custom avatar');
-                    console.log($('#fs-player-pad-avatar img').attr('src'));
+                    //console.log('Settings custom avatar');
+                    //console.log($('#fs-player-pad-avatar img').attr('src'));
                 }
             });
         };
