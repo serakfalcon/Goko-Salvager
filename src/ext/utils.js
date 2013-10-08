@@ -132,7 +132,6 @@
             playerName: '**',
             text: message
         });
-        gc.clientConnection.send('sendChat', {text: message});
     };
 
     GS.getBrowser = function () {
