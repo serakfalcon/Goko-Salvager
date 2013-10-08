@@ -50,6 +50,7 @@
                     .append($('<span>').text('***'))
                     .append($('<span>').text(' ' + message))
                     .append($('<br>'));
+                $('#chatarea').scrollTop(99999999);
             } else {
                 gokoShowRoomChat.apply(GS, arguments);
             }
