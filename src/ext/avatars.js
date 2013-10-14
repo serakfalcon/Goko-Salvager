@@ -20,12 +20,12 @@
 
         // Cache goko's avatar loading method
         var gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
+		var hasAvatar = new Object();
 
         // Define our own avatar loading method
         var customAvatarLoader = function (playerId, which, callback) {
             var size = [50, 100, 256][which];
             var img = new Image();
-			var hasAvatar = new Array();
 			if (typeof hasAvatar[playerId] == 'undefined') {
 				hasAvatar[playerId] = true;
 			}
