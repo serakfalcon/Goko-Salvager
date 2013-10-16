@@ -8,13 +8,15 @@ kinggen_utils = (function () {
 	"use strict";
 	var pubfuncts = {};
 	pubfuncts.sets = {};
+	pubfuncts.hideKingdomGenerator = false;
+	pubfuncts.myCachedCards;
 	//standardizes card names
 	pubfuncts.canonizeName = function (n) {
             return n.toLowerCase().replace(/\W+/g, '');
     };
 	
 	//array of card:set/cost relationships, card name as key
-	pubfuncts.setsComp = {
+	var setsComp = {
             cellar: "B2",
             chapel: "B2",
             moat: "B2",
@@ -223,7 +225,7 @@ kinggen_utils = (function () {
         };
 	
 	//array of set/cost meanings
-	pubfuncts.setNames = {
+	var setNames = {
             '1': 'cost1',
             '2': 'cost2',
             '3': 'cost3',
@@ -245,7 +247,7 @@ kinggen_utils = (function () {
             'G': 'guilds'
         };
 	
-	//magic
+	//magic (what is this doing, exactly?)
 	pubfuncts.types = {};
     FS.Dominion.CardBuilder.Data.cards.map(function (card) {
         pubfuncts.types[card.name[0]] = card.type;
@@ -536,21 +538,21 @@ kinggen_utils = (function () {
 	pubfuncts.buildSets = function() {
 		var c, i, t, n;
 		pubfuncts.sets.all = {};
-		for (c in pubfuncts.setNames) {
-			pubfuncts.sets[pubfuncts.setNames[c]] = {};
+		for (c in setNames) {
+			pubfuncts.sets[setNames[c]] = {};
 		}
-		for (c in pubfuncts.setsComp) {
-			t = pubfuncts.setsComp[c];
+		for (c in setsComp) {
+			t = setsComp[c];
 			pubfuncts.sets[c] = {};
 			pubfuncts.sets[c][c] = 1;
 			pubfuncts.sets.all[c] = 1;
 			for (i = 0; i < t.length; i += 1) {
-				pubfuncts.sets[pubfuncts.setNames[t[i]]][c] = 1;
+				pubfuncts.sets[setNames[t[i]]][c] = 1;
 			}
 		}
 		for (c in pubfuncts.types) {
 			n = pubfuncts.canonizeName(c);
-			if (pubfuncts.setsComp.hasOwnProperty(n)) {
+			if (setsComp.hasOwnProperty(n)) {
 				t = pubfuncts.types[c].split('-');
 				for (i = 0; i < t.length; i += 1) {
 					if (pubfuncts.sets[t[i]] === undefined) {
@@ -561,29 +563,198 @@ kinggen_utils = (function () {
 			}
 		}
     };
+	
+	function myBuildCard(avail, except, set) {
+		var sum = 0;
+		var c;
+		for (c in set) {
+			if (avail[c] && !except[c]) {
+				sum += set[c];
+			}
+		}
+		if (!sum) {
+			return null;
+		}
+		var rnd = Math.random() * sum;
+		for (c in set) {
+			if (avail[c] && !except[c]) {
+				rnd -= set[c];
+				if (rnd < 0) {
+					return c;
+				}
+			}
+		}
+		return c;
+	}
+
+	pubfuncts.myBuildDeck = function(avail, s) {
+		GS.debug('Entering myBuildDeck');
+		var i, c;
+		var chosen = {};
+		var deck = new Array(11);
+		for (i = 0; i < 11; i += 1) {
+			if (i === 10) {
+				if (!chosen.youngwitch) {
+					break;
+				}
+				for (c in avail) {
+					GS.debug("Sets:");
+					GS.debug(pubfuncts.sets);
+					if (!pubfuncts.sets.cost2[c] && !pubfuncts.sets.cost3[c]) {
+						chosen[c] = true;
+					}
+				}
+			}
+			var cs = s[i < s.length ? i : s.length - 1];
+			var card = myBuildCard(avail, chosen, cs);
+			if (!card) {
+				return null;
+			}
+			chosen[card] = true;
+			deck[i] = avail[card];
+		}
+		return deck;
+	};
+
+	pubfuncts.qq = function(x,opts,callback,kingselector) {
+		if (GS.get_option('generator') && !pubfuncts.hideKingdomGenerator
+						&& (!GS.AM.hasOwnProperty('state') || GS.AM.state.game === null)
+						&& opts.useEternalGenerateMethod) {
+					kinggen_utils.KingdomselCode.prompt(callback);
+				} else {
+					callback(x);
+				}
+				pubfuncts.hideKingdomGenerator = false;
+	};
+	
 	return pubfuncts;
 }());
 
 //second declaration allows this portion to be placed in a separate file
 //html portion of form
-if (typeof kinggen_utils === 'undefined') { var mynamespace = {}; }
+if (typeof kinggen_utils === 'undefined') { var kinggen_utils = {}; }
 kinggen_utils.KingdomselDisplay = (function() {
 	"use strict";
 	var pubvars = {};
-	pubvars.cssclass = "newlog";
+	var hasNewUi = false;
+	pubvars.cssclass = "newlog db-popup-container";
 	pubvars.htmlstyle = "position:absolute;display:none;left:0px;top:0px;height:100%;width:100%;background:rgba(0,0,0,0.5);z-index:6000;";
-	pubvars.innerHTML = '<div style="text-align:center;position:absolute;top:50%;left:50%;height:100px;margin-top:-50px;width:80%;margin-left:-40%;background:white;">\
-						<div style="margin-top:20px">Select a kingdom (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>):\
-						<br><form id="selform"><input id="selval" style="width:95%"><br><input type="submit" value="OK"></form></div></div>'; 
+	pubvars.innerHTML = function(defaultval) {
+		var output = '<div class="db-popup" style="top:40%;"><div class="content" style="position:absolute; min-height: 100px;max-height:200px; top: 40%;left:15%; width: 70%;">\
+						<div style="text-align:center;height:120px;margin:10px;">\
+						<div style="margin-top:10px">Select a kingdom (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>):</div>\
+						<form id="selform">';
+		if (hasNewUi) {
+			output += '#\'s:';
+			for (var i = 0;i<10;i++) {
+				switch(i) {
+				case 0:
+					output += ' Base:';
+					break;
+				case 1:
+					output += ' Int:';
+					break;
+				case 2:
+					output += ' Sea:';
+					break;
+				case 3:
+					output += ' Alch:';
+					break;
+				case 4:
+					output += ' Prosp:';
+					break;
+				case 5:
+					output += ' Corn:';
+					break;
+				case 6:
+					output += ' Hint:';
+					break;
+				case 7:
+					output += ' DA:';
+					break;
+				case 8:
+					output += ' Guilds:';
+					break;
+				case 9:
+					output += ' Promos:';
+					break;
+				}
+				output += '<input type="number" style="width:8px" id="king_gensel' + i + '" min="0" max="10">';
+			}
+		}
+		output += '<br />Cards: <input id="selval" name="selval" style="width:90%" value="' + defaultval + '"><br />\
+		<input type="button" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK" onClick="$kG.KingdomselCode.returnCards();">\
+		<input type="button" name="kingselCancel" class="fs-launch-game-btn" style="margin:5px;" value="Cancel (default settings)" onClick="$kG.KingdomselCode.cancelCards();">\
+		</form></div></div></div>'; 
+		return output;
+	};
+	
+
 	return pubvars;
 }());
-
+//code section of form
+kinggen_utils.KingdomselCode = (function() {
+	"use strict";
+	var pubfuncts = {};
+	var sel;
+	var selform;
+	var selval;
+	var savedfunct;
+	
+	pubfuncts.runSetup = function(val) {
+		sel = document.createElement('div');
+		sel.setAttribute("style", $kG.KingdomselDisplay.htmlstyle);
+		sel.setAttribute("class", $kG.KingdomselDisplay.cssclass);
+		document.getElementById('viewport').appendChild(sel);
+		sel.innerHTML = $kG.KingdomselDisplay.innerHTML(val);
+		selform = document.getElementById('selform');
+		selval = document.getElementById('selval');
+	};
+	
+	pubfuncts.prompt = function(callback) {
+		sel.style.display = 'block';
+		selval.select();
+		savedfunct = callback;
+	};
+	
+	//doesn't exit on error anymore, if a user gets stuck they can hit the cancel button
+	pubfuncts.returnCards = function () {
+		
+		var x = null;
+		try {
+			var all = {};
+			kinggen_utils.myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
+			var myret = kinggen_utils.myBuildDeck(all, kinggen_utils.set_parser.parse(selval.value));
+			if (myret) {
+				sel.style.display = 'none';
+				x = myret;
+				savedfunct(x);
+			} else {
+				throw new Error('Cannot generate specified kingdom from the cards availiable');
+			}
+		} catch (e) {
+			console.err(e);
+			alert('Error generating kingdom: ' + e);
+		}
+		
+	};
+	
+	//we've gone too far in Goko's code to pull out gracefully, but it could be possible with some rewiring
+	pubfuncts.cancelCards = function() {
+		sel.style.display = 'none';
+		var all = {};
+		kinggen_utils.myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
+		savedfunct(kinggen_utils.myBuildDeck(all, kinggen_utils.set_parser.parse('All')));
+	}
+	
+	return pubfuncts;
+}());
 //short name for this library, use at the end of the last library file
 var $kG = kinggen_utils;
 
 (function ($kG) {
     "use strict";
-
+	
     console.log('Loading Kingdom Generator');
 
     GS.modules.kingdomGenerator = new GS.Module('Kingdom Generator');
@@ -591,140 +762,46 @@ var $kG = kinggen_utils;
         ['FS.Dominion.DeckBuilder.Persistent', 'FS.DominionEditTableView',
          'FS.Dominion.CardBuilder.Data.cards'];
     GS.modules.kingdomGenerator.load = function () {
-        var hideKingdomGenerator = false;
         FS.DominionEditTableView.prototype._old_renderRandomDeck =
             FS.DominionEditTableView.prototype._renderRandomDeck;
         FS.DominionEditTableView.prototype._renderRandomDeck = function () {
             if (this.ratingType === 'pro') {
-                hideKingdomGenerator = true;
+                $kG.hideKingdomGenerator = true;
             }
             this._old_renderRandomDeck();
 		};
-	
+		
 		$kG.buildSets();
-
-		function myBuildCard(avail, except, set) {
-			var sum = 0;
-			var c;
-			for (c in set) {
-				if (avail[c] && !except[c]) {
-					sum += set[c];
-				}
-			}
-			if (!sum) {
-				return null;
-			}
-			var rnd = Math.random() * sum;
-			for (c in set) {
-				if (avail[c] && !except[c]) {
-					rnd -= set[c];
-					if (rnd < 0) {
-						return c;
-					}
-				}
-			}
-			return c;
-		}
-
-		function myBuildDeck(avail, s) {
-			GS.debug('Entering myBuildDeck');
-			var i, c;
-			var chosen = {};
-			var deck = new Array(11);
-			for (i = 0; i < 11; i += 1) {
-				if (i === 10) {
-					if (!chosen.youngwitch) {
-						break;
-					}
-					for (c in avail) {
-						GS.debug("Sets:");
-						GS.debug($kG.sets);
-						if (!$kG.sets.cost2[c] && !$kG.sets.cost3[c]) {
-							chosen[c] = true;
-						}
-					}
-				}
-				var cs = s[i < s.length ? i : s.length - 1];
-				var card = myBuildCard(avail, chosen, cs);
-				if (!card) {
-					return null;
-				}
-				chosen[card] = true;
-				deck[i] = avail[card];
-			}
-			return deck;
-		}
-
-		var Kingdomsel = function (val) {
-			this.sel = document.createElement('div');
-			this.sel.setAttribute("style", $kG.KingdomselDisplay.htmlstyle);
-			this.sel.setAttribute("class", $kG.KingdomselDisplay.cssclass);
-			document.getElementById('viewport').appendChild(this.sel);
-			this.sel.innerHTML = $kG.KingdomselDisplay.innerHTML;
-			this.selform = document.getElementById('selform');
-			this.selval = document.getElementById('selval');
-			this.selval.value = 'All';
-		};
-
-		Kingdomsel.prototype = {
-			prompt: function (callback) {
-				var self = this;
-				this.sel.style.display = 'block';
-				this.selval.select();
-				this.selform.onsubmit = function () {
-					callback(this.selval.value);
-					self.sel.style.display = 'none';
-					self.selform.onsubmit = null;
-					return false;
-				};
-			}
-		};
-
-		var myCachedCards;
-		var sel = new Kingdomsel('All');
+		
+		//could save settings and replace 'all' with the saved setting
+		$kG.KingdomselCode.runSetup('All');
+		
+		// FS.Dominion.Deckbuilder.Persistent.prototype is declared as = p in FS.DeckBuilder.js
+		
+		//if we've already overwritten the functions, don't do it twice
 		if (FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod) {
 			return;
 		}
-
-		FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod =
-			FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod;
-		FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod =
-			function (cachedCards, exceptCards, numberCards) {
-				myCachedCards = cachedCards;
-				var ret = this._old_proRandomMethod(cachedCards, exceptCards, numberCards);
-				return ret;
+		
+		//cache the old method of generating a pro set
+		FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod = 
+		FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod;
+		
+		FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
+			//potentially override default card set??
+			$kG.myCachedCards = cachedCards;
+			var ret = this._old_proRandomMethod(cachedCards, exceptCards, numberCards);
+			return ret;
 		};
-
-		FS.Dominion.DeckBuilder.Persistent.prototype._old_getRandomCards =
-			FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards;
-		FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards =
-		function (opts, callback) {
+		
+		//cache old method of generating a set
+		FS.Dominion.DeckBuilder.Persistent.prototype._old_getRandomCards = 
+		FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards;
+		
+		FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards = function (opts, callback) {
 			this._old_getRandomCards(opts, function (x) {
-				if (GS.get_option('generator') && !hideKingdomGenerator
-						&& (!GS.AM.hasOwnProperty('state') || GS.AM.state.game === null)
-						&& opts.useEternalGenerateMethod) {
-					sel.prompt(function (val) {
-						try {
-							var all = {};
-							myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
-							var myret = myBuildDeck(all, $kG.set_parser.parse(val));
-							if (myret) {
-								x = myret;
-							} else {
-								throw new Error('Cannot generate specified kingdom from the cards availiable');
-							}
-						} catch (e) {
-							console.err(e);
-							alert('Error generating kingdom: ' + e);
-						}
-						callback(x);
-					});
-				} else {
-					callback(x);
-				}
-				hideKingdomGenerator = false;
+				$kG.qq(x,opts,callback);
 			});
 		};
-
-    };
+	};
 }(kinggen_utils));
