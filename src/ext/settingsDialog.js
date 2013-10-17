@@ -1,11 +1,12 @@
 /*jslint browser:true, devel:true, white:true, es5:true, nomen:true */
 /*globals $, angular, GS, FS, mtgRoom */
 
+//if launchscreenloader namespace doesn't exist, create it
+//any functions that alter the launchscreen should be saved in this namespace and called in launchScreenLoader.js
+if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
 (function () {
     "use strict";
-
     console.log('Loading Settings Dialog');
-
     GS.modules.settingsDialog = new GS.Module('User Settings Dialog');
     GS.modules.settingsDialog.dependencies =
         ['$', 'angular', '#viewport', '.fs-rs-logout-row', 'mtgRoom', 'FS'];
@@ -123,7 +124,7 @@
             autoOpen: false
         });
 
-        var addSettingsLink = function () {
+        LSLoad.addSettingsLink = function () {
             // Add link to open dialog if necessary
             if ($('#userSettingsLink').length === 0) {
                 $('.fs-rs-logout-row').append(
@@ -135,9 +136,7 @@
                               }));
             }
         };
-        GS.alsoDo(FS.LaunchScreen.View.Container, '_gameBackgroundCallback',
-                  null, addSettingsLink);
-        addSettingsLink();
+			
 
         window.settingsController = function ($scope) {
             $scope.so = GS.get_options();
