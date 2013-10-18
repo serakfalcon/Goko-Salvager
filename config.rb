@@ -92,6 +92,7 @@
         'automatchOfferPop.js',
         'automatchSeekPop.js',
         'automatch.js',
-        'module_loader.js'
+        'module_loader.js',
+		'launchScreenLoader.js'
     ]
 }

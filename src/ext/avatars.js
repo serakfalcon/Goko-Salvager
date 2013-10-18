@@ -1,6 +1,9 @@
 /*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true, white:true */
 /*global $, _, GS, Goko, FS, mtgRoom */
 
+//if launchscreenloader namespace doesn't exist, create it
+//any functions that alter the launchscreen should be saved in this namespace and called in launchScreenLoader.js
+if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
 (function () {
 
     "use strict";
@@ -21,7 +24,7 @@
 
         // Cache goko's avatar loading method
         var gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
-		var hasAvatar = new Object();
+		var hasAvatar = {};
 
         // Define our own avatar loading method
         var customAvatarLoader = function (playerId, which, callback) {
@@ -78,9 +81,9 @@
         // scared to touch it.
         Goko.Player.preloader = function (ids, which) {};
 
-        var addChangeAvatarLink = function () {
+        LSLoad.addChangeAvatarLink = function () {
             // Add link to open dialog if necessary
-            if ($('changeAvatarLink').length === 0) {
+            if ($('#changeAvatarForm').length === 0) {
                 $('.fs-rs-logout-row').append(
                     $('<form>').attr('id', 'changeAvatarForm')
                                .attr('method', 'post')
@@ -103,7 +106,7 @@
             }
         };
 
-        var setLoginScreenAvatar = function () {
+        LSLoad.setLoginScreenAvatar = function () {
             var myPlayerId = mtgRoom.conn.connInfo.playerId;
             var myAvatarURL = "http://dom.retrobox.eu/avatars/" + myPlayerId + ".png";
 			$.ajax({
@@ -122,14 +125,7 @@
             });
 
         };
-
-        GS.alsoDo(FS.LaunchScreen.View.Container, '_gameBackgroundCallback',
-                  null, setLoginScreenAvatar);
-        GS.alsoDo(FS.LaunchScreen.View.Container, '_gameBackgroundCallback',
-                  null, addChangeAvatarLink);
-        try {
-            addChangeAvatarLink();
-            setLoginScreenAvatar();
-        } catch (e) { }
+    
+	
     };
 }());
