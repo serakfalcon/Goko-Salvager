@@ -329,8 +329,6 @@
                 if (!this.locked && this.isMultiplayer()) {
                     this.locked = true;
                     this.whyLocked = 'it is after Turn 5';
-                    GS.showRoomChat('The VP counter is now LOCKED. You can still '
-                                  + 'change it if all players agree by saying "#vpx"');
                 }
                 this.beforeT5 = false;
             }
