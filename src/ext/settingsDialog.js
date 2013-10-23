@@ -3,7 +3,7 @@
 
 //if launchscreenloader namespace doesn't exist, create it
 //any functions that alter the launchscreen should be saved in this namespace and called in launchScreenLoader.js
-if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
+if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
 (function () {
     "use strict";
     console.log('Loading Settings Dialog');
@@ -131,7 +131,7 @@ if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
             autoOpen: false
         });
 
-        LSLoad.addSettingsLink = function () {
+        GS.LSLoader.addSettingsLink = function () {
             // Add link to open dialog if necessary
             if ($('#userSettingsLink').length === 0) {
                 $('.fs-rs-logout-row').append(
