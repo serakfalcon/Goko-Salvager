@@ -1,4 +1,4 @@
-if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
+if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
 (function() {
 	"use strict";
 	console.log('Loading LaunchScreenLoader');
@@ -20,18 +20,16 @@ if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
 		var persist = FS.LaunchScreen.Persistent.getInstance(optslvl1['conn'], optslvl1['gameId'], optslvl1);
 		
 		var allCallbacks = function() {
-				LSLoad.addChangeAvatarLink();
-				LSLoad.setLoginScreenAvatar();
-				LSLoad.addSettingsLink();
+				GS.LSLoader.addChangeAvatarLink();
+				GS.LSLoader.setLoginScreenAvatar();
+				GS.LSLoader.addSettingsLink();
 		}
 
 		FS.LaunchScreen.View.Container.prototype.options = {opts: optslvl1, persistent: persist, root: FS.LaunchScreen.Main};
 		FS.LaunchScreen.View.Container.prototype.init(allCallbacks);
 		
 		//for Chrome
-		LSLoad.addChangeAvatarLink();
-		LSLoad.setLoginScreenAvatar();
-		LSLoad.addSettingsLink();
+		allCallbacks();
 	};
 	
 }());

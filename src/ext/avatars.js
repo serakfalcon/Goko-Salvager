@@ -3,7 +3,7 @@
 
 //if launchscreenloader namespace doesn't exist, create it
 //any functions that alter the launchscreen should be saved in this namespace and called in launchScreenLoader.js
-if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
+if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
 (function () {
 
     "use strict";
@@ -81,7 +81,7 @@ if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
         // scared to touch it.
         Goko.Player.preloader = function (ids, which) {};
 
-        LSLoad.addChangeAvatarLink = function () {
+        GS.LSLoader.addChangeAvatarLink = function () {
             // Add link to open dialog if necessary
             if ($('#changeAvatarForm').length === 0) {
                 $('.fs-rs-logout-row').append(
@@ -106,7 +106,7 @@ if (typeof LSLoad === 'undefined') { var LSLoad = {}; }
             }
         };
 
-        LSLoad.setLoginScreenAvatar = function () {
+        GS.LSLoader.setLoginScreenAvatar = function () {
             var myPlayerId = mtgRoom.conn.connInfo.playerId;
             var myAvatarURL = "http://dom.retrobox.eu/avatars/" + myPlayerId + ".png";
 			$.ajax({
