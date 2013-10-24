@@ -683,8 +683,8 @@ kinggen_utils.KingdomselDisplay = (function() {
 			}
 		}
 		output += '<br />Cards: <input id="selval" name="selval" style="width:90%" value="' + defaultval + '"><br />\
-		<input type="button" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK" onClick="$kG.KingdomselCode.returnCards();">\
-		<input type="button" name="kingselCancel" class="fs-launch-game-btn" style="margin:5px;" value="Cancel (default settings)" onClick="$kG.KingdomselCode.cancelCards();">\
+		<input type="button" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK" onClick="GS.kG.KingdomselCode.returnCards();">\
+		<input type="button" name="kingselCancel" class="fs-launch-game-btn" style="margin:5px;" value="Cancel (default settings)" onClick="GS.kG.KingdomselCode.cancelCards();">\
 		</form></div></div></div>'; 
 		return output;
 	};
@@ -703,10 +703,10 @@ kinggen_utils.KingdomselCode = (function() {
 	
 	pubfuncts.runSetup = function(val) {
 		sel = document.createElement('div');
-		sel.setAttribute("style", $kG.KingdomselDisplay.htmlstyle);
-		sel.setAttribute("class", $kG.KingdomselDisplay.cssclass);
+		sel.setAttribute("style", kinggen_utils.KingdomselDisplay.htmlstyle);
+		sel.setAttribute("class", kinggen_utils.KingdomselDisplay.cssclass);
 		document.getElementById('viewport').appendChild(sel);
-		sel.innerHTML = $kG.KingdomselDisplay.innerHTML(val);
+		sel.innerHTML = kinggen_utils.KingdomselDisplay.innerHTML(val);
 		selform = document.getElementById('selform');
 		selval = document.getElementById('selval');
 	};
@@ -750,12 +750,12 @@ kinggen_utils.KingdomselCode = (function() {
 	return pubfuncts;
 }());
 //short name for this library, use at the end of the last library file
-var $kG = kinggen_utils;
+GS.kG = kinggen_utils;
 
-(function ($kG) {
+(function() {
     "use strict";
 	
-    console.log('Loading Kingdom Generator');
+    //console.log('Loading Kingdom Generator');
 
     GS.modules.kingdomGenerator = new GS.Module('Kingdom Generator');
     GS.modules.kingdomGenerator.dependencies =
@@ -766,15 +766,15 @@ var $kG = kinggen_utils;
             FS.DominionEditTableView.prototype._renderRandomDeck;
         FS.DominionEditTableView.prototype._renderRandomDeck = function () {
             if (this.ratingType === 'pro') {
-                $kG.hideKingdomGenerator = true;
+                GS.kG.hideKingdomGenerator = true;
             }
             this._old_renderRandomDeck();
 		};
 		
-		$kG.buildSets();
+		GS.kG.buildSets();
 		
 		//could save settings and replace 'all' with the saved setting
-		$kG.KingdomselCode.runSetup('All');
+		GS.kG.KingdomselCode.runSetup('All');
 		
 		// FS.Dominion.Deckbuilder.Persistent.prototype is declared as = p in FS.DeckBuilder.js
 		
@@ -789,7 +789,7 @@ var $kG = kinggen_utils;
 		
 		FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
 			//potentially override default card set??
-			$kG.myCachedCards = cachedCards;
+			GS.kG.myCachedCards = cachedCards;
 			var ret = this._old_proRandomMethod(cachedCards, exceptCards, numberCards);
 			return ret;
 		};
@@ -800,8 +800,8 @@ var $kG = kinggen_utils;
 		
 		FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards = function (opts, callback) {
 			this._old_getRandomCards(opts, function (x) {
-				$kG.qq(x,opts,callback);
+				GS.kG.qq(x,opts,callback);
 			});
 		};
 	};
-}(kinggen_utils));
+}());
