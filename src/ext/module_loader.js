@@ -29,6 +29,7 @@
         'automatchOfferPop',
         'automatchSeekPop',
         'automatch',
+        'createGameFallback',
 		'launchScreenLoader'
     ];
 
