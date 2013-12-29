@@ -31,7 +31,9 @@
                          isRequestJoin: false,
                          isRequestSit: false,
                          tableIndex: null};
-                GS.AM.zch.createTable(tOpts);
+                var zch = mtgRoom.getHelper('ZoneClassicHelper');
+                zch.createTable(tOpts);
+                
             });
         };
     };
