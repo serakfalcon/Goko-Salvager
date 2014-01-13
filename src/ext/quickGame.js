@@ -39,6 +39,7 @@
                                  platinumColony: platinumColony,
                                  useShelters: useShelters,
                                  ratingType: ratingType};
+		    GS.AM.tableSettings = tSettings;
                     var tOpts = {settings: JSON.stringify(tSettings),
                              isLock: false,
                              isRequestJoin: false,
@@ -49,6 +50,13 @@
 	    }
         
             GS.QG.createQuickGameTable = function () {
+		var zch = mtgRoom.getHelper('ZoneClassicHelper');
+                // Leave current table first, if any
+                if (zch.hasOwnProperty('currentTable')
+                        && zch.currentTable !== null) {
+                    zch.leaveTable(GS.AM.zch.currentTable);
+                }
+        
 	        var tableName = GS.get_option('quick_game_name');
 		if (!tableName) {
 			tableName = 'My Table';
