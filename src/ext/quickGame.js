@@ -1,5 +1,5 @@
 /*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true, vars:true, white:true, nomen:true */
-/*global $, _, WebSocket, Audio, FS, GS, mtgRoom */
+/*global $, _, FS, GS, mtgRoom */
 
 (function () {
     "use strict";
@@ -17,7 +17,7 @@
             initQuickGame = function () {
                 GS.debug('Initializing quick game button');
         
-                // Replace the "Play Now" button with an Automatch button
+                // Add the "Quick Game" button
                 $('.room-section-header-buttons').append(
                     $('<button id="quickGameButton">Quick Game</button>')
                         .addClass('fs-mtrm-text-border')
@@ -92,6 +92,9 @@
 					ratingType
 				);
                 	});
+		}
+		if (GS.get_option('quick_game_automatch')) {
+	                GS.AM.sendAutoAutomatchSeekRequestParams(tableName, tablePlayers, ratingType);
 		}
             };
         

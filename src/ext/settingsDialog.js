@@ -57,6 +57,10 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                                     .attr('ng-model', 'so.quick_game_players')
                                     .addClass('indented'))
                 .append('<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.quick_game_automatch')
+                                    .addClass('indented'))
+                .append('Use Automatch<br>')
 
                 .append($('<div>').text('Notifications:'))
                 .append($('<input>').attr('type', 'checkbox')
