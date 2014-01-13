@@ -36,6 +36,28 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                                     .addClass('indented'))
                 .append('By player name<br>')
 
+                .append($('<div>').text('Quick game:'))
+                .append('&nbsp;&nbsp;&nbsp;&nbsp;Name:')
+                .append($('<input>').attr('type', 'name')
+                                    .attr('ng-model', 'so.quick_game_name')
+                                    .addClass('indented'))
+                .append('<br>')
+                .append('&nbsp;&nbsp;&nbsp;&nbsp;Type (pro/casual/unrated):')
+		//TODO Name and # of players to <select>
+		//.append($('<select>').attr('ng-model', 'so.quick_game_type')
+		//.attr('ng-options', 't.name for t in quick_game_types')
+		//.addClass('indented')
+		//)
+                .append($('<input>').attr('type', 'name')
+                                    .attr('ng-model', 'so.quick_game_type')
+                                    .addClass('indented'))
+                .append('<br>')
+                .append('&nbsp;&nbsp;&nbsp;&nbsp;# of players (2/3/4/5/6):')
+                .append($('<input>').attr('type', 'name')
+                                    .attr('ng-model', 'so.quick_game_players')
+                                    .addClass('indented'))
+                .append('<br>')
+
                 .append($('<div>').text('Notifications:'))
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('ng-model', 'so.audio_notifications')
@@ -146,6 +168,11 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
 			
 
         window.settingsController = function ($scope) {
+	    $scope.quick_game_types = [
+	        {name:'pro'},
+		{name:'casual'},
+		{name:'unrated'},
+	    ];
             $scope.so = GS.get_options();
             $scope.blAdd = function () {
                 if ($scope.newBlacklistee) {
