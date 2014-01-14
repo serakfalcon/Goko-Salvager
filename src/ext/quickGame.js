@@ -39,7 +39,9 @@
                                  platinumColony: platinumColony,
                                  useShelters: useShelters,
                                  ratingType: ratingType};
-		    GS.AM.tableSettings = tSettings;
+		    if (GS.get_option('quick_game_automatch')) {
+		        GS.AM.tableSettings = tSettings;
+		    }
                     var tOpts = {settings: JSON.stringify(tSettings),
                              isLock: false,
                              isRequestJoin: false,
