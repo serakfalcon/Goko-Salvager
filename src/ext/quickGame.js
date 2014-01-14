@@ -19,7 +19,7 @@
         
                 // Add the "Quick Game" button
                 $('.room-section-header-buttons').append(
-                    $('<button id="quickGameButton">Quick Game</button>')
+                    $('<button id="quickGameButton" title="You can set parameters for the game in User Settings (accessible from main page).">Quick Game</button>')
                         .addClass('fs-mtrm-text-border')
                         .addClass('fs-mtrm-dominion-btn')
                         .click(GS.QG.createQuickGameTable)
