@@ -151,6 +151,7 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
         $('#settingsDialog').dialog({
             modal: true,
             width: 550,
+	    maxHeight: $( window ).height(),
             closeText: 'Save',
             draggable: false,
             resizeable: false,
