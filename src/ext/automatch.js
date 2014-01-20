@@ -655,7 +655,11 @@
                     return s;
                 }).length;
                 var rSystem = tSettings.ratingType;
-        
+
+		GS.AM.sendAutoAutomatchSeekRequestParams(tName, pCount, rSystem);
+           };
+
+	   GS.AM.sendAutoAutomatchSeekRequestParams = function(tName, pCount, rSystem) {
                 GS.debug('tname: ' + tName);
                 GS.debug('pcount: ' + pCount);
                 GS.debug('rSystem: ' + rSystem);
