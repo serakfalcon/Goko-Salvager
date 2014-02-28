@@ -38,8 +38,9 @@
         // "Listen" to log additions
         GS.alsoDo(Dom.LogManager, 'addLog', function (opt) {
             if (opt.logUrl) {
-                // Link to retrobox prettified log instead of Goko
-                opt.logUrl = 'http://dom.retrobox.eu/?' + opt.logUrl.substr(29);
+                // Link to gokosalvager.com prettified log instead of Goko
+                // Credit to nutki for prettifier code
+                opt.logUrl = 'http://www.gokosalvager.com/static/logprettifier.html?' + opt.logUrl.substr(40);
             }
             if (opt.text) {
                 parseLogLine(opt.text);
