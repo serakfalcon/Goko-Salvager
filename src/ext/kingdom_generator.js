@@ -14,7 +14,7 @@ kinggen_utils = (function () {
 	pubfuncts.canonizeName = function (n) {
             return n.toLowerCase().replace(/\W+/g, '');
     };
-	
+
 	//array of card:set/cost relationships, card name as key
 	var setsComp = {
             cellar: "B2",
@@ -223,7 +223,7 @@ kinggen_utils = (function () {
             merchantguild: "G5",
             soothsayer: "G5"
         };
-	
+
 	//array of set/cost meanings
 	var setNames = {
             '1': 'cost1',
@@ -246,13 +246,13 @@ kinggen_utils = (function () {
             'X': 'promos',
             'G': 'guilds'
         };
-	
+
 	//magic (what is this doing, exactly?)
 	pubfuncts.types = {};
     FS.Dominion.CardBuilder.Data.cards.map(function (card) {
         pubfuncts.types[card.name[0]] = card.type;
     });
-	
+
 	pubfuncts.set_parser = (function () {
 		var parser = {trace: function trace() {},
 			yy: {},
@@ -534,7 +534,7 @@ kinggen_utils = (function () {
 		Parser.prototype = parser;parser.Parser = Parser;
 		return new Parser;
 	})();
-	
+
 	pubfuncts.buildSets = function() {
 		var c, i, t, n;
 		pubfuncts.sets.all = {};
@@ -563,7 +563,7 @@ kinggen_utils = (function () {
 			}
 		}
     };
-	
+
 	function myBuildCard(avail, except, set) {
 		var sum = 0;
 		var c;
@@ -626,7 +626,7 @@ kinggen_utils = (function () {
 				}
 				pubfuncts.hideKingdomGenerator = false;
 	};
-	
+
 	return pubfuncts;
 }());
 
@@ -683,12 +683,12 @@ kinggen_utils.KingdomselDisplay = (function() {
 			}
 		}
 		output += '<br />Cards: <input id="selval" name="selval" style="width:90%" value="' + defaultval + '"><br />\
-		<input type="button" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK" onClick="GS.kG.KingdomselCode.returnCards();">\
+		<input type="submit" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK" >\
 		<input type="button" name="kingselCancel" class="fs-launch-game-btn" style="margin:5px;" value="Cancel (default settings)" onClick="GS.kG.KingdomselCode.cancelCards();">\
-		</form></div></div></div>'; 
+		</form></div></div></div>';
 		return output;
 	};
-	
+
 
 	return pubvars;
 }());
@@ -700,7 +700,7 @@ kinggen_utils.KingdomselCode = (function() {
 	var selform;
 	var selval;
 	var savedfunct;
-	
+
 	pubfuncts.runSetup = function(val) {
 		sel = document.createElement('div');
 		sel.setAttribute("style", kinggen_utils.KingdomselDisplay.htmlstyle);
@@ -708,18 +708,19 @@ kinggen_utils.KingdomselCode = (function() {
 		document.getElementById('viewport').appendChild(sel);
 		sel.innerHTML = kinggen_utils.KingdomselDisplay.innerHTML(val);
 		selform = document.getElementById('selform');
+		$(selform).submit(GS.kG.KingdomselCode.returnCards);
 		selval = document.getElementById('selval');
 	};
-	
+
 	pubfuncts.prompt = function(callback) {
 		sel.style.display = 'block';
 		selval.select();
 		savedfunct = callback;
 	};
-	
+
 	//doesn't exit on error anymore, if a user gets stuck they can hit the cancel button
 	pubfuncts.returnCards = function () {
-		
+
 		var x = null;
 		try {
 			var all = {};
@@ -736,9 +737,9 @@ kinggen_utils.KingdomselCode = (function() {
 			console.err(e);
 			alert('Error generating kingdom: ' + e);
 		}
-		
+    return false;
 	};
-	
+
 	//we've gone too far in Goko's code to pull out gracefully, but it could be possible with some rewiring
 	pubfuncts.cancelCards = function() {
 		sel.style.display = 'none';
@@ -746,7 +747,7 @@ kinggen_utils.KingdomselCode = (function() {
 		kinggen_utils.myCachedCards.each(function (c) {all[c.get('nameId').toLowerCase()] = c.toJSON(); });
 		savedfunct(kinggen_utils.myBuildDeck(all, kinggen_utils.set_parser.parse('All')));
 	}
-	
+
 	return pubfuncts;
 }());
 //short name for this library, use at the end of the last library file
@@ -754,7 +755,7 @@ GS.kG = kinggen_utils;
 
 (function() {
     "use strict";
-	
+
     //console.log('Loading Kingdom Generator');
 
     GS.modules.kingdomGenerator = new GS.Module('Kingdom Generator');
@@ -770,34 +771,34 @@ GS.kG = kinggen_utils;
             }
             this._old_renderRandomDeck();
 		};
-		
+
 		GS.kG.buildSets();
-		
+
 		//could save settings and replace 'all' with the saved setting
 		GS.kG.KingdomselCode.runSetup('All');
-		
+
 		// FS.Dominion.Deckbuilder.Persistent.prototype is declared as = p in FS.DeckBuilder.js
-		
+
 		//if we've already overwritten the functions, don't do it twice
 		if (FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod) {
 			return;
 		}
-		
+
 		//cache the old method of generating a pro set
-		FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod = 
+		FS.Dominion.DeckBuilder.Persistent.prototype._old_proRandomMethod =
 		FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod;
-		
+
 		FS.Dominion.DeckBuilder.Persistent.prototype._proRandomMethod = function (cachedCards, exceptCards, numberCards) {
 			//potentially override default card set??
 			GS.kG.myCachedCards = cachedCards;
 			var ret = this._old_proRandomMethod(cachedCards, exceptCards, numberCards);
 			return ret;
 		};
-		
+
 		//cache old method of generating a set
-		FS.Dominion.DeckBuilder.Persistent.prototype._old_getRandomCards = 
+		FS.Dominion.DeckBuilder.Persistent.prototype._old_getRandomCards =
 		FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards;
-		
+
 		FS.Dominion.DeckBuilder.Persistent.prototype.getRandomCards = function (opts, callback) {
 			this._old_getRandomCards(opts, function (x) {
 				GS.kG.qq(x,opts,callback);
