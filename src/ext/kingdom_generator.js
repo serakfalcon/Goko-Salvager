@@ -734,10 +734,11 @@ kinggen_utils.KingdomselCode = (function() {
 				throw new Error('Cannot generate specified kingdom from the cards availiable');
 			}
 		} catch (e) {
-			console.err(e);
+			console.error(e);
 			alert('Error generating kingdom: ' + e);
 		}
-    return false;
+
+		return false;
 	};
 
 	//we've gone too far in Goko's code to pull out gracefully, but it could be possible with some rewiring
