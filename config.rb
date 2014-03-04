@@ -94,8 +94,9 @@
         'automatchOfferPop.js',
         'automatchSeekPop.js',
         'automatch.js',
-	'quickGame.js',
+        'quickGame.js',
         'launchScreenLoader.js',
+        'connection.js',
         'module_loader.js'
     ]
 }
