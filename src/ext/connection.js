@@ -69,6 +69,9 @@
                 case 'CONFIRM_RECEIPT':
                     confirmReceipt(msg);
                     break;
+                case 'CLIENTLIST':
+                    console.log(msg);
+                    break;
                 default:
                     throw 'Received unknown message type: ' + msg.msgtype +
                           ' from ' + GS.WS.domain;
@@ -102,11 +105,11 @@
             // ping server every 25 sec. Timeout if no responses for 180s.
             GS.WS.lastpingTime = new Date();
 
-            GS.pingLoop = setInterval(function () {
+            GS.WS.pingLoop = setInterval(function () {
                 GS.debug('Running ping loop');
                 if (new Date() - GS.WS.lastpingTime > 180000) {
                     GS.debug('Connection to ' + GS.WS.domain + ' timed out.');
-                    clearInterval(GS.pingLoop);
+                    clearInterval(GS.WS.pingLoop);
                     try {
                         GS.WS.conn.close();
                     } catch (e) {
@@ -121,7 +124,7 @@
 
         updateWSIcon = function () {
             // TODO: inform the user that he's connected to the GokoSalvager server
-            console.log('TODO: Update icon for status: ' + GS.WS.conn.status);
+            console.log('TODO: Update icon for status: ' + GS.WS.conn.readyState);
         };
 
         handleDisconnect = function () {
