@@ -1,4 +1,4 @@
-/*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true, white:true */
+/*jslint browser: true, devel: true, indent: 4, vars: true, nomen: true, regexp: true, forin: true */
 /*global $, _, GS, Goko, FS, mtgRoom */
 
 //if launchscreenloader namespace doesn't exist, create it
@@ -25,47 +25,47 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
 
         // Cache goko's avatar loading method
         var gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
-		var hasAvatar = {};
+        var hasAvatar = {};
 
         // Define our own avatar loading method
         var customAvatarLoader = function (playerId, which, callback) {
             var size = [50, 100, 256][which];
             var img = new Image();
-			if (typeof hasAvatar[playerId] == 'undefined') {
-				hasAvatar[playerId] = true;
-			}
-			
-			img.onerror = function () {
-					// When no URL for a custom avatar can be found
-					hasAvatar[playerId] = false;
-					gokoAvatarLoader(playerId, which, callback);
-			};
-			
-			img.onload = function() {
-					// When custom avatar is found
-					// Draw a resized version
-					myCanvas.width = size;
-					myCanvas.height = size;
-					myContext.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
-		
-					var img2 = new Image();
-					// Convert the resized version to a URL
-					img2.onload = function () {
-						//console.log('Found avatar for ' + playerId);
-						var user = {};
-						user.playerid = playerId;
-						user.image = img2;
-						callback(user);
-					};
-					img2.src = myCanvas.toDataURL("image/png");
-			};
-			
-			if (hasAvatar[playerId]) {
-				img.crossOrigin = "Anonymous";
-				img.src = "http://dom.retrobox.eu/avatars/" + playerId + ".png";
-			} else {
-				gokoAvatarLoader(playerId, which, callback);
-			}
+            if (typeof hasAvatar[playerId] === 'undefined') {
+                hasAvatar[playerId] = true;
+            }
+            
+            img.onerror = function () {
+                // When no URL for a custom avatar can be found
+                hasAvatar[playerId] = false;
+                gokoAvatarLoader(playerId, which, callback);
+            };
+            
+            img.onload = function () {
+                // When custom avatar is found
+                // Draw a resized version
+                myCanvas.width = size;
+                myCanvas.height = size;
+                myContext.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
+    
+                var img2 = new Image();
+                // Convert the resized version to a URL
+                img2.onload = function () {
+                    //console.log('Found avatar for ' + playerId);
+                    var user = {};
+                    user.playerid = playerId;
+                    user.image = img2;
+                    callback(user);
+                };
+                img2.src = myCanvas.toDataURL("image/png");
+            };
+            
+            if (hasAvatar[playerId]) {
+                img.crossOrigin = "Anonymous";
+                img.src = "http://dom.retrobox.eu/avatars/" + playerId + ".png";
+            } else {
+                gokoAvatarLoader(playerId, which, callback);
+            }
         };
 
         // Let Goko handle the large avatar images ('which' >=3). I believe
@@ -85,48 +85,42 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
         GS.LSLoader.addChangeAvatarLink = function () {
             // Add link to open dialog if necessary
             if ($('#changeAvatarForm').length === 0) {
-                $('.fs-rs-logout-row').append(
-                    $('<form>').attr('id', 'changeAvatarForm')
-                               .attr('method', 'post')
-                               .attr('action', 'http://dom.retrobox.eu/setavatar.php')
-                                .append(
-                        $('<div>').addClass('fs-lg-settings-btn')
-                                  .attr('id', 'changeAvatarLink')
-                                  .text('Change Avatar')
-                                  .click(function () {
-                                      $('#changeAvatarId').val(mtgRoom.conn.connInfo.playerId);
-                                      $('#changeAvatarForm').submit();
-                                  })
-                               .append(
-                        $('<input>').attr('type', 'text')
-                                    .attr('hidden', 'true')
-                                    .attr('name', 'id')
-                                    .attr('id', 'changeAvatarId')
-                                    .attr('value', 'x'))
-                                  ));
+                $('.fs-rs-logout-row')
+                    .append($('<form>').attr('id', 'changeAvatarForm')
+                                       .attr('method', 'post')
+                                       .attr('action', 'http://dom.retrobox.eu/setavatar.php')
+                        .append($('<div>').addClass('fs-lg-settings-btn')
+                                          .attr('id', 'changeAvatarLink')
+                                          .text('Change Avatar')
+                                          .click(function () {
+                                $('#changeAvatarId').val(mtgRoom.conn.connInfo.playerId);
+                                $('#changeAvatarForm').submit();
+                            })
+                            .append($('<input>').attr('type', 'text')
+                                                .attr('hidden', 'true')
+                                                .attr('name', 'id')
+                                                .attr('id', 'changeAvatarId')
+                                                .attr('value', 'x'))));
             }
         };
 
         GS.LSLoader.setLoginScreenAvatar = function () {
             var myPlayerId = mtgRoom.conn.connInfo.playerId;
             var myAvatarURL = "http://dom.retrobox.eu/avatars/" + myPlayerId + ".png";
-			$.ajax({
+            $.ajax({
                 url: myAvatarURL,
                 type: 'HEAD',
-                error: function() {
+                error: function () {
                     myAvatarURL = null;
                     //console.log('User does not have a custom avatar');
                 },
-                success: function() {
+                success: function () {
                     $('#fs-player-pad-avatar img').attr('src', myAvatarURL);
                     $('.player-info-avatar img').attr('src', myAvatarURL);
                     //console.log('Settings custom avatar');
                     //console.log($('#fs-player-pad-avatar img').attr('src'));
                 }
             });
-
         };
-    
-	
     };
 }());
