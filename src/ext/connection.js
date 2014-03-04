@@ -8,7 +8,7 @@
 // - Salvager's settings
 // - challenges
 // - veto mode
-// - vp counter
+// - vp counter toggling
 // - in-game chat <?>
 
 (function () {
@@ -23,8 +23,9 @@
 
         // Connection variables
         GS.WS = {};
-        GS.WS.domain = 'www.gokosalvager.com';
-        GS.WS.url = "https://" + GS.WS.domain + "/gs/wsConn";
+        GS.WS.domain = 'andrewiannaccone.com';
+        GS.WS.port = 8889;
+        GS.WS.url = "wss://" + GS.WS.domain + ":" + GS.WS.port + "/gs/wsConn";
         GS.WS.maxFails = 5;
         GS.WS.failCount = 0;
         GS.WS.lastPingTime = new Date();
@@ -36,14 +37,14 @@
             GS.WS.conn = new WebSocket(GS.WS.url);
 
             GS.WS.conn.onopen = function () {
-                GS.debug('Connected to ' + GS.WS.domain);
+                console.log('Connected to ' + GS.WS.domain);
                 GS.WS.FailCount = 0;
                 updateWSIcon();
                 startPingLoop();
             };
 
             GS.WS.conn.onclose = function () {
-                GS.debug('Automatch server closed websocket.');
+                console.log('Automatch server closed websocket.');
                 handleDisconnect();
             };
 
@@ -55,8 +56,18 @@
                 GS.debug(msg.message);
 
                 switch (msg.msgtype) {
-                case 'XXX':
-                //    // TODO do stuff...
+                case 'REQUEST_CLIENT_INFO':
+                    var info = {
+                        username: 'TESTER',
+                        gsversion: 'v2.4.3'
+                    };
+                    GS.WS.sendMessage('CLIENT_INFO', info, function () {
+                        console.log('Received receipt confirmation');
+                    });
+
+                    break;
+                case 'CONFIRM_RECEIPT':
+                    confirmReceipt(msg);
                     break;
                 default:
                     throw 'Received unknown message type: ' + msg.msgtype +
@@ -69,7 +80,7 @@
         GS.WS.sendMessage = function (msgtype, msg, smCallback) {
             var msgid, msgObj, msgStr;
 
-            msgid = GS.player.pname + Date.now();
+            msgid = 'msg' + Date.now();
             msgObj = {msgtype: msgtype,
                       message: msg,
                       msgid: msgid};

@@ -14,6 +14,7 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
         'Goko.Player.preloader',
         'FS.AvatarHelper',
         '.fs-rs-logout-row',
+        'mtgRoom.conn',
         'FS.LaunchScreen.View.Container'
     ];
     mod.load = function () {

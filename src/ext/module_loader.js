@@ -16,14 +16,9 @@
         'tableState', 
         'autokick',
         'blacklist',
-        'avatars',
         'kingdomGenerator',
-        'sidebar',
         'logviewer',
-        'chatbox',
         'vpcalculator',
-        'vptoggle',
-        'vpcounterui',
         'alwaysStack',
         'automatchGamePop',
         'automatchOfferPop',
@@ -31,7 +26,12 @@
         'automatch',
         'quickGame',
         'wsConnection',
-        'launchScreenLoader'
+        'avatars',
+        'launchScreenLoader',
+        'chatbox',
+        'vptoggle',
+        'vpcounterui',
+        'sidebar'
     ];
 
     var loadModule = function (i) {
@@ -58,7 +58,7 @@
                     }
                 } else {
                     failCount += 1;
-                    if (failCount % 10 === 0) {
+                    if (failCount % 60 === 0) {
                         console.log('Module ' + mod.name + ' is missing dependencies:');
                         console.log(missing);
                     }
