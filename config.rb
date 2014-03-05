@@ -92,7 +92,6 @@
         'automatchOfferPop.js',
         'automatchSeekPop.js',
         'automatch.js',
-        'createGameFallback.js',
         'launchScreenLoader.js',
         'module_loader.js'
     ]
