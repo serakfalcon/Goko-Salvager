@@ -7,8 +7,8 @@ Discuss the extension at the [Dominion Strategy forum](http://forum.dominionstra
 Installation
 ------------
 - Chrome - [get it from the Chrome web store](https://chrome.google.com/webstore/detail/goko-dominion-salvager/kaignighoceeemhinbbophdeogpnedjn?hl=en-US)
-- Firefox - [download the .xpi file](https://www.gokosalvager.com:8888/v2.4.3/gokosalvager.xpi), then open your Add-ons menu and "Install Add-ons from file."  Depending on your Firefox settings, it may also work to just single-click the link.
-- Safari - [download the extension file](https://www.gokosalvager.com:8888/safari-latest-gokosalvager.safariextz), and double-click on it to add it to Safari
+- Firefox - [download the .xpi file](https://www.gokosalvager.com:8888/v2.4.3/gokosalvager.xpi).  Just click the link to install, probably.  Depending on your Firefox settings, you may need to Save the file and then install it manually from the Add-ons dialog, using "Install Add-ons from file."
+- Safari - [download the extension file](https://www.gokosalvager.com:8888/safari-latest-gokosalvager.safariextz), and double-click on it to add it to Safari.  Enable automatic updates from Safari's Settings/Extensions panel to make sure you stay current!
 
 Contributing
 ------------
