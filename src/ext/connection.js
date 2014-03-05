@@ -26,7 +26,8 @@
         GS.WS.domain = 'andrewiannaccone.com';
         GS.WS.port = 8889;
         GS.WS.url = "wss://" + GS.WS.domain + ":" + GS.WS.port + "/gs/wsConn";
-        GS.WS.maxFails = 5;
+        GS.WS.noreconnect = false;
+        GS.WS.maxFails = 36;
         GS.WS.failCount = 0;
         GS.WS.lastPingTime = new Date();
         GS.WS.callbacks = {};
@@ -44,7 +45,7 @@
             };
 
             GS.WS.conn.onclose = function () {
-                console.log('GokoSalvager server closed websocket.');
+                console.log('Received onclose event on connection to ' + GS.WS.domain);
                 handleDisconnect();
             };
 
@@ -54,6 +55,8 @@
                 var m = d.message;
                 //console.log('Got ' + d.msgtype + ' message from ' + GS.WS.domain + ':');
                 //console.log(d);
+                
+                GS.WS.lastpingTime = new Date();
 
                 switch (d.msgtype) {
                 case 'REQUEST_CLIENT_INFO':
@@ -119,10 +122,10 @@
             // ping server every 25 sec. Timeout if no responses for 180s.
             GS.WS.lastpingTime = new Date();
 
+            console.log('Starting ping loop');
             GS.WS.pingLoop = setInterval(function () {
-                GS.debug('Running ping loop');
                 if (new Date() - GS.WS.lastpingTime > 180000) {
-                    GS.debug('Connection to ' + GS.WS.domain + ' timed out.');
+                    console.log('Connection to ' + GS.WS.domain + ' timed out.');
                     clearInterval(GS.WS.pingLoop);
                     try {
                         GS.WS.conn.close();
@@ -130,7 +133,7 @@
                         console.log(e);
                     }
                 } else {
-                    GS.debug('Sending ping');
+                    //console.log('Sending ping');
                     GS.WS.sendMessage('PING', {});
                 }
             }, 25000);
@@ -146,8 +149,8 @@
             GS.state = {seek: null, offer: null, game: null};
             GS.WS.FailCount += 1;
 
-            GS.debug('Connection to ' + GS.WS.domain + ' lost: '
-                    + GS.WS.FailCount + '/' + GS.WS.MaxFails);
+            console.log('Connection to ' + GS.WS.domain + ' lost: '
+                      + GS.WS.FailCount + '/' + GS.WS.maxFails);
 
             // Update UI
             updateWSIcon();
@@ -158,10 +161,10 @@
             }
 
             // Wait 5 seconds and attempt to reconnect.
-            if (!GS.WS.noreconnect) {
-                GS.debug('Auto-reconnect to GokoSalvager server disabled.');
-            } else if (GS.WS.failCount < GS.WS.maxFails) {
-                GS.debug('Max connection failures reached.');
+            if (GS.WS.noreconnect) {
+                console.log('Auto-reconnect to GokoSalvager server disabled.');
+            } else if (GS.WS.failCount >= GS.WS.maxFails) {
+                console.log('Max connection failures reached.');
             } else {
                 setTimeout(function () {
                     GS.WS.connectToGS();
