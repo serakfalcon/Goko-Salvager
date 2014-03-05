@@ -29,7 +29,8 @@
         'automatchOfferPop',
         'automatchSeekPop',
         'automatch',
-		'launchScreenLoader'
+	'quickGame',
+	'launchScreenLoader'
     ];
 
     var loadModule = function (i) {

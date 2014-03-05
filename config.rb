@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.3.4.13',
+    :version => '2.4.3',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -24,7 +24,9 @@
         'http://play.goko.com/Dominion/gameClient.html',
         'https://play.goko.com/Dominion/gameClient.html',
         'http://beta.goko.com/Dominion/gameClient.html',
-        'https://beta.goko.com/Dominion/gameClient.html'
+        'https://beta.goko.com/Dominion/gameClient.html',
+        'https://www.playdominion.com/Dominion/gameClient.html',
+        'http://www.playdominion.com/Dominion/gameClient.html'
     ],
     :hostServer => 'www.gokosalvager.com',
     :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager/',
@@ -92,6 +94,7 @@
         'automatchOfferPop.js',
         'automatchSeekPop.js',
         'automatch.js',
+	'quickGame.js',
         'launchScreenLoader.js',
         'module_loader.js'
     ]
