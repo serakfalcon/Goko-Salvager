@@ -27,11 +27,11 @@
         'automatchSeekPop',
         'automatch',
         'quickGame',
-        //'launchScreenLoader',
         'chatbox',
         'vptoggle',
         'vpcounterui',
-        'sidebar'
+        'sidebar',
+        'launchScreenLoader'    // Depends on avatars, settingsDialog modules
     ];
 
     var loadModule = function (i) {

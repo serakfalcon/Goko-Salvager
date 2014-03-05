@@ -95,7 +95,7 @@
         'automatchSeekPop.js',
         'automatch.js',
         'quickGame.js',
-        #'launchScreenLoader.js',
+        'launchScreenLoader.js',
         'connection.js',
         'module_loader.js'
     ]

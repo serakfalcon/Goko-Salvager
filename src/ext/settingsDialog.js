@@ -1,9 +1,6 @@
-/*jslint browser:true, devel:true, white:true, es5:true, nomen:true */
+/*jslint browser:true, devel:true, es5:true, nomen:true */
 /*globals $, angular, GS, FS, mtgRoom */
 
-//if launchscreenloader namespace doesn't exist, create it
-//any functions that alter the launchscreen should be saved in this namespace and called in launchScreenLoader.js
-if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
 (function () {
     "use strict";
     console.log('Loading Settings Dialog');
@@ -43,11 +40,11 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                                     .addClass('indented'))
                 .append('<br>')
                 .append('&nbsp;&nbsp;&nbsp;&nbsp;Type (pro/casual/unrated):')
-		//TODO Name and # of players to <select>
-		//.append($('<select>').attr('ng-model', 'so.quick_game_type')
-		//.attr('ng-options', 't.name for t in quick_game_types')
-		//.addClass('indented')
-		//)
+        //TODO Name and # of players to <select>
+        //.append($('<select>').attr('ng-model', 'so.quick_game_type')
+        //.attr('ng-options', 't.name for t in quick_game_types')
+        //.addClass('indented')
+        //)
                 .append($('<input>').attr('type', 'name')
                                     .attr('ng-model', 'so.quick_game_type')
                                     .addClass('indented'))
@@ -151,33 +148,19 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
         $('#settingsDialog').dialog({
             modal: true,
             width: 550,
-	    maxHeight: $( window ).height(),
+            maxHeight: $(window).height(),
             closeText: 'Save',
             draggable: false,
             resizeable: false,
             autoOpen: false
         });
 
-        GS.LSLoader.addSettingsLink = function () {
-            // Add link to open dialog if necessary
-            if ($('#userSettingsLink').length === 0) {
-                $('.fs-rs-logout-row').append(
-                    $('<div>').addClass('fs-lg-settings-btn')
-                              .attr('id', 'userSettingsLink')
-                              .text('User Settings')
-                              .click(function () {
-                                  $('#settingsDialog').dialog('open');
-                              }));
-            }
-        };
-			
-
         window.settingsController = function ($scope) {
-	    $scope.quick_game_types = [
-	        {name:'pro'},
-		{name:'casual'},
-		{name:'unrated'},
-	    ];
+            $scope.quick_game_types = [
+                {name: 'pro'},
+                {name: 'casual'},
+                {name: 'unrated'},
+            ];
             $scope.so = GS.get_options();
             $scope.blAdd = function () {
                 if ($scope.newBlacklistee) {
@@ -209,7 +192,7 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                 $scope.so.vp_refuse = $scope.so.vp_refuse && !$scope.so.vp_request;
             });
             $scope.$watch('so.desktop_notifications', function () {
-                $scope.so.popup_notifications = 
+                $scope.so.popup_notifications =
                     $scope.so.popup_notifications && !$scope.so.desktop_notifications;
             });
             $scope.$watch('so.popup_notifications', function () {
