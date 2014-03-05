@@ -8,6 +8,8 @@
 
     // Module load order
     var modNames = [
+        'wsConnection',
+        'avatars',
         'settingsDialog',
         //'eventLogger',
         'notifications',
@@ -25,9 +27,7 @@
         'automatchSeekPop',
         'automatch',
         'quickGame',
-        'wsConnection',
-        'avatars',
-        'launchScreenLoader',
+        //'launchScreenLoader',
         'chatbox',
         'vptoggle',
         'vpcounterui',

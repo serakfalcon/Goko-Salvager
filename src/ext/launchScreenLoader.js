@@ -19,7 +19,6 @@ if (typeof GS.LSLoader === 'undefined') {
         'GS.LSLoader',
         'fsConnectionParams',
         'GS.LSLoader.addSettingsLink',
-        'GS.LSLoader.addChangeAvatarLink',
         'Goko.Player.preloader',
         'FS.AvatarHelper',
         'FS.LaunchScreen'
@@ -41,8 +40,8 @@ if (typeof GS.LSLoader === 'undefined') {
         var persist = FS.LaunchScreen.Persistent.getInstance(optslvl1.conn, optslvl1.gameId, optslvl1);
         
         var allCallbacks = function () {
-            GS.LSLoader.addChangeAvatarLink();
-            GS.LSLoader.setLoginScreenAvatar();
+            //GS.LSLoader.addChangeAvatarLink();
+            //GS.LSLoader.setLoginScreenAvatar();
             GS.LSLoader.addSettingsLink();
         };
 

@@ -3,13 +3,13 @@
 
 // Create a single WebSocket connection to gokosalvager.com
 //
-// Use this connection for all client-server communication, including:
+// I plan to use this connection for all client-server communication, including:
 // - automatch
 // - Salvager's settings
 // - challenges
 // - veto mode
 // - vp counter toggling
-// - in-game chat <?>
+// - in-game chat (maybe)
 
 (function () {
     "use strict";
@@ -44,64 +44,78 @@
             };
 
             GS.WS.conn.onclose = function () {
-                console.log('Automatch server closed websocket.');
+                console.log('GokoSalvager server closed websocket.');
                 handleDisconnect();
             };
 
             // Messages from server
             GS.WS.conn.onmessage = function (evt) {
-                var msg = JSON.parse(evt.data);
-                GS.debug('Got ' + msg.msgtype + ' message from '
-                         + GS.WS.domain + ':');
-                GS.debug(msg.message);
+                var d = JSON.parse(evt.data);
+                var m = d.message;
+                //console.log('Got ' + d.msgtype + ' message from ' + GS.WS.domain + ':');
+                //console.log(d);
 
-                switch (msg.msgtype) {
+                switch (d.msgtype) {
                 case 'REQUEST_CLIENT_INFO':
                     var info = {
                         username: 'TESTER',
                         gsversion: 'v2.4.3'
                     };
-                    GS.WS.sendMessage('CLIENT_INFO', info, function () {
-                        console.log('Received receipt confirmation');
-                    });
-
+                    GS.WS.sendMessage('CLIENT_INFO', info);
                     break;
-                case 'CONFIRM_RECEIPT':
-                    confirmReceipt(msg);
-                    break;
-                case 'CLIENTLIST':
-                    console.log(msg);
+                case 'RESPONSE':
+                    // Server response to client's request for information.
+                    // Evaluate the callback the client registered, with the
+                    // server's response as its argument.
+                    var callback = GS.WS.callbacks[m.queryid];
+                    if (typeof callback !== 'undefined') {
+                        //console.log('Executing callback for msgid: ' + m.queryid);
+                        if (callback !== null) {
+                            callback(m);
+                        }
+                        delete GS.WS.callbacks[m.queryid];
+                    //} else {
+                    //    console.log('No callback found for msgid: ' + m.queryid);
+                    }
                     break;
                 default:
-                    throw 'Received unknown message type: ' + msg.msgtype +
-                          ' from ' + GS.WS.domain;
+                    throw 'Invalid server message type: ' + d.msgtype;
                 }
             };
         };
 
+        GS.WS.isConnReady = function () {
+            return typeof GS.WS.conn !== 'undefined' && GS.WS.conn.readyState === 1;
+        };
+
         // Convenience wrapper for websocket send() method.  Globally accessible.
         GS.WS.sendMessage = function (msgtype, msg, smCallback) {
-            var msgid, msgObj, msgStr;
+            
+            var msgid, msgJSON;
 
             msgid = 'msg' + Date.now();
-            msgObj = {msgtype: msgtype,
-                      message: msg,
-                      msgid: msgid};
-            msgStr = JSON.stringify(msgObj);
+            msgJSON = JSON.stringify({
+                msgtype: msgtype,
+                message: msg,
+                msgid: msgid
+            });
 
-            GS.WS.callbacks[msgid] = smCallback;
-            GS.WS.conn.send(msgStr);
+            if (typeof smCallback !== 'undefined' && smCallback !== null) {
+                GS.WS.callbacks[msgid] = smCallback;
+            }
 
             try {
-                GS.debug('Sent ' + msgtype + ' message to Automatch server:');
-                GS.debug(msgObj);
+                GS.WS.conn.send(msgJSON);
+                //if (msgtype !== 'PING') {
+                //    console.log('Sent ' + msgtype + ' message to Automatch server:');
+                //    console.log(msgJSON);
+                //}
             } catch (e) {
                 console.log(e);
             }
         };
 
         startPingLoop = function () {
-
             // ping server every 25 sec. Timeout if no responses for 180s.
             GS.WS.lastpingTime = new Date();
 
@@ -155,15 +169,6 @@
             }
         };
 
-        // Invoke any callback that was registered when the message was sent.
-        confirmReceipt = function (msg) {
-            GS.debug('Receipt of message confirmed: ' + msg.msgid);
-            var crCallback = GS.WS.callbacks[msg.msgid];
-            if (typeof crCallback !== 'undefined' && crCallback !== null) {
-                GS.debug('Invoking callback for message ' + msg.msgid);
-                crCallback();
-            }
-            updateWSIcon();
-        };
+        GS.WS.connectToGS();
     };
 }());
