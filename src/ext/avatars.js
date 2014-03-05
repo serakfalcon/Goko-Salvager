@@ -7,7 +7,7 @@
     var mod = GS.modules.avatars = new GS.Module('Avatars');
     mod.dependencies = [
         'FS.AvatarHelper.loadAvatarImage',
-        'Goko.Player.AvatarLoader',
+        'Goko.Player.preloader',
         'GS.WS'
     ];
     mod.load = function () {
@@ -15,10 +15,6 @@
         // Cache of who has custom avatars: playerid --> true/false
         var customAvatarLoader, gokoAvatarLoader;
         GS.hasAvatar = {};
-
-        // Prevent Goko from pre-caching its own avatars, as this will prevent
-        // it from calling .loadAvatarImage() later.
-        Goko.Player.preloader = function (ids, which) {};
 
         // Goko's default avatar loader and our replacement function
         gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
@@ -60,8 +56,7 @@
                 // Continue asynchronously by showing the avatar.
                 GS.WS.sendMessage('QUERY_AVATAR', {playerid: playerid}, function (resp) {
                     GS.hasAvatar[playerid] = resp.available;
-                    //console.log(resp);
-                    if (resp.available) {
+                    if (resp.available === true) {
                         customAvatarLoader(playerid, size, callback);
                     } else {
                         gokoAvatarLoader(playerid, size, callback);
@@ -69,5 +64,17 @@
                 });
             }
         };
+
+        // Prevent Goko's preloader from building a cache of vanilla avatars.
+        // Note that the cache will still be populated later and used, but it
+        // will be populated using the avatar loading code in this module.
+        Goko.Player.preloader = function (ids, which) {};
+
+        // Also clear anything that got into the cache befor this module loaded
+        try {
+            Goko.ObjectCache.getInstance().player = {};
+        } catch (e) {
+            // Player cache does not yet exist --> no need to clear it
+        }
     };
 }());

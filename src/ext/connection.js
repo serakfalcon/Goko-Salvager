@@ -92,11 +92,13 @@
         };
 
         // Convenience wrapper for websocket send() method.  Globally accessible.
+        var msgcount = 0;
         GS.WS.sendMessage = function (msgtype, msg, smCallback) {
             
             var msgid, msgJSON;
 
-            msgid = 'msg' + Date.now();
+            msgcount += 1;
+            msgid = 'msg' + msgcount;
             msgJSON = JSON.stringify({
                 msgtype: msgtype,
                 message: msg,
@@ -110,7 +112,7 @@
             try {
                 GS.WS.conn.send(msgJSON);
                 //if (msgtype !== 'PING') {
-                //    console.log('Sent ' + msgtype + ' message to Automatch server:');
+                //    console.log('Sent ' + msgtype + ' message to GS server:');
                 //    console.log(msgJSON);
                 //}
             } catch (e) {
@@ -122,7 +124,7 @@
             // ping server every 25 sec. Timeout if no responses for 180s.
             GS.WS.lastpingTime = new Date();
 
-            console.log('Starting ping loop');
+            //console.log('Starting ping loop');
             GS.WS.pingLoop = setInterval(function () {
                 if (new Date() - GS.WS.lastpingTime > 180000) {
                     console.log('Connection to ' + GS.WS.domain + ' timed out.');
@@ -162,10 +164,11 @@
 
             // Wait 5 seconds and attempt to reconnect.
             if (GS.WS.noreconnect) {
-                console.log('Auto-reconnect to GokoSalvager server disabled.');
+                console.log('Auto-reconnect to GS server disabled.');
             } else if (GS.WS.failCount >= GS.WS.maxFails) {
                 console.log('Max connection failures reached.');
             } else {
+                console.log('Attempting reconnect to GS server.');
                 setTimeout(function () {
                     GS.WS.connectToGS();
                 }, 5000);
