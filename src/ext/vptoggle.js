@@ -368,7 +368,11 @@
     GS.vp.toggle = new GS.VPToggle(false, false, 'My Table', '', [], []);
 
     GS.modules.vptoggle = new GS.Module('VP Toggle');
-    GS.modules.vptoggle.dependencies = ['DominionClient', 'mtgRoom.conn', '#vptable'];
+    GS.modules.vptoggle.dependencies = [
+        'DominionClient',
+        'mtgRoom.conn',
+        '#vptable'
+    ];
     GS.modules.vptoggle.load = function () {
 
         var onGameSetup, onRoomChat, onAddLog, checkGameOver;

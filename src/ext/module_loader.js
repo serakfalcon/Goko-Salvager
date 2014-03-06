@@ -19,19 +19,19 @@
         'autokick',
         'blacklist',
         'kingdomGenerator',
-        'logviewer',
-        'vpcalculator',
         'alwaysStack',
         'automatchGamePop',
         'automatchOfferPop',
         'automatchSeekPop',
         'automatch',
         'quickGame',
-        'chatbox',
-        'vptoggle',
-        'vpcounterui',
-        'sidebar',
-        'launchScreenLoader'    // Depends on avatars, settingsDialog modules
+        'launchScreenLoader',   // Depends on avatars, settingsDialog modules
+        'sidebar',              
+        'logviewer',            // Depends on sidebar
+        'vpcalculator',         // Depends on sidebar
+        'vptoggle',             // Depends on sidebar
+        'vpcounterui',          // Depends on sidebar
+        'chatbox'               // Depends on sidebar
     ];
 
     var loadModule = function (i) {
