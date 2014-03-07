@@ -90,7 +90,7 @@
             return this.dependencies.filter(function (depName) {
                 var dep;
                 if (depName[0] === '#') {
-                    dep = $(depName);
+                    dep = $(depName)[0];
                 } else if (depName[0] === '.') {
                     dep = $(depName);
                 } else {
