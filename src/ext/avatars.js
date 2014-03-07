@@ -13,21 +13,37 @@
     mod.load = function () {
 
         // Cache of who has custom avatars: playerid --> true/false
-        var customAvatarLoader, gokoAvatarLoader;
+        var gsAvatarLoader, retroboxAvatarLoader, gokoAvatarLoader;
         GS.hasAvatar = {};
 
         // Goko's default avatar loader and our replacement function
         gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
-        customAvatarLoader = function (playerid, size, callback) {
+        gsAvatarLoader = function (playerid, size, callback) {
             var img = new Image();
 
             img.onerror = function () {
-                GS.hasAvatar[playerid] = false;
+                // Defer to retrobox if GokoSalvager fails
+                retroboxAvatarLoader(playerid, size, callback);
             };
 
             img.crossOrigin = "Anonymous";
             img.src = "https://www.andrewiannaccone.com:8889/"
-                    + "avatars/medium/" + playerid + ".png";
+                    + "avatars/" + playerid + ".jpg";
+            callback({
+                playerid: playerid,
+                image: img
+            });
+        };
+        retroboxAvatarLoader = function (playerid, size, callback) {
+            var img = new Image();
+            img.onerror = function () {
+                // Defer to Goko if GokoSalvager fails
+                gokoAvatarLoader(playerid, size, callback);
+            };
+            img.src = "http://dom.retrobox.eu/avatars/" + playerid + ".png";
+            img.onerror = function () {
+                gokoAvatarLoader(playerid, size, callback);
+            };
             callback({
                 playerid: playerid,
                 image: img
@@ -43,7 +59,7 @@
                 gokoAvatarLoader(playerid, size, callback);
             } else if (typeof GS.hasAvatar[playerid] !== 'undefined') {
                 if (GS.hasAvatar[playerid]) {
-                    customAvatarLoader(playerid, size, callback);
+                    gsAvatarLoader(playerid, size, callback);
                 } else {
                     gokoAvatarLoader(playerid, size, callback);
                 }
@@ -57,7 +73,7 @@
                 GS.WS.sendMessage('QUERY_AVATAR', {playerid: playerid}, function (resp) {
                     GS.hasAvatar[playerid] = resp.available;
                     if (resp.available === true) {
-                        customAvatarLoader(playerid, size, callback);
+                        gsAvatarLoader(playerid, size, callback);
                     } else {
                         gokoAvatarLoader(playerid, size, callback);
                     }
