@@ -9,6 +9,7 @@
         '$',
         '.fs-rs-logout-row',
         '#settingsDialog',
+        '#uploadAvatarDialog',
         'mtgRoom.conn',
         'FS.LaunchScreen.getInstance'
     ];
@@ -31,24 +32,14 @@
                                   .text('Salvager v2.4.3'));
 
             // Add link to update avatar
-            var openAvatarPage = function () {
-                $('#changeAvatarId').val(mtgRoom.conn.connInfo.playerId);
-                $('#changeAvatarForm').submit();
+            var openAvatarDialog = function () {
+                $('#uploadAvatarDialog').dialog('open');
             };
             $('.fs-rs-logout-row')
-                .append($('<form>').attr('id', 'changeAvatarForm')
-                                   .attr('method', 'post')
-                                   .attr('action',
-                                         'http://dom.retrobox.eu/setavatar.php')
-                    .append($('<div>').addClass('fs-lg-settings-btn')
-                                      .attr('id', 'changeAvatarLink')
-                                      .text('Change Avatar')
-                                      .click(openAvatarPage))
-                    .append($('<input>').attr('type', 'text')
-                                        .attr('hidden', 'true')
-                                        .attr('name', 'id')
-                                        .attr('id', 'changeAvatarId')
-                                        .attr('value', 'x')));
+                .append($('<div>').addClass('fs-lg-settings-btn')
+                                  .attr('id', 'changeAvatarLink')
+                                  .text('Change Avatar')
+                                  .click(openAvatarDialog));
 
             // Add link to show GokoSalvager user settings
             var showSettings = function () {

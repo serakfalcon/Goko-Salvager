@@ -66,13 +66,19 @@
     # has to load external version.
     :jslib => [
         'jquery.ui.js',
-        'angular.min.js'
+        'angular.min.js',
+        'load-image.min.js',
+        'jquery.fileupload.js',
+        'jquery.fileupload-process.js',
+        'jquery.fileupload-image.js',
+        'jquery.fileupload-validate.js'
     ],
 
     # JS scripts for Goko to load, in order
     :js => [
         'init.js',
         'utils.js',
+        'avatarUpload.js',
         'settingsDialog.js',
         'eventLogger.js',
         'notifications.js',

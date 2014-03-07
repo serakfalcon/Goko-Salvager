@@ -1,5 +1,5 @@
 /*jslint browser:true, devel:true, white:true, vars:true, forin:true */
-/*globals $, angular, GS */
+/*globals $, angular, GS, mtgRoom */
 
 (function () {
     "use strict";
@@ -10,6 +10,7 @@
     var modNames = [
         'wsConnection',
         'avatars',
+        'avatarUpload',
         'settingsDialog',
         //'eventLogger',
         'notifications',
@@ -38,8 +39,9 @@
         var failCount = 0;
         var mod = GS.modules[modNames[i]];
         var missing = mod.getMissingDeps();
+
         if (missing.length === 0) {
-            console.log('Starting module ' + mod.name);
+            console.log('Loading module ' + mod.name);
             mod.load();
             i += 1;
             if (i !== modNames.length) {
@@ -50,7 +52,7 @@
                 var missing = mod.getMissingDeps();
                 if (missing.length === 0) {
                     clearInterval(intvl);
-                    console.log('Starting module ' + mod.name);
+                    console.log('Loading module ' + mod.name);
                     mod.load();
                     i += 1;
                     if (i !== modNames.length) {
@@ -65,6 +67,8 @@
                     if (failCount === 120) {
                         alert('Goko Salvager could not load. Module ' + mod.name
                             + ' could not find its Goko object dependencies.');
+                        console.log('Goko Salvager could not load. Module ' + mod.name
+                                  + ' could not find its Goko object dependencies.');
                     }
                 }
             }, 500);
