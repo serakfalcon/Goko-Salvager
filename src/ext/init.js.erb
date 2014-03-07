@@ -97,7 +97,7 @@
                     try {
                         dep = depName.split('.').reduce(index, window);
                     } catch (e) {
-                        return false;
+                        return true;
                     }
                 }
                 return typeof dep === 'undefined' || dep === null;
