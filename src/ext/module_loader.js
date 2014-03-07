@@ -58,14 +58,14 @@
                     }
                 } else {
                     failCount += 1;
-                    if (failCount % 60 === 0) {
+                    if (failCount === 20) {
                         console.log('Module ' + mod.name + ' is missing dependencies:');
                         console.log(missing);
                     }
-                    //if (failCount === 300) {
-                    //    alert('Goko Salvager could not load. Module ' + mod.name
-                    //        + ' could not find its Goko object dependencies.');
-                    //}
+                    if (failCount === 120) {
+                        alert('Goko Salvager could not load. Module ' + mod.name
+                            + ' could not find its Goko object dependencies.');
+                    }
                 }
             }, 500);
         }
