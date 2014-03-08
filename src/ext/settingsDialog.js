@@ -1,5 +1,5 @@
-/*jslint browser:true, devel:true, es5:true, nomen:true */
-/*globals $, angular, GS, FS, mtgRoom */
+/*jslint browser:true, devel:true, es5:true, nomen:true, forin:true */
+/*globals $, _, angular, GS, FS */
 
 (function () {
     "use strict";
@@ -10,8 +10,8 @@
         'angular',
         '#viewport',
         '.fs-rs-logout-row',
-        'mtgRoom',
         'FS',
+        'GS.WS',
         'FS.LaunchScreen.View.Container'
     ];
     GS.modules.settingsDialog.load = function () {
@@ -27,7 +27,7 @@
                         .append($('<li><a href="#settingsTabs-lobby">Lobby</a></li>'))
                         .append($('<li><a href="#settingsTabs-game">Game</a></li>'))
                         .append($('<li><a href="#settingsTabs-black">Blacklist</a></li>'))
-                        .append($('<li><a href="#settingsTabs-misc">misc</a></li>')))
+                        .append($('<li><a href="#settingsTabs-misc">Misc</a></li>')))
                     .append($('<div id="settingsTabs-game">'))
                     .append($('<div id="settingsTabs-black">'))
                     .append($('<div id="settingsTabs-lobby">'))
@@ -59,33 +59,61 @@
             .append('Stack duplicate cards<br>');
 
         $('#settingsTabs-black')
-            .append('Blacklist (noplay + censor):<br>')
-            .append($('<table>').addClass('indented')
+            .append('Blacklist')
+            .append($('<table style="table-layout:fixed">').addClass('indented')
                 .append($('<tbody>')
-                    .append($('<tr>').attr('ng-repeat', 'pname in so.blacklist')
-                        .append($('<td>').css('color', 'red')
-                                         .attr('ng-click', 'blRemove(pname)')
-                                         .text('X'))
-                        .append($('<td>').text('{{pname}}')))))
-            .append($('<form>').attr('ng-submit', 'blAdd()')
-                               .addClass('indented')
-                .append('Add:')
-                .append($('<input>').attr('type', 'text')
-                                    .attr('ng-model', 'newBlacklistee')))
+                    .append($('<tr>')
+                        .append($('<td width="50%">').text('Player'))
+                        .append($('<td width="15%">').text('Kick'))
+                        .append($('<td width="15%">').text('NoAM'))
+                        .append($('<td width="15%">').text('Censor'))
+                        .append($('<td width="5%">')))
+                    .append($('<tr ng-repeat="(pname, o) in so.blacklist2">')
+                        .append($('<td>').text('{{pname}}'))
+                        .append($('<td>')
+                            .append($('<input type="checkbox" ng-model="o.noplay">')))
+                        .append($('<td>')
+                            .append($('<input type="checkbox" ng-model="o.nomatch">')))
+                        .append($('<td>')
+                            .append($('<input type="checkbox" ng-model="o.censor">')))
+                        .append($('<td>')
+                            .append($('<button ng-click="bldel(pname)">').append('Del'))))
+                    .append($('<tr>')
+                        .append($('<td>')
+                            .append($('<input type="text" ng-model="blnewpname">')))
+                        .append($('<td>')
+                            .append($('<input>').attr('type', 'checkbox')
+                                                .attr('ng-model', 'blnew.noplay')
+                                                .attr('ng-disabled', 'bladdDisable()')))
+                        .append($('<td>')
+                            .append($('<input>').attr('type', 'checkbox')
+                                                .attr('ng-model', 'blnew.nomatch')
+                                                .attr('ng-disabled', 'bladdDisable()')))
+                        .append($('<td>')
+                            .append($('<input>').attr('type', 'checkbox')
+                                                .attr('ng-model', 'blnew.censor')
+                                                .attr('ng-disabled', 'bladdDisable()')))
+                        .append($('<td>')
+                            .append($('<button>').attr('ng-click', 'bladd()')
+                                                 .attr('ng-disabled', 'bladdDisable()')
+                                .append('Add'))))))
 
-            .append('Automatch Blacklist (no-automatch):<br>')
-            .append($('<table>').addClass('indented')
-                .append($('<tbody>')
-                    .append($('<tr>').attr('ng-repeat', 'pname in so.automatch_blacklist')
-                        .append($('<td>').css('color', 'red')
-                                         .attr('ng-click', 'amblRemove(pname)')
-                                         .text('X'))
-                        .append($('<td>').text('{{pname}}')))))
-            .append($('<form>').attr('ng-submit', 'amblAdd()')
-                               .addClass('indented')
-                .append('Add:')
-                .append($('<input>').attr('type', 'text')
-                                    .attr('ng-model', 'newAMBlacklistee')));
+            .append($('<div>')
+                .append('Options:<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.blacklist_common')
+                                    .addClass('indented'))
+                .append('Also use community blacklist <br>')
+    
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.blacklist_store')
+                                    .addClass('indented'))
+                .append('Store my list online<br>')
+    
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.blacklist_share')
+                                    .addClass('indented'))
+                .append('Add my list to community<br>'));
 
         $('#settingsTabs-lobby')
                 .append($('<div>').text('Notifications:'))
@@ -158,12 +186,12 @@
         // Make dialog into a JQueryUI popup
         $('#settingsDialog').dialog({
             modal: true,
-            width: 550,
+            width: 700,
             maxHeight: $(window).height(),
             closeText: 'Save',
             draggable: true,
             resizeable: false,
-            position: { my: "center", at: "center", of: window },
+            position: { my: "center top", at: "center top", of: window },
             autoOpen: false
         });
 
@@ -173,30 +201,36 @@
                 {name: 'casual'},
                 {name: 'unrated'},
             ];
+            $scope.blnew = {
+                noplay: true,
+                nomatch: true,
+                censor: true
+            };
+            $scope.blnewpname = '';
             $scope.so = GS.get_options();
-            $scope.blAdd = function () {
-                if ($scope.newBlacklistee) {
-                    $scope.so.blacklist.push($scope.newBlacklistee);
-                    $scope.newBlacklistee = '';
+
+            $scope.bldel = function (pname) {
+                delete $scope.so.blacklist2[pname];
+            };
+            $scope.bladdDisable = function () {
+                return $scope.blnewpname === '';
+            }
+            $scope.bladd = function () {
+                if ($scope.blnewpname !== '') {
+                    $scope.so.blacklist2[$scope.blnewpname] = {
+                        noplay: $scope.blnew.noplay,
+                        nomatch: $scope.blnew.nomatch,
+                        censor: $scope.blnew.censor
+                    }
+                    $scope.blnew = {
+                        noplay: true,
+                        nomatch: true,
+                        censor: true
+                    }
                 }
+                $scope.blnewpname = '';
             };
-            $scope.blRemove = function (pname) {
-                $scope.so.blacklist = $scope.so.blacklist.filter(function (pn) {
-                    return pn !== pname;
-                });
-            };
-            $scope.amblAdd = function () {
-                if ($scope.newAMBlacklistee) {
-                    $scope.so.automatch_blacklist.push($scope.newAMBlacklistee);
-                    $scope.newAMBlacklistee = '';
-                }
-            };
-            $scope.amblRemove = function (pname) {
-                $scope.so.automatch_blacklist =
-                    $scope.so.automatch_blacklist.filter(function (pn) {
-                        return pn !== pname;
-                    });
-            };
+
             $scope.$watch('so.vp_refuse', function () {
                 $scope.so.vp_request = $scope.so.vp_request && !$scope.so.vp_refuse;
             });
@@ -209,6 +243,14 @@
             $scope.$watch('so.vp_request', function () {
                 $scope.so.vp_refuse = $scope.so.vp_refuse && !$scope.so.vp_request;
             });
+            $scope.$watch('so.blacklist_share', function () {
+                $scope.so.blacklist_store =
+                    $scope.so.blacklist_share || $scope.so.blacklist_store;
+            });
+            $scope.$watch('so.blacklist_store', function () {
+                $scope.so.blacklist_share =
+                    $scope.so.blacklist_share && $scope.so.blacklist_store;
+            });
             $scope.$watch('so.desktop_notifications', function () {
                 $scope.so.popup_notifications =
                     $scope.so.popup_notifications && !$scope.so.desktop_notifications;
@@ -217,6 +259,7 @@
                 $scope.so.desktop_notifications =
                     $scope.so.desktop_notifications && !$scope.so.popup_notifications;
             });
+
             $scope.$watch('so', function () {
                 GS.set_options($scope.so);
             }, true);
