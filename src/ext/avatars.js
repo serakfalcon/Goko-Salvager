@@ -19,16 +19,19 @@
         // Goko's default avatar loader and our replacement function
         gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
         gsAvatarLoader = function (playerid, size, callback) {
+            // NOTE: there is no need for image-resizing code that used to be
+            //       here.  The Goko framework will resize as necessary.
             var img = new Image();
 
             img.onerror = function () {
-                // Defer to retrobox if GokoSalvager fails
+                // Defer to retrobox if GokoSalvager is offline
                 retroboxAvatarLoader(playerid, size, callback);
             };
 
             img.crossOrigin = "Anonymous";
-            img.src = "https://www.andrewiannaccone.com:8889/"
-                    + "avatars/" + playerid + ".jpg";
+            // TODO: Switch from port 8889 back to 443 after server transition
+            img.src = "https://gokosalvager.com:8889/"
+                    + "gs/avatars/" + playerid + ".jpg";
             callback({
                 playerid: playerid,
                 image: img
@@ -50,8 +53,15 @@
             });
         };
 
-        // Let goko provide the large sized and non-custom avatars.
-        // Ask gokosalvager.com to provide small and medium sized custom avatars.
+        // Prevent the billions of 404 CORS and mixed content errors that
+        // loading avatars from retrobox causes:
+        // 1. Use the GS websocket to ask whether a custom avatar exists.
+        // 2a. Look up a custom avatar from GS via https
+        // 2b. Look up a vanilla avatar using the regular goko method
+        // 
+        // Goko should also provide any large (size >= 3) versions of the
+        // avatars, even if a custom one is available.
+        //
         // NOTE: The 'size' argument used to be called 'which'
         var SMALL = 1, MEDIUM = 2;
         FS.AvatarHelper.loadAvatarImage = function (playerid, size, callback) {

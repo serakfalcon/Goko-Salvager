@@ -23,9 +23,10 @@
 
         // Connection variables
         GS.WS = {};
-        GS.WS.domain = 'andrewiannaccone.com';
-        GS.WS.port = 8889;
-        GS.WS.url = "wss://" + GS.WS.domain + ":" + GS.WS.port + "/gs/wsConn";
+        GS.WS.domain = 'gokosalvager.com';
+        GS.WS.port = 8889;  // TODO: Switch from port 8889 back to 443 after 
+                            //       server transition
+        GS.WS.url = "wss://" + GS.WS.domain + ":" + GS.WS.port + "/gs/websocket";
         GS.WS.noreconnect = false;
         GS.WS.maxFails = 36;
         GS.WS.failCount = 0;

@@ -23,7 +23,8 @@
             GS.AM.wsMaxFails = 100;
         
             // Use secure websockets
-            GS.AM.server_url = 'wss://andrewiannaccone.com/automatch';
+            // TODO: switch from 8889 back to 443 port after transition
+            GS.AM.server_url = 'wss://gokosalvager.com:8889/automatch';
         
             // Initial state
             automatchInitStarted = false;

@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.4.3',
+    :version => '2.5.1',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -62,12 +62,12 @@
         'images/ui-bg_fine-grain_10_c3c3c3_60x60.png'
     ],
 
-    # Internally-stored versions, so be loaded by Chrome and Firefox. Safari
-    # has to load external version.
+    # Internally-stored versions, to be loaded by Chrome and Firefox. Safari
+    # has to load external versions, so add links to src/ext/safari_libs.js
     :jslib => [
         'jquery.ui.js',
         'angular.min.js',
-        'load-image.min.js',
+        'load-image.js',
         'jquery.fileupload.js',
         'jquery.fileupload-process.js',
         'jquery.fileupload-image.js',
