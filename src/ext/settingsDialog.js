@@ -200,6 +200,12 @@
             $scope.$watch('so.vp_refuse', function () {
                 $scope.so.vp_request = $scope.so.vp_request && !$scope.so.vp_refuse;
             });
+            $scope.$watch('so.sidebar', function () {
+                $scope.so.sidebar_chat = $scope.so.sidebar_chat && $scope.so.sidebar;
+            });
+            $scope.$watch('so.sidebar_chat', function () {
+                $scope.so.sidebar = $scope.so.sidebar_chat || $scope.so.sidebar;
+            });
             $scope.$watch('so.vp_request', function () {
                 $scope.so.vp_refuse = $scope.so.vp_refuse && !$scope.so.vp_request;
             });
