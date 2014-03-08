@@ -67,11 +67,6 @@
     :jslib => [
         'jquery.ui.js',
         'angular.min.js',
-        'load-image.js',
-        'jquery.fileupload.js',
-        'jquery.fileupload-process.js',
-        'jquery.fileupload-image.js',
-        'jquery.fileupload-validate.js'
     ],
 
     # JS scripts for Goko to load, in order
