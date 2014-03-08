@@ -29,7 +29,7 @@
                 .append($('<div>').addClass('fs-lg-settings-btn')
                                   .text(' '))
                 .append($('<div>').addClass('fs-lg-settings-btn')
-                                  .text('Salvager v2.4.3'));
+                                  .text('Salvager v' + GS.version));
 
             // Add link to update avatar
             var openAvatarDialog = function () {

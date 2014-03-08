@@ -10,7 +10,8 @@
     // Global namespace
     // TODO: deal with possibility that a modules runs before this code
     var GS = window.GS = {
-        modules: {}
+        modules: {},
+        version: '<%= config[:version] %>'
     };
 
     var default_options = {
