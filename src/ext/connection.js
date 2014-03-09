@@ -1,5 +1,5 @@
 /*jslint browser: true, devel: true, indent: 4, maxlen: 90, es5: true, vars:true, white:true, nomen:true */
-/*global $, _, WebSocket, GS */
+/*global $, _, WebSocket, GS, mtgRoom */
 
 // Create a single WebSocket connection to gokosalvager.com
 //
@@ -15,8 +15,14 @@
     "use strict";
 
     var mod = GS.modules.wsConnection = new GS.Module('WS Connection');
-    mod.dependencies = ['GS'];
+    mod.dependencies = [
+        'GS',
+        'mtgRoom.conn.connInfo.playerId',
+        'mtgRoom.conn.connInfo.playerName',
+        'mtgRoom.conn.connInfo.playerPoolId'
+    ];
     mod.load = function () {
+
         var startPingLoop, handleDisconnect, updateWSIcon, confirmReceipt;
 
         console.log('Loading WS Connection module');
@@ -24,7 +30,7 @@
         // Connection variables
         GS.WS = {};
         GS.WS.domain = 'gokosalvager.com';
-        GS.WS.port = 8889;  // TODO: Switch from port 8889 back to 443 after 
+        GS.WS.port = 7889;  // TODO: Switch from port 8889 back to 443 after 
                             //       server transition
         GS.WS.url = "wss://" + GS.WS.domain + ":" + GS.WS.port + "/gs/websocket";
         GS.WS.noreconnect = false;
@@ -63,7 +69,8 @@
                 case 'REQUEST_CLIENT_INFO':
                     var info = {
                         username: 'TESTER',
-                        gsversion: 'v2.4.3'
+                        playerId: mtgRoom.conn.connInfo.playerId,
+                        gsversion: GS.version
                     };
                     GS.WS.sendMessage('CLIENT_INFO', info);
                     break;

@@ -12,43 +12,43 @@
     ];
     mod.load = function () {
 
-        // Cache of who has custom avatars: playerid --> true/false
+        // Cache of who has custom avatars: playerId --> true/false
         var gsAvatarLoader, retroboxAvatarLoader, gokoAvatarLoader;
         GS.hasAvatar = {};
 
         // Goko's default avatar loader and our replacement function
         gokoAvatarLoader = FS.AvatarHelper.loadAvatarImage;
-        gsAvatarLoader = function (playerid, size, callback) {
+        gsAvatarLoader = function (playerId, size, callback) {
             // NOTE: there is no need for image-resizing code that used to be
             //       here.  The Goko framework will resize as necessary.
             var img = new Image();
 
             img.onerror = function () {
                 // Defer to retrobox if GokoSalvager is offline
-                retroboxAvatarLoader(playerid, size, callback);
+                retroboxAvatarLoader(playerId, size, callback);
             };
 
             img.crossOrigin = "Anonymous";
             // TODO: Switch from port 8889 back to 443 after server transition
             img.src = "https://gokosalvager.com:8889/"
-                    + "gs/avatars/" + playerid + ".jpg";
+                    + "gs/avatars/" + playerId + ".jpg";
             callback({
-                playerid: playerid,
+                playerId: playerId,
                 image: img
             });
         };
-        retroboxAvatarLoader = function (playerid, size, callback) {
+        retroboxAvatarLoader = function (playerId, size, callback) {
             var img = new Image();
             img.onerror = function () {
                 // Defer to Goko if GokoSalvager fails
-                gokoAvatarLoader(playerid, size, callback);
+                gokoAvatarLoader(playerId, size, callback);
             };
-            img.src = "http://dom.retrobox.eu/avatars/" + playerid + ".png";
+            img.src = "http://dom.retrobox.eu/avatars/" + playerId + ".png";
             img.onerror = function () {
-                gokoAvatarLoader(playerid, size, callback);
+                gokoAvatarLoader(playerId, size, callback);
             };
             callback({
-                playerid: playerid,
+                playerId: playerId,
                 image: img
             });
         };
@@ -64,28 +64,28 @@
         //
         // NOTE: The 'size' argument used to be called 'which'
         var SMALL = 1, MEDIUM = 2;
-        FS.AvatarHelper.loadAvatarImage = function (playerid, size, callback) {
+        FS.AvatarHelper.loadAvatarImage = function (playerId, size, callback) {
             if (size > MEDIUM) {
-                gokoAvatarLoader(playerid, size, callback);
-            } else if (typeof GS.hasAvatar[playerid] !== 'undefined') {
-                if (GS.hasAvatar[playerid]) {
-                    gsAvatarLoader(playerid, size, callback);
+                gokoAvatarLoader(playerId, size, callback);
+            } else if (typeof GS.hasAvatar[playerId] !== 'undefined') {
+                if (GS.hasAvatar[playerId]) {
+                    gsAvatarLoader(playerId, size, callback);
                 } else {
-                    gokoAvatarLoader(playerid, size, callback);
+                    gokoAvatarLoader(playerId, size, callback);
                 }
             } else if (!GS.WS.isConnReady()) {
                 console.log('No connection to gokosalvager server.  '
-                          + 'Using non-custom avatar for player: ' + playerid);
-                gokoAvatarLoader(playerid, size, callback);
+                          + 'Using non-custom avatar for player: ' + playerId);
+                gokoAvatarLoader(playerId, size, callback);
             } else {
                 // Ask GS server whether custom avatar is available.
                 // Continue asynchronously by showing the avatar.
-                GS.WS.sendMessage('QUERY_AVATAR', {playerid: playerid}, function (resp) {
-                    GS.hasAvatar[playerid] = resp.available;
+                GS.WS.sendMessage('QUERY_AVATAR', {playerId: playerId}, function (resp) {
+                    GS.hasAvatar[playerId] = resp.available;
                     if (resp.available === true) {
-                        gsAvatarLoader(playerid, size, callback);
+                        gsAvatarLoader(playerId, size, callback);
                     } else {
-                        gokoAvatarLoader(playerid, size, callback);
+                        gokoAvatarLoader(playerId, size, callback);
                     }
                 });
             }
