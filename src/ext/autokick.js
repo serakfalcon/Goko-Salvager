@@ -95,7 +95,10 @@
                     playerAddress: joiner.get('playerAddress')
                 });
             } else {
-                GS.notifyUser('Opponent joined', new Audio('sounds/startTurn.ogg'));
+                if (!joiner.get('isBot')) {
+                    // TODO: make this work on Safari too
+                    GS.notifyUser('Opponent joined', new Audio('sounds/startTurn.ogg'));
+                }
             }
         };
     
