@@ -573,8 +573,13 @@
             };
         
             GS.AM.submitSeek = function (seek) {
-                seek.blacklist = _.union(GS.get_option('blacklist'),
-                        GS.get_option('automatch_blacklist'));
+                var blist = GS.get_option('blacklist');
+                seek.blacklist = [];
+                _.each(blist, function (pname) {
+                    if (blist[pname].nomatch) {
+                        seek.blacklist.push(pname);
+                    }
+                });
                 GS.AM.state.seek = seek;
                 GS.AM.ws.sendMessage('SUBMIT_SEEK', {seek: GS.AM.state.seek});
             };
