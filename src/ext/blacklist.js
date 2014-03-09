@@ -10,12 +10,12 @@
         FS.MeetingRoom.prototype.old_onRoomChat = FS.MeetingRoom.prototype.onRoomChat;
         FS.MeetingRoom.prototype.onRoomChat = function (resp) {
             var player = this.playerList.findByAddress(resp.data.playerAddress).getName();
-    
-            if (GS.get_option('blacklist').indexOf(player) > -1) {
-                return;
+
+            // Hide chat messages from censored players
+            var blist = GS.get_option('blacklist2');
+            if (typeof blist[player] === 'undefined' || !blist[player].censor) {
+                this.old_onRoomChat(resp);
             }
-    
-            this.old_onRoomChat(resp);
         };
     
         FS.ClassicTableView.prototype.old_modifyDOM = FS.ClassicTableView.prototype.modifyDOM;
@@ -25,21 +25,32 @@
             var players, name, blacklisted, localPlayerJoined;
     
             if (this.model && this.model.getJoinedPlayers) {
+
                 players = this.model.getJoinedPlayers();
+
                 _(players).each(function (player, index, list) {
                     name = player.getName();
-                    if (GS.get_option('blacklist').indexOf(name) > -1 && this.model && this.model.view && this.model.view.$el) {
+
+                    // Determine whether a blacklisted player is at the table
+                    var blist = GS.get_option('blacklist2');
+                    if (typeof blist[name] !== 'undefined' && !blist[name].noplay
+                            && this.model && this.model.view && this.model.view.$el) {
                         blacklisted = true;
                     }
+
+                    // Determine whether we're at the table
                     if (name === this.meetingRoom.getLocalPlayer().getName()) {
                         localPlayerJoined = true;
                     }
                 }, this);
     
                 if (blacklisted && !localPlayerJoined) {
+                    // Hide games with blacklisted players unless we're in them too
                     this.model.view.$el.hide();
                 } else if (blacklisted && localPlayerJoined) {
-                    GS.debug("Warning: in a game with a blacklisted player.");
+                    // This shouldn't happen: our game should kick the blacklisted
+                    // player, while his should be invisible to us.
+                    console.log("Error: in a game with a blacklisted player.");
                 }
             }
         };

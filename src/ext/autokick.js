@@ -76,12 +76,10 @@
             }
     
             // Kick players on my blacklist
-            var i, blackList = GS.get_option('blacklist');
-            for (i = 0; i < blackList.length; i += 1) {
-                if (blackList[i].toLowerCase() === hisName.toLowerCase()) {
-                    GS.debug(hisName + 'is on my blacklist... kicking');
-                    shouldKick = true;
-                }
+            var i, blist = GS.get_option('blacklist2');
+            if (typeof blist[hisName] !== 'undefined' && blist[hisName].noplay) {
+                GS.debug(hisName + 'is on my noplay blacklist... kicking');
+                shouldKick = true;
             }
     
             // Never kick bots

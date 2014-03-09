@@ -59,7 +59,10 @@
             .append('Stack duplicate cards<br>');
 
         $('#settingsTabs-black')
-            .append('Blacklist')
+            .append('Local Blacklist')
+            .append($('<button>').attr('ng-click', 'fetchBlacklist()')
+                                 .attr('ng-disable', 'isWSConnReady()')
+                .append('Fetch server version'))
             .append($('<table style="table-layout:fixed">').addClass('indented')
                 .append($('<tbody>')
                     .append($('<tr>')
@@ -191,7 +194,7 @@
             closeText: 'Save',
             draggable: true,
             resizeable: false,
-            position: { my: "center top", at: "center top", of: window },
+            position: { my: "center", at: "center", of: window },
             autoOpen: false
         });
 
@@ -209,24 +212,33 @@
             $scope.blnewpname = '';
             $scope.so = GS.get_options();
 
+            $scope.isWSConnReady = function () {
+                return GS.WS.isConnReady();
+            };
+            $scope.fetchBlacklist = function () {
+                GS.WS.sendMessage('QUERY_BLACKLIST', {}, function (blacklist) {
+                    console.log(blacklist);
+                });
+            };
+
             $scope.bldel = function (pname) {
                 delete $scope.so.blacklist2[pname];
             };
             $scope.bladdDisable = function () {
                 return $scope.blnewpname === '';
-            }
+            };
             $scope.bladd = function () {
                 if ($scope.blnewpname !== '') {
                     $scope.so.blacklist2[$scope.blnewpname] = {
                         noplay: $scope.blnew.noplay,
                         nomatch: $scope.blnew.nomatch,
                         censor: $scope.blnew.censor
-                    }
+                    };
                     $scope.blnew = {
                         noplay: true,
                         nomatch: true,
                         censor: true
-                    }
+                    };
                 }
                 $scope.blnewpname = '';
             };

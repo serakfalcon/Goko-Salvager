@@ -36,7 +36,12 @@
                     if (GS.get_option('sortrating')) {
                         insertInPlace(playerElement);
                     }
-                    if (GS.get_option('blacklist').indexOf(playerElement.querySelector('.fs-mtrm-player-name>strong').innerHTML) > -1) {
+                    
+                    // Don't show blacklisted players on the player list
+                    var blist = GS.get_option('blacklist2');
+                    var pname = playerElement
+                        .querySelector('.fs-mtrm-player-name>strong').innerHTML;
+                    if (typeof blist[pname] !== 'undefined' && blist[pname].censor) {
                         $(playerElement).hide();
                     } else {
                         $(playerElement).show();
