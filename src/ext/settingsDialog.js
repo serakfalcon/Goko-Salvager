@@ -1,4 +1,4 @@
-/*jslint browser:true, devel:true, es5:true, nomen:true, forin:true */
+/*jslint browser:true, devel:true, es5:true, nomen:true, forin:true, vars:true */
 /*globals $, _, angular, GS, FS, mtgRoom */
 
 (function () {
@@ -59,10 +59,7 @@
             .append('Stack duplicate cards<br>');
 
         $('#settingsTabs-black')
-            .append('Local Blacklist')
-            .append($('<button>').attr('ng-click', 'fetchBlacklist()')
-                                 .attr('ng-disable', 'isWSConnReady()')
-                .append('Fetch server version'))
+            .append('My Blacklist:<br>')
             .append($('<table style="table-layout:fixed">').addClass('indented')
                 .append($('<tbody>')
                     .append($('<tr>')
@@ -101,22 +98,18 @@
                                                  .attr('ng-disabled', 'bladdDisable()')
                                 .append('Add'))))))
 
+            .append($('<br>'))
             .append($('<div>')
-                .append('Options:<br>')
-                .append($('<input>').attr('type', 'checkbox')
-                                    .attr('ng-model', 'so.blacklist_common')
-                                    .addClass('indented'))
-                .append('Also use community blacklist <br>')
-    
-                .append($('<input>').attr('type', 'checkbox')
-                                    .attr('ng-model', 'so.blacklist_store')
-                                    .addClass('indented'))
-                .append('Store my list online<br>')
-    
-                .append($('<input>').attr('type', 'checkbox')
-                                    .attr('ng-model', 'so.blacklist_share')
-                                    .addClass('indented'))
-                .append('Add my list to community<br>'));
+                .append('Common Blacklist:<br><br>')
+
+                .append($('<div>').addClass('indented')
+                    .append('Also blacklist the ')
+                    .append($('<select>').attr('ng-model',
+                                              'so.blacklist_common')
+                                        .attr('ng-options',
+                                              's for s in blacklist_strengths'))
+                    .append('% most-commonly blacklisted players')));
+
 
         $('#settingsTabs-lobby')
                 .append($('<div>').text('Notifications:'))
@@ -185,6 +178,48 @@
             .append('Extra logging (for error reports)<br>');
 
         $('#settingsTabs').tabs();
+        $('#settingsTabs').on("tabsactivate", function (event, ui) {
+            if (ui.newTab[0].innerText === 'Blacklist') {
+                GS.WS.sendMessage('QUERY_BLACKLIST', {}, function (resp) {
+                    var serverlist = resp.blacklist;
+                    var locallist = GS.get_option('blacklist2');
+                    if (!_.isEqual(locallist, serverlist)) {
+                        $('<div id="blmergeConfirm" title="Merge blacklists?">')
+                            .append("Your local blacklist differs from the version "
+                                  + "stored at " + GS.WS.domain + ".  Which version "
+                                  + "do you want to keep?")
+                            .dialog({
+                                resizeable: false,
+                                height: 250,
+                                width: 500,
+                                modal: true,
+                                buttons: {
+                                    "Local Version": function () {
+                                        GS.set_options(GS.get_options());
+                                        $('#blmergeConfirm').dialog('close');
+                                    },
+                                    "Server Version": function () {
+                                        GS.set_option('blacklist2', serverlist);
+                                        $('#blmergeConfirm').dialog('close');
+                                    },
+                                    "Merge Them": function () {
+                                        _.each(serverlist, function (pname) {
+                                            locallist[pname] = serverlist[pname];
+                                        });
+                                        $('#blmergeConfirm').dialog('close');
+                                    },
+                                    "Huh?": function () {
+                                        console.log('TODO: link to docs');
+                                    }
+                                }
+                            });
+                    }
+                });
+            }
+        });
+        // Override goko's select-hiding CSS nonsense
+        $('#settingsTabs select').css('visibility', 'inherit');
+        $('#settingsTabs select').css('top', 'auto');
 
         // Make dialog into a JQueryUI popup
         $('#settingsDialog').dialog({
@@ -204,22 +239,16 @@
                 {name: 'casual'},
                 {name: 'unrated'},
             ];
+            $scope.blnewpname = '';
             $scope.blnew = {
                 noplay: true,
                 nomatch: true,
                 censor: true
             };
-            $scope.blnewpname = '';
+            $scope.blacklist_strengths = [
+                0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+            ];
             $scope.so = GS.get_options();
-
-            $scope.isWSConnReady = function () {
-                return GS.WS.isConnReady();
-            };
-            $scope.fetchBlacklist = function () {
-                GS.WS.sendMessage('QUERY_BLACKLIST', {}, function (blacklist) {
-                    console.log(blacklist);
-                });
-            };
 
             $scope.bldel = function (pname) {
                 delete $scope.so.blacklist2[pname];
@@ -254,14 +283,6 @@
             });
             $scope.$watch('so.vp_request', function () {
                 $scope.so.vp_refuse = $scope.so.vp_refuse && !$scope.so.vp_request;
-            });
-            $scope.$watch('so.blacklist_share', function () {
-                $scope.so.blacklist_store =
-                    $scope.so.blacklist_share || $scope.so.blacklist_store;
-            });
-            $scope.$watch('so.blacklist_store', function () {
-                $scope.so.blacklist_share =
-                    $scope.so.blacklist_share && $scope.so.blacklist_store;
             });
             $scope.$watch('so.desktop_notifications', function () {
                 $scope.so.popup_notifications =
