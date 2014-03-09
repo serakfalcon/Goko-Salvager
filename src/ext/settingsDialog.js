@@ -12,7 +12,9 @@
         '.fs-rs-logout-row',
         'FS',
         'GS.WS',
-        'FS.LaunchScreen.View.Container'
+        'FS.LaunchScreen.View.Container',
+        'GS.storeBlacklistOnline',
+        'GS.fetchBlacklistOnline'
     ];
     GS.modules.settingsDialog.load = function () {
 
@@ -32,6 +34,11 @@
                     .append($('<div id="settingsTabs-black">'))
                     .append($('<div id="settingsTabs-lobby">'))
                     .append($('<div id="settingsTabs-misc">'))));
+
+        // Display dialog sections as tabs
+        $('#settingsTabs').tabs();
+
+        // Define the dialog sections: game, lobby, blacklist, misc
 
         $('#settingsTabs-game')
             .append($('<div>').text('In-game sidebar'))
@@ -181,46 +188,124 @@
                                 .attr('ng-model', 'so.debug_mode'))
             .append('Extra logging (for error reports)<br>');
 
-        $('#settingsTabs').tabs();
-        $('#settingsTabs').on("tabsactivate", function (event, ui) {
-            if (ui.newTab[0].innerText === 'Blacklist') {
-                GS.WS.sendMessage('QUERY_BLACKLIST', {}, function (resp) {
-                    var serverlist = resp.blacklist;
-                    var locallist = GS.get_option('blacklist2');
-                    if (!_.isEqual(locallist, serverlist)) {
-                        $('<div id="blmergeConfirm" title="Merge blacklists?">')
-                            .append("Your local blacklist differs from the version "
-                                  + "stored at " + GS.WS.domain + ".  Which version "
-                                  + "do you want to keep?")
-                            .dialog({
-                                resizeable: false,
-                                height: 250,
-                                width: 500,
-                                modal: true,
-                                buttons: {
-                                    "Local Version": function () {
-                                        GS.set_options(GS.get_options());
-                                        $('#blmergeConfirm').dialog('close');
-                                    },
-                                    "Server Version": function () {
-                                        GS.set_option('blacklist2', serverlist);
-                                        $('#blmergeConfirm').dialog('close');
-                                    },
-                                    "Merge Them": function () {
-                                        _.each(serverlist, function (pname) {
-                                            locallist[pname] = serverlist[pname];
-                                        });
-                                        $('#blmergeConfirm').dialog('close');
-                                    },
-                                    "Huh?": function () {
-                                        console.log('TODO: link to docs');
-                                    }
-                                }
+        var submitBlacklist, serverBlacklist;
+
+        var didVerifyBlacklist;
+        var createBlacklistResolveDialog = function () {
+            $('<div>').attr('id', 'blResolve')
+                      .attr('title', 'Blacklist Conflict')
+                .append("Warning: Your local blacklist is out of sync with "
+                      + "the version stored at " + GS.WS.domain + ".  The "
+                      + "most likely reason is that you're logging in from "
+                      + "a different browser.  How do you want to resolve "
+                      + "the conflict?")
+                .dialog({
+                    resizeable: false,
+                    height: 250,
+                    width: 500,
+                    modal: true,
+                    autoOpen: false,
+                    buttons: {
+                        "Keep Local Version": function () {
+                            GS.set_options(GS.get_options());
+                            submitBlacklist(function () {
+                                $('#blResolve').dialog('close');
+                                didVerifyBlacklist = true;
                             });
+                        },
+                        "Keep Server Version": function () {
+                            // TODO: make this change appear (angularJS issue)
+                            GS.set_option('blacklist2', serverBlacklist);
+                            $('#blResolve').dialog('close');
+                            didVerifyBlacklist = true;
+                        },
+                        "Keep Both (Merge Them)": function () {
+                            // TODO: make this change appear (angularJS issue)
+                            var locallist = GS.get_option('blacklist2');
+                            _.each(serverBlacklist, function (pname) {
+                                locallist[pname] = serverBlacklist[pname];
+                            });
+                            GS.set_option('blacklist2', locallist);
+                            $('#blResolve').dialog('close');
+                            didVerifyBlacklist = true;
+                        }
                     }
                 });
+        };
+
+        var resolveBlacklistConflict = function (locallist, serverBlacklistNew) {
+            serverBlacklist = serverBlacklistNew;
+            if ($('#blResolve').length === 0) {
+                createBlacklistResolveDialog();
+            }
+            $('#blResolve').dialog('open');
+        };
+
+        var verifyBlacklist = function () {
+            GS.WS.sendMessage('QUERY_BLACKLIST', {}, function (resp) {
+                if (resp === null) {
+                    console.log("Cannot compare blacklists: no GS connection");
+                    didVerifyBlacklist = false;
+                } else {
+                    var serverlist = resp.blacklist;
+                    var locallist = GS.get_option('blacklist2');
+
+                    var equal = true;
+                    _.keys(locallist).map(function (pname) {
+                        if (!serverlist.hasOwnProperty(pname)
+                                || serverlist[pname].noplay !== locallist[pname].noplay
+                                || serverlist[pname].nomatch !== locallist[pname].nomatch
+                                || serverlist[pname].censor !== locallist[pname].censor) {
+                            equal = false;
+                        }
+                    });
+                    _.keys(serverlist).map(function (pname) {
+                        if (!locallist.hasOwnProperty(pname)
+                                || locallist[pname].noplay !== serverlist[pname].noplay
+                                || locallist[pname].nomatch !== serverlist[pname].nomatch
+                                || locallist[pname].censor !== serverlist[pname].censor) {
+                            equal = false;
+                        }
+                    });
+
+                    if (!equal) {
+                        resolveBlacklistConflict(locallist, serverlist);
+                    } else {
+                        didVerifyBlacklist = true;
+                    }
+
+                }
+            });
+        };
+
+        submitBlacklist = function () {
+            if (didVerifyBlacklist) {
+                // Normal situation. Save local blacklist to server.
+                GS.storeBlacklistOnline(GS.get_option('blacklist2'), false);
+            } else {
+                // Failed to sync blacklists when this dialog was opened.
+                // Perform a blacklist merge just to be safe
+                GS.storeBlacklistOnline(GS.get_option('blacklist2'), true);
+            }
+        };
+
+        // Verify blacklist when opening Blacklist tab.  Save on close.
+        $('#settingsTabs').on("tabsactivate", function (event, ui) {
+            if (ui.newTab[0].innerText === 'Blacklist') {
+                // Compare local and server lists when opening Blacklist tab
+                verifyBlacklist();
+            } else if (ui.oldTab[0].innerText === 'Blacklist') {
+                // Save local lists when closing Blacklist tab
+                submitBlacklist();
             }
         });
+
+        // Also save blacklist when settings dialog is closed. No need to
+        // verify when dialog reopened though, even if Blacklist tab is open.
+        $('#settingsDialog').on("dialogclose", function (event, ui) {
+            submitBlacklist();
+        });
+
         // Override goko's select-hiding CSS nonsense
         $('#settingsTabs select').css('visibility', 'inherit');
         $('#settingsTabs select').css('top', 'auto');

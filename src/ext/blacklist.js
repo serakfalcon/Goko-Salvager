@@ -17,7 +17,7 @@
                 this.old_onRoomChat(resp);
             }
         };
-    
+
         FS.ClassicTableView.prototype.old_modifyDOM = FS.ClassicTableView.prototype.modifyDOM;
         FS.ClassicTableView.prototype.modifyDOM = function () {
             FS.ClassicTableView.prototype.old_modifyDOM.call(this);
@@ -51,6 +51,38 @@
                     // This shouldn't happen: our game should kick the blacklisted
                     // player, while his should be invisible to us.
                     console.log("Error: in a game with a blacklisted player.");
+                }
+            }
+        };
+
+        GS.fetchBlacklistOnline = function (callback) {
+            // Try to send blacklist to gokosalvager
+            if (GS.WS.isConnReady()) {
+                GS.WS.sendMessage('QUERY_BLACKLIST', {}, callback);
+            }
+
+            console.log('No connection to ' + GS.WS.domain + '.  '
+                      + 'Cannot submit blacklist.');
+            callback(null);
+        };
+
+        GS.storeBlacklistOnline = function (blist, merge, callback) {
+            // First delete the angularJS display hash keys
+            _.keys(blist).map(function (pname) {
+                delete blist[pname].$$hashKey;
+            });
+
+            // Try to send blacklist to gokosalvager
+            if (GS.WS.isConnReady()) {
+                GS.WS.sendMessage('SUBMIT_BLACKLIST', {
+                    blacklist: blist,
+                    merge: merge
+                }, callback);
+            } else {
+                console.log('No connection to ' + GS.WS.domain + '.  '
+                          + 'Cannot submit blacklist.');
+                if (typeof callback !== 'undefined') {
+                    callback(null);
                 }
             }
         };

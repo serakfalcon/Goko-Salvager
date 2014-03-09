@@ -83,9 +83,6 @@
                 out[optName] = default_options[optName];
             }
         }
-
-        // TODO: fetch blacklist from online storage <?>
-
         if (out.hasOwnProperty('blacklist')
                 || out.hasOwnProperty('automatch_blacklist')) {
             transformBlacklist(out);
@@ -94,22 +91,6 @@
     };
 
     GS.set_options = function (o) {
-        // Store blacklist online as well as in local storage
-        console.log(o.blacklist2);
-        _.keys(o.blacklist2).map(function (pname) {
-            delete o.blacklist2[pname].$$hashKey;
-        });
-        console.log(o.blacklist2);
-
-        if (GS.WS.isConnReady()) {
-            GS.WS.sendMessage('SUBMIT_BLACKLIST', {
-                share: o.blacklist_share,
-                blacklist: o.blacklist2
-            });
-        } else {
-            console.log('No connection to ' + GS.WS.domain + '.  '
-                      + 'Cannot submit blacklist.');
-        }
         localStorage.salvagerOptions = JSON.stringify(o);
     };
 
