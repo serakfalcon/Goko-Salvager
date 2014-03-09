@@ -68,7 +68,7 @@
                 switch (d.msgtype) {
                 case 'REQUEST_CLIENT_INFO':
                     var info = {
-                        username: mtgRoom.conn.connInfo.playername,
+                        playerName: mtgRoom.conn.connInfo.playerName,
                         playerId: mtgRoom.conn.connInfo.playerId,
                         gsversion: GS.version
                     };
