@@ -40,7 +40,7 @@
 
             GS.WS.conn.onopen = function () {
                 console.log('Connected to ' + GS.WS.domain);
-                GS.WS.FailCount = 0;
+                GS.WS.failCount = 0;
                 updateWSIcon();
                 startPingLoop();
             };
@@ -150,10 +150,10 @@
         handleDisconnect = function () {
             // Update state
             GS.state = {seek: null, offer: null, game: null};
-            GS.WS.FailCount += 1;
+            GS.WS.failCount += 1;
 
             console.log('Connection to ' + GS.WS.domain + ' lost: '
-                      + GS.WS.FailCount + '/' + GS.WS.maxFails);
+                      + GS.WS.failCount + '/' + GS.WS.maxFails);
 
             // Update UI
             updateWSIcon();
