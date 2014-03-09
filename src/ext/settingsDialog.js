@@ -1,5 +1,5 @@
 /*jslint browser:true, devel:true, es5:true, nomen:true, forin:true */
-/*globals $, _, angular, GS, FS */
+/*globals $, _, angular, GS, FS, mtgRoom */
 
 (function () {
     "use strict";
@@ -10,11 +10,20 @@
         'angular',
         '#viewport',
         '.fs-rs-logout-row',
+        'mtgRoom.conn.connInfo.playerId',
+        'mtgRoom.conn.connInfo.playerName',
+        'mtgRoom.conn.connInfo.playerPoolId',
         'FS',
         'GS.WS',
         'FS.LaunchScreen.View.Container'
     ];
     GS.modules.settingsDialog.load = function () {
+
+        // TODO: put this stuff somehwere more sensible
+        // TODO: make sure that this info gets refreshed if a new player logs in
+        GS.playerId = mtgRoom.conn.connInfo.playerId;
+        GS.playerName = mtgRoom.conn.connInfo.playerName;
+        GS.playerPoolId = mtgRoom.conn.connInfo.playerPoolId;
 
         // Create dialog
         $('#viewport')
