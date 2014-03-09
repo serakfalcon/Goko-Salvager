@@ -81,7 +81,9 @@
             this.alreadyResponded = false;
             
             if (this.isMultiplayer()) {
-                GS.sendRoomChat('I have joined the game.');
+                if (GS.get_option('greeting').length > 0) {
+                    GS.sendRoomChat(GS.get_option('greeting'));
+                }
             }
 
             // Initialize toggle state and explain commands

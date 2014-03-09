@@ -56,7 +56,11 @@
 
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.always_stack'))
-            .append('Stack duplicate cards<br>');
+            .append('Stack duplicate cards<br>')
+
+            .append('Greeting Message')
+            .append($('<input>').attr('type', 'text')
+                                .attr('ng-model', 'so.greeting'));
 
         $('#settingsTabs-black')
             .append('My Blacklist:<br>')
