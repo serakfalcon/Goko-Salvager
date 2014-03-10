@@ -573,10 +573,10 @@
             };
         
             GS.AM.submitSeek = function (seek) {
-                var blist = GS.get_option('blacklist');
+                var blist = GS.get_option('blacklist2');
                 seek.blacklist = [];
-                _.each(blist, function (pname) {
-                    if (blist[pname].nomatch) {
+                _.keys(blist).map(function (pname) {
+                    if (blist[pname].nomatch || blist[pname].noplay) {
                         seek.blacklist.push(pname);
                     }
                 });
