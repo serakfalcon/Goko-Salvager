@@ -75,8 +75,8 @@
                 }
             } else if (!GS.WS.isConnReady()) {
                 console.log('No connection to gokosalvager server.  '
-                          + 'Using non-custom avatar for player: ' + playerId);
-                gokoAvatarLoader(playerId, size, callback);
+                          + 'Using retrobox to fetch avatar for player: ' + playerId);
+                retroboxAvatarLoader(playerId, size, callback);
             } else {
                 // Ask GS server whether custom avatar is available.
                 // Continue asynchronously by showing the avatar.
