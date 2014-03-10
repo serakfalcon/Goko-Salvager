@@ -643,7 +643,7 @@ kinggen_utils.KingdomselDisplay = (function() {
 		var output = '<div class="db-popup" style="top:40%;"><div class="content" style="position:absolute; min-height: 100px;max-height:200px; top: 40%;left:15%; width: 70%;">\
 						<div style="text-align:center;height:120px;margin:10px;">\
 						<div style="margin-top:10px">Select a kingdom (see <a target="_blank" href="http://dom.retrobox.eu/kingdomgenerator.html">instructions</a>):</div>\
-						<form id="selform">';
+						<form id="selform" onsubmit="GS.kG.KingdomselCode.returnCards(event);">';
 		if (hasNewUi) {
 			output += '#\'s:';
 			for (var i = 0;i<10;i++) {
@@ -683,7 +683,7 @@ kinggen_utils.KingdomselDisplay = (function() {
 			}
 		}
 		output += '<br />Cards: <input id="selval" name="selval" style="width:90%" value="' + defaultval + '"><br />\
-		<input type="submit" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK" >\
+		<input type="submit" name="kingselGo" class="fs-launch-game-btn" style="margin:5px;" value="OK">\
 		<input type="button" name="kingselCancel" class="fs-launch-game-btn" style="margin:5px;" value="Cancel (default settings)" onClick="GS.kG.KingdomselCode.cancelCards();">\
 		</form></div></div></div>';
 		return output;
@@ -708,7 +708,6 @@ kinggen_utils.KingdomselCode = (function() {
 		document.getElementById('viewport').appendChild(sel);
 		sel.innerHTML = kinggen_utils.KingdomselDisplay.innerHTML(val);
 		selform = document.getElementById('selform');
-		$(selform).submit(GS.kG.KingdomselCode.returnCards);
 		selval = document.getElementById('selval');
 	};
 
@@ -719,7 +718,7 @@ kinggen_utils.KingdomselCode = (function() {
 	};
 
 	//doesn't exit on error anymore, if a user gets stuck they can hit the cancel button
-	pubfuncts.returnCards = function () {
+	pubfuncts.returnCards = function (event) {
 
 		var x = null;
 		try {
@@ -738,7 +737,9 @@ kinggen_utils.KingdomselCode = (function() {
 			alert('Error generating kingdom: ' + e);
 		}
 
-		return false;
+    // don't let the form submission reload the page
+    event.stopPropagation();
+    event.preventDefault();
 	};
 
 	//we've gone too far in Goko's code to pull out gracefully, but it could be possible with some rewiring
