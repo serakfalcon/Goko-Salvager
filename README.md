@@ -16,7 +16,7 @@ If you'd like to contribute, either fork this project and submit your changes vi
 
 Instructions for making changes and building the extension are available [on the wiki](https://github.com/aiannacc/Goko-Salvager/wiki/Development).
 
-Contributors from the [DominionStrategy forum](forum.dominionstrategy.com)
+Contributors from the [DominionStrategy forum](http://forum.dominionstrategy.com)
 ------------
 - (philosophyguy)
 - (nutki)
