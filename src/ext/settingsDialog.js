@@ -13,6 +13,7 @@
         'FS',
         'GS.WS',
         'FS.LaunchScreen.View.Container',
+        'mtgRoom.conn.connInfo',
         'GS.storeBlacklistOnline',
         'GS.fetchBlacklistOnline'
     ];
@@ -24,7 +25,7 @@
                               .attr('title', 'Extension Settings')
                               .attr('ng-app', 'settingsApp')
                               .attr('ng-controller', 'settingsController')
-                .append($('<div>').attr('id', 'settingsTabs')
+                .append($('<div id="settingsTabs">')
                     .append($('<ul>')
                         .append($('<li><a href="#settingsTabs-lobby">Lobby</a></li>'))
                         .append($('<li><a href="#settingsTabs-game">Game</a></li>'))
@@ -70,57 +71,62 @@
                                 .attr('ng-model', 'so.greeting'));
 
         $('#settingsTabs-black')
-            .append('My Blacklist:<br>')
-            .append($('<table style="table-layout:fixed">').addClass('indented')
-                .append($('<tbody>')
-                    .append($('<tr>')
-                        .append($('<td width="50%">').text('Player'))
-                        .append($('<td width="15%">').text('Kick'))
-                        .append($('<td width="15%">').text('NoAM'))
-                        .append($('<td width="15%">').text('Censor'))
-                        .append($('<td width="5%">')))
-                    .append($('<tr ng-repeat="(pname, o) in so.blacklist2">')
-                        .append($('<td>').text('{{pname}}'))
-                        .append($('<td>')
-                            .append($('<input type="checkbox" ng-model="o.noplay">')))
-                        .append($('<td>')
-                            .append($('<input type="checkbox" ng-model="o.nomatch">')))
-                        .append($('<td>')
-                            .append($('<input type="checkbox" ng-model="o.censor">')))
-                        .append($('<td>')
-                            .append($('<button ng-click="bldel(pname)">').append('Del'))))
-                    .append($('<tr>')
-                        .append($('<td>')
-                            .append($('<input type="text" ng-model="blnewpname">')))
-                        .append($('<td>')
-                            .append($('<input>').attr('type', 'checkbox')
-                                                .attr('ng-model', 'blnew.noplay')
-                                                .attr('ng-disabled', 'bladdDisable()')))
-                        .append($('<td>')
-                            .append($('<input>').attr('type', 'checkbox')
-                                                .attr('ng-model', 'blnew.nomatch')
-                                                .attr('ng-disabled', 'bladdDisable()')))
-                        .append($('<td>')
-                            .append($('<input>').attr('type', 'checkbox')
-                                                .attr('ng-model', 'blnew.censor')
-                                                .attr('ng-disabled', 'bladdDisable()')))
-                        .append($('<td>')
-                            .append($('<button>').attr('ng-click', 'bladd()')
-                                                 .attr('ng-disabled', 'bladdDisable()')
-                                .append('Add'))))))
+            .append('<br>')
+            .append($('<form name="blnewForm" novalidate>')
+                .append($('<table style="table-layout:fixed">').addClass('indented')
+                    .append($('<tbody>')
+                        .append($('<tr>')
+                            .append($('<td width="50%"><b>Player</b></td>'))
+                            .append($('<td width="15%"><b>Kick</b></td>'))
+                            .append($('<td width="15%"><b>NoAM</b></td>'))
+                            .append($('<td width="15%"><b>Censor</b></td>'))
+                            .append($('<td width="5%">')))
+                        .append($('<tr ng-repeat="(pname, o) in so.blacklist2">')
+                            .append($('<td>{{pname}}</td>'))
+                            .append($('<td><input type="checkbox" ng-model="o.noplay"></td>'))
+                            .append($('<td><input type="checkbox" ng-model="o.nomatch"></td>'))
+                            .append($('<td><input type="checkbox" ng-model="o.censor"></td>'))
+                            .append($('<td><button ng-click="bldel(pname)">Del</button></td>')))
+                        .append($('<tr>')
+                            .append($('<td>')
+                                .append($('<input type="text" ng-model="blnewpname" '
+                                        + 'id="blnewpnameField" required>')))
+                            .append($('<td>')
+                                .append($('<input>').attr('type', 'checkbox')
+                                                    .attr('ng-model', 'blnew.noplay')
+                                                    .attr('ng-disabled', 'blnewForm.$invalid')))
+                            .append($('<td>')
+                                .append($('<input>').attr('type', 'checkbox')
+                                                    .attr('ng-model', 'blnew.nomatch')
+                                                    .attr('ng-disabled', 'blnewForm.$invalid')))
+                            .append($('<td>')
+                                .append($('<input>').attr('type', 'checkbox')
+                                                    .attr('ng-model', 'blnew.censor')
+                                                    .attr('ng-disabled', 'blnewForm.$invalid')))
+                            .append($('<td>')
+                                .append($('<button>').attr('ng-click', 'bladd()')
+                                                     .attr('ng-disabled', 'blnewForm.$invalid')
+                                                     .attr('id', 'blAddButton')
+                                    .append('Add')))))))
 
             .append($('<br>'))
             .append($('<div>')
-                .append('Common Blacklist:<br><br>')
-
+                .append('Common Blacklist:<br>')
                 .append($('<div>').addClass('indented')
                     .append('Also blacklist the ')
-                    .append($('<select>').attr('ng-model',
-                                              'so.blacklist_common')
-                                        .attr('ng-options',
-                                              's for s in blacklist_strengths'))
+                    .append($('<select>').attr('ng-model', 'so.blacklist_common')
+                                        .attr('ng-options', 's for s in blacklist_strengths'))
                     .append('% most-commonly blacklisted players')));
 
+        $('#blnewpnameField').keypress(function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $(this).blur();
+                $('#blAddButton').focus().click();
+                $('#blnewpnameField').focus();
+                return false;
+            }
+        });
 
         $('#settingsTabs-lobby')
                 .append($('<div>').text('Notifications:'))
@@ -128,15 +134,15 @@
                                     .attr('ng-model', 'so.audio_notifications')
                                     .addClass('indented'))
                 .append('Sounds<br>')
-                .append($('<input>').attr('id', 'desktopnotificationcheckbox')
-                                    .attr('type', 'checkbox')
-                                    .attr('ng-model', 'so.desktop_notifications')
-                                    .addClass('indented'))
-                .append('HTML5 "Desktop" Notifications (recommended)<br>')
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('ng-model', 'so.popup_notifications')
                                     .addClass('indented'))
                 .append('Traditional popups<br>')
+                .append($('<input>').attr('id', 'desktopnotificationcheckbox')
+                                    .attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.desktop_notifications')
+                                    .addClass('indented'))
+                .append('HTML5 Notifications (recommended)<br>')
 
                 .append($('<div>').text('Lobby Ratings:'))
                 .append($('<input>').attr('type', 'checkbox')
@@ -194,50 +200,57 @@
         var createBlacklistResolveDialog = function () {
             $('<div>').attr('id', 'blResolve')
                       .attr('title', 'Blacklist Conflict')
-                .append("Warning: Your local blacklist is out of sync with "
-                      + "the version stored at " + GS.WS.domain + ".  The "
-                      + "most likely reason is that you're logging in from "
-                      + "a different browser.  How do you want to resolve "
-                      + "the conflict?")
+                      .attr('ng-app', 'settingsApp')
+                      .attr('ng-controller', 'blDiff')
+                .append("The blacklist on this computer is out of sync "
+                      + "with the version stored on " + GS.WS.domain + ":<br>")
+                .append($('<table>').addClass('indented')
+                    .append($('<tr>')
+                        .append($('<td><b>Player&nbsp;</b></td><td><b>Difference</b></td>')))
+                    .append($('<tr ng-repeat="(pname, desc) in diff">')
+                        .append($('<td>{{pname}}</td>'))
+                        .append($('<td>{{desc}}</td>'))))
+                .append("Which version do you want to keep?")
                 .dialog({
                     resizeable: false,
-                    height: 250,
                     width: 500,
+                    maxHeight: $(window).height(),
+                    height: "auto",
                     modal: true,
                     autoOpen: false,
+                    closeOnEscape: false,
+                    closeText: 'Keep local version',
                     buttons: {
-                        "Keep Local Version": function () {
-                            GS.set_options(GS.get_options());
-                            submitBlacklist(function () {
-                                $('#blResolve').dialog('close');
-                                didVerifyBlacklist = true;
-                            });
-                        },
-                        "Keep Server Version": function () {
-                            // TODO: make this change appear (angularJS issue)
-                            GS.set_option('blacklist2', serverBlacklist);
+                        "Local": function () {
+                            // No change to local list.  List will be saved to
+                            // server on settings dialog close.
                             $('#blResolve').dialog('close');
                             didVerifyBlacklist = true;
                         },
-                        "Keep Both (Merge Them)": function () {
+                        "Server": function () {
                             // TODO: make this change appear (angularJS issue)
-                            var locallist = GS.get_option('blacklist2');
-                            _.each(serverBlacklist, function (pname) {
-                                locallist[pname] = serverBlacklist[pname];
-                            });
-                            GS.set_option('blacklist2', locallist);
+                            $('#blResolve').scope().saveServerList();
                             $('#blResolve').dialog('close');
+                            $('#settingsDialog').scope().parseLocalStorage();
+                            didVerifyBlacklist = true;
+                        },
+                        "Merge Them": function () {
+                            // TODO: make this change appear (angularJS issue)
+                            $('#blResolve').scope().saveMergedList();
+                            $('#blResolve').dialog('close');
+                            $('#settingsDialog').scope().parseLocalStorage();
                             didVerifyBlacklist = true;
                         }
                     }
                 });
+            angular.bootstrap($('#blResolve'));
         };
 
-        var resolveBlacklistConflict = function (locallist, serverBlacklistNew) {
-            serverBlacklist = serverBlacklistNew;
+        var resolveBlacklistConflict = function (blLocal, blRemote) {
             if ($('#blResolve').length === 0) {
-                createBlacklistResolveDialog();
+                createBlacklistResolveDialog(blLocal, blRemote);
             }
+            $('#blResolve').scope().setLists(blLocal, blRemote);
             $('#blResolve').dialog('open');
         };
 
@@ -273,7 +286,6 @@
                     } else {
                         didVerifyBlacklist = true;
                     }
-
                 }
             });
         };
@@ -322,6 +334,59 @@
             autoOpen: false
         });
 
+        window.blDiff = function ($scope) {
+            $scope.local = null;
+            $scope.remote = null;
+            $scope.diff = {};
+            $scope.setLists = function (local, remote) {
+                $scope.local = local;
+                $scope.remote = remote;
+                $scope.diff = {};
+                _.keys(remote).map(function (pname) {
+                    if (!local.hasOwnProperty(pname)) {
+                        $scope.diff[pname] = "Only in server version";
+                    } else if (local[pname].noplay !== remote[pname].noplay) {
+                        $scope.diff[pname] = "Different no-play setting";
+                    } else if (local[pname].nomatch !== remote[pname].nomatch) {
+                        $scope.diff[pname] = "Different no-automatch setting";
+                    } else if (local[pname].censor !== remote[pname].censor) {
+                        $scope.diff[pname] = "Different censor setting";
+                    }
+                });
+                _.keys(local).map(function (pname) {
+                    if (!remote.hasOwnProperty(pname)) {
+                        $scope.diff[pname] = "Only in local version";
+                    }
+                });
+                // NOTE: This line shouldn't be necessary, but I've got the 
+                //       angularJS bindings wrong somehow.
+                $scope.$digest();
+            };
+            $scope.saveServerList = function () {
+                GS.set_option('blacklist2', $scope.remote);
+            };
+            $scope.saveMergedList = function () {
+                var merged = {};
+                _.keys($scope.remote).map(function (pname) {
+                    merged[pname] = {
+                        noplay: $scope.remote[pname].noplay,
+                        nomatch: $scope.remote[pname].nomatch,
+                        censor: $scope.remote[pname].censor
+                    };
+                });
+                _.keys($scope.local).map(function (pname) {
+                    if (!merged.hasOwnProperty(pname)) {
+                        merged[pname] = {
+                            noplay: $scope.local[pname].noplay,
+                            nomatch: $scope.local[pname].nomatch,
+                            censor: $scope.local[pname].censor
+                        };
+                    }
+                });
+                GS.set_option('blacklist2', merged);
+            };
+        };
+
         window.settingsController = function ($scope) {
             $scope.quick_game_types = [
                 {name: 'pro'},
@@ -338,6 +403,12 @@
                 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
             ];
             $scope.so = GS.get_options();
+
+            $scope.parseLocalStorage = function () {
+                $scope.so = GS.get_options();
+                $scope.$digest();
+            };
+
 
             $scope.bldel = function (pname) {
                 delete $scope.so.blacklist2[pname];
