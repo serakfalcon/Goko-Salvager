@@ -38,10 +38,12 @@
                     }
                     
                     // Don't show blacklisted players on the player list
-                    var blist = GS.get_option('blacklist2');
+                    // TODO: move this somewhere more logical
+                    var blist = GS.getCombinedBlacklist(true);
                     var pname = playerElement
                         .querySelector('.fs-mtrm-player-name>strong').innerHTML;
-                    if (typeof blist[pname] !== 'undefined' && blist[pname].censor) {
+                    if (typeof blist[pname.toLowerCase()] !== 'undefined'
+                            && blist[pname.toLowerCase()].censor) {
                         $(playerElement).hide();
                     } else {
                         $(playerElement).show();
