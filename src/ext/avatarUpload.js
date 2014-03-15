@@ -21,8 +21,9 @@
                 .append('Image will be resized/cropped to 100x100')
                 .append($('<form enctype="multipart/form-data" id="auForm">')
                     .append($('<input type="file"   name="avatar"   id="auInput" />'))
-                    .append($('<input type="hidden" name="playerid" id="auPID" />'))
+                    .append($('<input type="hidden" name="playerId" id="auPID" />'))
                     .append($('<input type="button" value="Upload" id="auButton" />')))
+                .append('<br>')
                 .append('<div id="auInfo">'));
 
         // Make upload avatar dialog into a JQueryUI popup
@@ -55,8 +56,8 @@
         });
 
         var completeHandler = function () {
-            console.log('success');
-            $('#uploadAvatarDialog').dialog('close');
+            $('#auInfo').html('Upload successful.  You may have to clear your '
+                            + 'browser cache before you see your new avatar.');
             FS.LaunchScreen.getInstance().loadPlayerAvatar(mtgRoom.conn);
         };
 
