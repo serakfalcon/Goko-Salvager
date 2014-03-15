@@ -30,7 +30,8 @@
         // Connection variables
         GS.WS = {};
         GS.WS.domain = 'gokosalvager.com';
-        GS.WS.port = 8889;  // TODO: Switch from port 8889 back to 443 after 
+        // TODO: switch back to 8889 after testing
+        GS.WS.port = 7889;  // TODO: Switch from port 8889 back to 443 after 
                             //       server transition
         GS.WS.url = "wss://" + GS.WS.domain + ":" + GS.WS.port + "/gs/websocket";
         GS.WS.noreconnect = false;
@@ -60,8 +61,6 @@
             GS.WS.conn.onmessage = function (evt) {
                 var d = JSON.parse(evt.data);
                 var m = d.message;
-                //console.log('Got ' + d.msgtype + ' message from ' + GS.WS.domain + ':');
-                //console.log(d);
                 
                 GS.WS.lastpingTime = new Date();
 
@@ -80,13 +79,10 @@
                     // server's response as its argument.
                     var callback = GS.WS.callbacks[m.queryid];
                     if (typeof callback !== 'undefined') {
-                        //console.log('Executing callback for msgid: ' + m.queryid);
                         if (callback !== null) {
                             callback(m);
                         }
                         delete GS.WS.callbacks[m.queryid];
-                    //} else {
-                    //    console.log('No callback found for msgid: ' + m.queryid);
                     }
                     break;
                 default:
@@ -97,6 +93,16 @@
 
         GS.WS.isConnReady = function () {
             return typeof GS.WS.conn !== 'undefined' && GS.WS.conn.readyState === 1;
+        };
+
+
+        GS.WS.waitSendMessage = function (msgtype, msg, callback) {
+            var waitInt = window.setInterval(function () {
+                if (GS.WS.isConnReady()) {
+                    window.clearInterval(waitInt);
+                    GS.WS.sendMessage(msgtype, msg, callback);
+                }
+            }, 100);
         };
 
         // Convenience wrapper for websocket send() method.  Globally accessible.
@@ -119,10 +125,6 @@
 
             try {
                 GS.WS.conn.send(msgJSON);
-                //if (msgtype !== 'PING') {
-                //    console.log('Sent ' + msgtype + ' message to GS server:');
-                //    console.log(msgJSON);
-                //}
             } catch (e) {
                 console.log(e);
             }
@@ -132,7 +134,6 @@
             // ping server every 25 sec. Timeout if no responses for 180s.
             GS.WS.lastpingTime = new Date();
 
-            //console.log('Starting ping loop');
             GS.WS.pingLoop = setInterval(function () {
                 if (new Date() - GS.WS.lastpingTime > 180000) {
                     console.log('Connection to ' + GS.WS.domain + ' timed out.');
@@ -143,7 +144,6 @@
                         console.log(e);
                     }
                 } else {
-                    //console.log('Sending ping');
                     GS.WS.sendMessage('PING', {});
                 }
             }, 25000);

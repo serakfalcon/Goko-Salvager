@@ -76,7 +76,7 @@
             }
     
             // Kick players on my blacklist
-            var i, blist = GS.get_option('blacklist2');
+            var i, blist = GS.getCombinedBlacklist();
             if (typeof blist[hisName] !== 'undefined' && blist[hisName].noplay) {
                 GS.debug(hisName + 'is on my noplay blacklist... kicking');
                 shouldKick = true;

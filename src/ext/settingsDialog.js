@@ -14,8 +14,9 @@
         'GS.WS',
         'FS.LaunchScreen.View.Container',
         'mtgRoom.conn.connInfo',
-        'GS.storeBlacklistOnline',
-        'GS.fetchBlacklistOnline'
+        'GS.submitBlacklist',
+        'GS.reconcileBlacklist',
+        'GS.cachedCommonBlacklist'
     ];
     GS.modules.settingsDialog.load = function () {
 
@@ -36,11 +37,10 @@
                     .append($('<div id="settingsTabs-lobby">'))
                     .append($('<div id="settingsTabs-misc">'))));
 
-        // Display dialog sections as tabs
+        // Display dialog sections using tabbed sheets
         $('#settingsTabs').tabs();
 
-        // Define the dialog sections: game, lobby, blacklist, misc
-
+        // Define the dialog sections: in-game settings
         $('#settingsTabs-game')
             .append($('<div>').text('In-game sidebar'))
             .append($('<input>').attr('type', 'checkbox')
@@ -51,7 +51,6 @@
                                 .attr('ng-model', 'so.sidebar_chat')
                                 .addClass('indented'))
             .append('Replace Goko chat window<br>')
-
             .append($('<div>').text('VP Counter'))
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.vp_request')
@@ -61,15 +60,14 @@
                                 .attr('ng-model', 'so.vp_refuse')
                                 .addClass('indented'))
             .append('Always refuse (#vpoff)<br>')
-
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.always_stack'))
             .append('Stack duplicate cards<br>')
-
             .append('Greeting Message')
             .append($('<input>').attr('type', 'text')
                                 .attr('ng-model', 'so.greeting'));
 
+        // Define the dialog sections: blacklist settings
         $('#settingsTabs-black')
             .append('<br>')
             .append($('<form name="blnewForm" novalidate>')
@@ -108,16 +106,17 @@
                                                      .attr('ng-disabled', 'blnewForm.$invalid')
                                                      .attr('id', 'blAddButton')
                                     .append('Add')))))))
-
             .append($('<br>'))
             .append($('<div>')
                 .append('Common Blacklist:<br>')
                 .append($('<div>').addClass('indented')
                     .append('Also blacklist the ')
                     .append($('<select>').attr('ng-model', 'so.blacklist_common')
-                                        .attr('ng-options', 's for s in blacklist_strengths'))
+                                        .attr('ng-options', 's for s in blacklist_strengths')
+                                        .attr('ng-change', 'cacheCommonBlacklist'))
                     .append('% most-commonly blacklisted players')));
 
+        // Pressing enter adds the new blacklist entry
         $('#blnewpnameField').keypress(function (e) {
             if (e.which === 13) {
                 e.preventDefault();
@@ -128,6 +127,7 @@
             }
         });
 
+        // Define the dialog sections: lobby settings
         $('#settingsTabs-lobby')
                 .append($('<div>').text('Notifications:'))
                 .append($('<input>').attr('type', 'checkbox')
@@ -185,137 +185,30 @@
                                     .addClass('indented'))
                 .append('Use Automatch<br>');
 
+        // Define the dialog sections: miscellaneous settings
         $('#settingsTabs-misc')
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.generator'))
             .append('Kingdom Generator<br>')
-
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.debug_mode'))
             .append('Extra logging (for error reports)<br>');
-
-        var submitBlacklist, serverBlacklist;
-
-        var didVerifyBlacklist;
-        var createBlacklistResolveDialog = function () {
-            $('<div>').attr('id', 'blResolve')
-                      .attr('title', 'Blacklist Conflict')
-                      .attr('ng-app', 'settingsApp')
-                      .attr('ng-controller', 'blDiff')
-                .append("The blacklist on this computer is out of sync "
-                      + "with the version stored on " + GS.WS.domain + ":<br>")
-                .append($('<table>').addClass('indented')
-                    .append($('<tr>')
-                        .append($('<td><b>Player&nbsp;</b></td><td><b>Difference</b></td>')))
-                    .append($('<tr ng-repeat="(pname, desc) in diff">')
-                        .append($('<td>{{pname}}</td>'))
-                        .append($('<td>{{desc}}</td>'))))
-                .append("Which version do you want to keep?")
-                .dialog({
-                    resizeable: false,
-                    width: 500,
-                    maxHeight: $(window).height(),
-                    height: "auto",
-                    modal: true,
-                    autoOpen: false,
-                    closeOnEscape: false,
-                    closeText: 'Keep local version',
-                    buttons: {
-                        "Local": function () {
-                            // No change to local list.  List will be saved to
-                            // server on settings dialog close.
-                            $('#blResolve').dialog('close');
-                            didVerifyBlacklist = true;
-                        },
-                        "Server": function () {
-                            // TODO: make this change appear (angularJS issue)
-                            $('#blResolve').scope().saveServerList();
-                            $('#blResolve').dialog('close');
-                            $('#settingsDialog').scope().parseLocalStorage();
-                            didVerifyBlacklist = true;
-                        },
-                        "Merge Them": function () {
-                            // TODO: make this change appear (angularJS issue)
-                            $('#blResolve').scope().saveMergedList();
-                            $('#blResolve').dialog('close');
-                            $('#settingsDialog').scope().parseLocalStorage();
-                            didVerifyBlacklist = true;
-                        }
-                    }
-                });
-            angular.bootstrap($('#blResolve'));
-        };
-
-        var resolveBlacklistConflict = function (blLocal, blRemote) {
-            if ($('#blResolve').length === 0) {
-                createBlacklistResolveDialog(blLocal, blRemote);
-            }
-            $('#blResolve').scope().setLists(blLocal, blRemote);
-            $('#blResolve').dialog('open');
-        };
-
-        var verifyBlacklist = function () {
-            GS.WS.sendMessage('QUERY_BLACKLIST', {}, function (resp) {
-                if (resp === null) {
-                    console.log("Cannot compare blacklists: no GS connection");
-                    didVerifyBlacklist = false;
-                } else {
-                    var serverlist = resp.blacklist;
-                    var locallist = GS.get_option('blacklist2');
-
-                    var equal = true;
-                    _.keys(locallist).map(function (pname) {
-                        if (!serverlist.hasOwnProperty(pname)
-                                || serverlist[pname].noplay !== locallist[pname].noplay
-                                || serverlist[pname].nomatch !== locallist[pname].nomatch
-                                || serverlist[pname].censor !== locallist[pname].censor) {
-                            equal = false;
-                        }
-                    });
-                    _.keys(serverlist).map(function (pname) {
-                        if (!locallist.hasOwnProperty(pname)
-                                || locallist[pname].noplay !== serverlist[pname].noplay
-                                || locallist[pname].nomatch !== serverlist[pname].nomatch
-                                || locallist[pname].censor !== serverlist[pname].censor) {
-                            equal = false;
-                        }
-                    });
-
-                    if (!equal) {
-                        resolveBlacklistConflict(locallist, serverlist);
-                    } else {
-                        didVerifyBlacklist = true;
-                    }
-                }
-            });
-        };
-
-        submitBlacklist = function () {
-            if (didVerifyBlacklist) {
-                // Normal situation. Save local blacklist to server.
-                GS.storeBlacklistOnline(GS.get_option('blacklist2'), false);
-            } else {
-                // Failed to sync blacklists when this dialog was opened.
-                // Perform a blacklist merge just to be safe
-                GS.storeBlacklistOnline(GS.get_option('blacklist2'), true);
-            }
-        };
 
         // Verify blacklist when opening Blacklist tab.  Save on close.
         $('#settingsTabs').on("tabsactivate", function (event, ui) {
             if (ui.newTab[0].innerText === 'Blacklist') {
                 // Compare local and server lists when opening Blacklist tab
-                verifyBlacklist();
+                GS.reconcileBlacklist(function () {
+                    $('#settingsTabs').scope().$digest();
+                });
             } else if (ui.oldTab[0].innerText === 'Blacklist') {
                 // Save local lists when closing Blacklist tab
-                submitBlacklist();
+                GS.submitBlacklist();
             }
         });
-
-        // Also save blacklist when settings dialog is closed. No need to
-        // verify when dialog reopened though, even if Blacklist tab is open.
+        // Also save blacklist when settings dialog is closed.
         $('#settingsDialog').on("dialogclose", function (event, ui) {
-            submitBlacklist();
+            GS.submitBlacklist();
         });
 
         // Override goko's select-hiding CSS nonsense
@@ -333,59 +226,6 @@
             position: { my: "center", at: "center", of: window },
             autoOpen: false
         });
-
-        window.blDiff = function ($scope) {
-            $scope.local = null;
-            $scope.remote = null;
-            $scope.diff = {};
-            $scope.setLists = function (local, remote) {
-                $scope.local = local;
-                $scope.remote = remote;
-                $scope.diff = {};
-                _.keys(remote).map(function (pname) {
-                    if (!local.hasOwnProperty(pname)) {
-                        $scope.diff[pname] = "Only in server version";
-                    } else if (local[pname].noplay !== remote[pname].noplay) {
-                        $scope.diff[pname] = "Different no-play setting";
-                    } else if (local[pname].nomatch !== remote[pname].nomatch) {
-                        $scope.diff[pname] = "Different no-automatch setting";
-                    } else if (local[pname].censor !== remote[pname].censor) {
-                        $scope.diff[pname] = "Different censor setting";
-                    }
-                });
-                _.keys(local).map(function (pname) {
-                    if (!remote.hasOwnProperty(pname)) {
-                        $scope.diff[pname] = "Only in local version";
-                    }
-                });
-                // NOTE: This line shouldn't be necessary, but I've got the 
-                //       angularJS bindings wrong somehow.
-                $scope.$digest();
-            };
-            $scope.saveServerList = function () {
-                GS.set_option('blacklist2', $scope.remote);
-            };
-            $scope.saveMergedList = function () {
-                var merged = {};
-                _.keys($scope.remote).map(function (pname) {
-                    merged[pname] = {
-                        noplay: $scope.remote[pname].noplay,
-                        nomatch: $scope.remote[pname].nomatch,
-                        censor: $scope.remote[pname].censor
-                    };
-                });
-                _.keys($scope.local).map(function (pname) {
-                    if (!merged.hasOwnProperty(pname)) {
-                        merged[pname] = {
-                            noplay: $scope.local[pname].noplay,
-                            nomatch: $scope.local[pname].nomatch,
-                            censor: $scope.local[pname].censor
-                        };
-                    }
-                });
-                GS.set_option('blacklist2', merged);
-            };
-        };
 
         window.settingsController = function ($scope) {
             $scope.quick_game_types = [
@@ -409,7 +249,6 @@
                 $scope.$digest();
             };
 
-
             $scope.bldel = function (pname) {
                 delete $scope.so.blacklist2[pname];
             };
@@ -430,6 +269,9 @@
                     };
                 }
                 $scope.blnewpname = '';
+            };
+            $scope.cacheCommonBlacklist = function () {
+                GS.cacheCommonBlacklist($scope.so.blacklist_common, function () {});
             };
 
             $scope.$watch('so.vp_refuse', function () {

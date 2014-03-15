@@ -12,7 +12,8 @@
         'avatars',
         'avatarUpload',
         'blacklist',
-        'settingsDialog',       // Depends on blacklist
+        'blacklistSync',
+        'settingsDialog',       // Depends on blacklist, blacklistSync
         //'eventLogger',
         'notifications',
         'lobbyRatings',

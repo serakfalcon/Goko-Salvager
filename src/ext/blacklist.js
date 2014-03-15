@@ -5,17 +5,48 @@
     "use strict";
 
     var mod = GS.modules.blacklist = new GS.Module('Blacklist');
-    mod.dependencies = ['FS.MeetingRoom', 'FS.ClassicTableView'];
+    mod.dependencies = [
+        'FS.MeetingRoom',
+        'FS.ClassicTableView',
+        'GS.WS'
+    ];
     mod.load = function () {
         FS.MeetingRoom.prototype.old_onRoomChat = FS.MeetingRoom.prototype.onRoomChat;
         FS.MeetingRoom.prototype.onRoomChat = function (resp) {
             var player = this.playerList.findByAddress(resp.data.playerAddress).getName();
 
             // Hide chat messages from censored players
-            var blist = GS.get_option('blacklist2');
+            var blist = GS.getCombinedBlacklist();
             if (typeof blist[player] === 'undefined' || !blist[player].censor) {
                 this.old_onRoomChat(resp);
             }
+        };
+
+        GS.getMyBlacklist = function () {
+            return GS.get_option('blacklist2');
+        };
+
+        GS.cacheCommonBlacklist = function (percentile, callback) {
+            GS.WS.waitSendMessage(
+                'QUERY_BLACKLIST_COMMON',
+                {percentile: percentile},
+                function (resp) {
+                    GS.cachedCommonBlacklist = resp.common_blacklist;
+                    if (typeof callback !== 'undefined') {
+                        callback();
+                    }
+                }
+            );
+        };
+        GS.cacheCommonBlacklist(GS.get_option('blacklist_common'));
+
+        GS.getCombinedBlacklist = function () {
+            var combined = _.clone(GS.cachedCommonBlacklist);
+            var local = GS.get_option('blacklist2');
+            _.keys(local).map(function (pname) {
+                combined[pname] = local[pname];
+            });
+            return combined;
         };
 
         FS.ClassicTableView.prototype.old_modifyDOM = FS.ClassicTableView.prototype.modifyDOM;
@@ -51,38 +82,6 @@
                     // This shouldn't happen: our game should kick the blacklisted
                     // player, while his should be invisible to us.
                     console.log("Error: in a game with a blacklisted player.");
-                }
-            }
-        };
-
-        GS.fetchBlacklistOnline = function (callback) {
-            // Try to send blacklist to gokosalvager
-            if (GS.WS.isConnReady()) {
-                GS.WS.sendMessage('QUERY_BLACKLIST', {}, callback);
-            }
-
-            console.log('No connection to ' + GS.WS.domain + '.  '
-                      + 'Cannot submit blacklist.');
-            callback(null);
-        };
-
-        GS.storeBlacklistOnline = function (blist, merge, callback) {
-            // First delete the angularJS display hash keys
-            _.keys(blist).map(function (pname) {
-                delete blist[pname].$$hashKey;
-            });
-
-            // Try to send blacklist to gokosalvager
-            if (GS.WS.isConnReady()) {
-                GS.WS.sendMessage('SUBMIT_BLACKLIST', {
-                    blacklist: blist,
-                    merge: merge
-                }, callback);
-            } else {
-                console.log('No connection to ' + GS.WS.domain + '.  '
-                          + 'Cannot submit blacklist.');
-                if (typeof callback !== 'undefined') {
-                    callback(null);
                 }
             }
         };
