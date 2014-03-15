@@ -32,16 +32,33 @@
                 {percentile: percentile},
                 function (resp) {
                     GS.cachedCommonBlacklist = resp.common_blacklist;
+                    GS.commonBlacklistRetreived = true;
+                    console.log('Retrieved and cached common blacklist');
                     if (typeof callback !== 'undefined') {
                         callback();
                     }
                 }
             );
         };
+
+        // Attempt to retreive the common blacklist from GS server.
+        GS.commonBlacklistRetreived = false;
+        GS.commonBlacklistWarningGiven = false;
         GS.cacheCommonBlacklist(GS.get_option('blacklist_common'));
 
+        // Until and unless we can connect to the GS server, just use an empty
+        // common blacklist.  Warn once in console.
         GS.getCombinedBlacklist = function () {
-            var combined = _.clone(GS.cachedCommonBlacklist);
+            var combined = {};
+            if (GS.commonBlacklistRetreived) {
+                combined = _.clone(GS.cachedCommonBlacklist);
+            } else {
+                if (!GS.commonBlacklistWarningGiven) {
+                    console.warn('Common blacklist not available.');
+                    GS.commonBlacklistWarningGiven = true;
+                }
+            }
+
             var local = GS.get_option('blacklist2');
             _.keys(local).map(function (pname) {
                 combined[pname] = local[pname];
