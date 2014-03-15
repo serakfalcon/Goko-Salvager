@@ -20,12 +20,14 @@
                   .attr('ng-controller', 'blReconcileController')
             .append("The blacklist on this computer is out of sync "
                   + "with the version stored on " + GS.WS.domain + ":<br>")
+            .append($('<br>'))
             .append($('<table>').addClass('indented')
                 .append($('<tr>')
                     .append($('<td><b>Player&nbsp;</b></td><td><b>Difference</b></td>')))
                 .append($('<tr ng-repeat="(pname, desc) in diff">')
                     .append($('<td>{{pname}}</td>'))
                     .append($('<td>{{desc}}</td>'))))
+            .append($('<br>'))
             .append('Which version do you want to keep?  If you aren\'t sure '
                   + 'what this means, click "Merge Them."')
             .dialog({

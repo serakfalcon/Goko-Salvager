@@ -16,7 +16,6 @@
         'mtgRoom.conn.connInfo',
         'GS.submitBlacklist',
         'GS.reconcileBlacklist',
-        'GS.cachedCommonBlacklist'
     ];
     GS.modules.settingsDialog.load = function () {
 
@@ -78,30 +77,41 @@
                             .append($('<td width="15%"><b>Kick</b></td>'))
                             .append($('<td width="15%"><b>NoAM</b></td>'))
                             .append($('<td width="15%"><b>Censor</b></td>'))
-                            .append($('<td width="5%">')))
+                            .append($('<td width="5%">')))))
+                .append($('<table style="table-layout:fixed">').addClass('indented')
+                                                               .css('display', 'block')
+                    .append($('<tbody>').css('height', '210px')
+                                        .css('overflow-y', 'scroll')
+                                        .css('display', 'block')
                         .append($('<tr ng-repeat="(pname, o) in so.blacklist2">')
-                            .append($('<td>{{pname}}</td>'))
-                            .append($('<td><input type="checkbox" ng-model="o.noplay"></td>'))
-                            .append($('<td><input type="checkbox" ng-model="o.nomatch"></td>'))
-                            .append($('<td><input type="checkbox" ng-model="o.censor"></td>'))
-                            .append($('<td><button ng-click="bldel(pname)">Del</button></td>')))
+                            .append($('<td witdh="50%">{{pname}}</td>'))
+                            .append($('<td width="15%">')
+                                .append($('<input type="checkbox" ng-model="o.noplay"></td>')))
+                            .append($('<td width="15%">')
+                                .append($('<input type="checkbox" ng-model="o.nomatch"></td>')))
+                            .append($('<td width="15%">')
+                                .append($('<input type="checkbox" ng-model="o.censor"></td>')))
+                            .append($('<td width="5%">')
+                                .append($('<button ng-click="bldel(pname)">Del</button></td>'))))))
+                .append($('<table style="table-layout:fixed">').addClass('indented')
+                    .append($('<tbody>')
                         .append($('<tr>')
-                            .append($('<td>')
+                            .append($('<td width="46%">')
                                 .append($('<input type="text" ng-model="blnewpname" '
                                         + 'id="blnewpnameField" required>')))
-                            .append($('<td>')
+                            .append($('<td width="15%">')
                                 .append($('<input>').attr('type', 'checkbox')
                                                     .attr('ng-model', 'blnew.noplay')
                                                     .attr('ng-disabled', 'blnewForm.$invalid')))
-                            .append($('<td>')
+                            .append($('<td width="15%">')
                                 .append($('<input>').attr('type', 'checkbox')
                                                     .attr('ng-model', 'blnew.nomatch')
                                                     .attr('ng-disabled', 'blnewForm.$invalid')))
-                            .append($('<td>')
+                            .append($('<td width="15%">')
                                 .append($('<input>').attr('type', 'checkbox')
                                                     .attr('ng-model', 'blnew.censor')
                                                     .attr('ng-disabled', 'blnewForm.$invalid')))
-                            .append($('<td>')
+                            .append($('<td width="9%">')
                                 .append($('<button>').attr('ng-click', 'bladd()')
                                                      .attr('ng-disabled', 'blnewForm.$invalid')
                                                      .attr('id', 'blAddButton')
@@ -219,7 +229,7 @@
         $('#settingsDialog').dialog({
             modal: true,
             width: 700,
-            maxHeight: $(window).height(),
+            maxHeight: $(window).height() - 200,
             closeText: 'Save',
             draggable: true,
             resizeable: false,
