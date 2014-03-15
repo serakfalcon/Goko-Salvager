@@ -88,6 +88,7 @@
         'vpcounterui.js',
         'vptoggle.js',
         'lobby_ratings.js',
+        'speedTweak.js',
         'alwaysStack.js',
         'decktracker.js',
         'automatchGamePop.js',
