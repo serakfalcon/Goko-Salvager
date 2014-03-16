@@ -155,14 +155,20 @@
                 .append('HTML5 Notifications (recommended)<br>')
 
                 .append($('<div>').text('Lobby Ratings:'))
-                .append($('<input>').attr('type', 'checkbox')
-                                    .attr('ng-model', 'so.sortrating')
-                                    .addClass('indented'))
-                .append('Sort players by rating<br>')
+                .append($('<span>').addClass('indented')
+                    .append('Sort players by ')
+                    .append($('<select>').attr('ng-model', 'so.sortkey')
+                                         .attr('ng-options',
+                                               's.name as s.text for s in sortkeys')))
+                .append($('<br>'))
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('ng-model', 'so.proranks')
                                     .addClass('indented'))
-                .append('Display pro ratings<br>')
+                .append('Display Pro ratings instead of Casual<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.isoranks')
+                                    .addClass('indented'))
+                .append('Also display Isotropish ratings<br>')
 
                 .append($('<div>').text('Autokick:'))
                 .append($('<input>').attr('type', 'checkbox')
@@ -238,6 +244,11 @@
         });
 
         window.settingsController = function ($scope) {
+            $scope.sortkeys = [
+                {name: 'pname', text: 'Username'},
+                {name: 'pro', text: 'Pro Rating'},
+                {name: 'iso', text: 'Isotropish Rating'}
+            ];
             $scope.quick_game_types = [
                 {name: 'pro'},
                 {name: 'casual'},
@@ -283,6 +294,30 @@
             $scope.cacheCommonBlacklist = function () {
                 GS.cacheCommonBlacklist($scope.so.blacklist_common, function () {});
             };
+
+            $scope.$watch('so.sortkey', function () {
+                if ($scope.so.sortkey === 'iso') {
+                    $scope.so.isoranks = true;
+                } else if ($scope.so.sortkey === 'pro') {
+                    $scope.so.proranks = true;
+                }
+            });
+
+            $scope.$watch('so.proranks', function () {
+                if (!$scope.so.proranks && $scope.so.sortkey === 'pro') {
+                    $scope.so.sortkey = 'pname';
+                }
+            });
+
+            $scope.$watch('so.isoranks', function () {
+                if (!$scope.so.isoranks && $scope.so.sortkey === 'iso') {
+                    if ($scope.so.proranks) {
+                        $scope.so.sortkey = 'pro';
+                    } else {
+                        $scope.so.sortkey = 'pname';
+                    }
+                }
+            });
 
             $scope.$watch('so.vp_refuse', function () {
                 $scope.so.vp_request = $scope.so.vp_request && !$scope.so.vp_refuse;
