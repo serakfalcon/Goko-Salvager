@@ -40,8 +40,7 @@
             // Apply speed factor uniformly to all animation speeds
             if (GS.get_option('speed_tweak_uniform')) {
                 var mode, prop;
-                _.each(['normal', 'fast', 'veryFast'], function (mode) {
-                    var fac = factors[mode];
+                _.each(factors, function (fac, mode) {
                     Dom.GlobalLayout.animationTimings[mode]= {
                         name: mode,
                         factor : 1/fac,
