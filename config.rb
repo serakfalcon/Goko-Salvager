@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.4.5',
+    :version => '2.4.7',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -19,7 +19,6 @@
     :homepage => 'https://github.com/aiannacc/Goko-Salvager/wiki',
     :license => 'MPL 2.0',
     :manifest_version => '2',
-    :safarixtz_url => 'http://goo.gl/1SJmbB',
     :targeturls => [
         'http://play.goko.com/Dominion/gameClient.html',
         'https://play.goko.com/Dominion/gameClient.html',
@@ -29,15 +28,10 @@
         'http://www.playdominion.com/Dominion/gameClient.html'
     ],
     :hostServer => 'www.gokosalvager.com',
-    :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager/',
+    :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager',
     :hostPort => '8888',
     :hostURLBase => '/',
     :extinfo => 'index.html',
-    :extupdate => {
-        :firefox => 'update_firefox.rdf',
-        :chrome => 'update_chrome.xml',
-        :safari => 'update_safari.plist'
-    },
     :firefox_minversion => '19.0',
     :firefox_maxversion => '23.*',
 
@@ -95,7 +89,7 @@
         'automatchOfferPop.js',
         'automatchSeekPop.js',
         'automatch.js',
-	'quickGame.js',
+        'quickGame.js',
         'launchScreenLoader.js',
         'module_loader.js'
     ]

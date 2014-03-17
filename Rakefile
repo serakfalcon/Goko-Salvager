@@ -7,17 +7,6 @@ require 'ostruct'
 CLEAN.include 'build/*/'
 CLOBBER.include 'build'
 
-PARSER = 'src/dev/set_parser.js'
-
-# TODO: Restore this. I didn't understand it before, but it's better than
-#       manually merging set_parser.js and kingdom_builder.js as I'm doing now.
-def insert_set_parser_into_main_script(out_file_name)
-  out = File.new(out_file_name, 'w')
-  out.write(File.read(PARSER))
-  out.write(File.read(SCRIPT))
-  out.close
-end
-
 WRAPPER = 'src/dev/runInPageContext.js'
 
 def run_in_page_context(file)
@@ -40,5 +29,13 @@ end
 
 Dir.glob('tasks/*.rake').each { |r| import r }
 
-desc 'Build packages for all supported browsers'
-task :default => ['firefox:build', 'chrome:build', 'safari:build']
+desc 'Build and package extension for all supported browsers'
+task :build, :forbetas do |task, args|
+    Rake::Task['chrome:build'].invoke(args[:forbetas])
+    Rake::Task['firefox:build'].invoke(args[:forbetas])
+    Rake::Task['safari:build'].invoke(args[:forbetas])
+end
+
+desc 'Equivalent to "rake build"'
+task :default => [:build]
+

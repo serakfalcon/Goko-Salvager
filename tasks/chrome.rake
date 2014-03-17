@@ -2,19 +2,38 @@
 
 namespace :chrome do
 
-    task :build => ['chrome:zip', 'chrome:crx']
-
+    # Run as 'rake chrome:build' or 'rake chrome:build[true]'
     desc 'Assemble content and generate config files for Chrome extension'
-    task :assemble, :store do |task, args|
+    task :build, :forbetas do |task, args|
         # Read properties from common config file
         props = eval(File.open('config.rb') {|f| f.read })
 
-        # Chrome store builds cannot contain an update_url tag
-        if args[:store] != 'store' then
-            server = 'https://%s:%s' % [props[:hostServer], props[:hostPort]]
-            dir = '%s%s' % [props[:hostURLBase], props[:extupdate][:chrome]]
-            props[:chrome_update_tag] = '"update_url": "%s%s",' % [server, dir]
+        # Create update URL
+        server = 'https://%s:%s' % [props[:hostServer], props[:hostPort]]
+        if args[:forbetas] == 'true' then
+            file = 'update_chrome_forbetas.xml'
+            title = "%s (beta tester version)" % props[:title]
+        else
+            file = 'update_chrome.xml'
+            title = "%s" % props[:title]
         end
+        update_url= '%s%s%s' % [server, props[:hostURLBase], file]
+
+        Rake::Task['chrome:zip'].invoke
+        Rake::Task['chrome:crx'].invoke(update_url, title)
+    end
+
+    task :assemble, :update_url, :title do |task, args|
+        # Read properties from common config file
+        props = eval(File.open('config.rb') {|f| f.read })
+
+        # Add a Chrome manifest update_url tag if url given as argument
+        if args[:update_url] then
+            props[:chrome_update_tag] = '"update_url": "%s",' % [args[:update_url]]
+        else
+            props[:chrome_update_tag] = ''
+        end
+        props[:title] = args[:title]
 
         # Prepare a blank Chrome Extension project
         FileUtils.rm_rf 'build/chrome/'
@@ -43,22 +62,24 @@ namespace :chrome do
              '"unpacked extension."'
     end
 
-    desc 'Create a store-deployable .zip for Chrome'
+    # Create a store-deployable (not self-updating) .zip for Chrome
     task :zip do
         # Must manually invoke to force 'assemble' to run again with "store"
         # argument even if it has already been run before without it.  Naming
         # it as a dependency does not suffice.
-        Rake::Task["chrome:assemble"].invoke('store')
+        Rake::Task["chrome:assemble"].execute
         FileUtils.rm_rf 'build/gokosalvager.zip'
         Dir.chdir('build/chrome') { sh 'zip -qr ../gokosalvager.zip *' }
         puts 'Created .zip, for deploying in Chrome Store.'
         puts
     end
+    
+    # Create a self-updating .crx for Chrome
+    task :crx, :update_url, :title do |task, args|
+        # Read properties from common config file
+        props = eval(File.open('config.rb') {|f| f.read })
 
-    desc 'Create a signed .crx for Chrome'
-    task :crx do
-        # Must manually execute.  See comment on :zip task above.
-        Rake::Task["chrome:assemble"].execute
+        Rake::Task["chrome:assemble"].invoke(args[:update_url], args[:title])
         sh './crxmake.sh build/chrome ~/.private/chrome_key.pem'
         FileUtils.mv 'chrome.crx', 'build/gokosalvager.crx'
         puts 'Created signed .crx, for manual installation.'

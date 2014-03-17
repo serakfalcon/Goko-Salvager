@@ -56,10 +56,10 @@
 		</dict>
 	</dict>
 	<key>URL</key>
-	<string><%= config[:safarixtz_url] %></string>
+    <string><%= config[:source_url] %></string>
 	<key>Website</key>
 	<string><%= config[:homepage] %></string>
     <key>Update Manifest URL</key>
-    <string>https://<%= config[:hostServer] %>:<%= config[:hostPort] %><%= config[:hostURLBase] %><%= config[:extupdate][:safari] %></string>
+    <string><%= config[:update_url] %></string>
 </dict>
 </plist>
