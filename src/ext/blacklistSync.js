@@ -57,6 +57,16 @@
                         $('#blReconcile').scope().callback();
                         $('#blReconcile').dialog('close');
                     }
+                },
+                open: function () {
+                    var helpURL = 'https://github.com/aiannacc/Goko-Salvager/'
+                                + 'wiki/User-Settings#blacklist-settings';
+                    $(this).parent().children(".ui-dialog-titlebar")
+                        .append($('<a>').attr('href', helpURL)
+                                        .attr('target', '_blank')
+                                        .css('text-decoration', 'underline')
+                                        .css('color', '#0000cc')
+                            .append('Help'));
                 }
             });
 

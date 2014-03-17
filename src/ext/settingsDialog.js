@@ -240,7 +240,17 @@
             draggable: true,
             resizeable: false,
             position: { my: "center", at: "center", of: window },
-            autoOpen: false
+            autoOpen: false,
+            open: function () {
+                var helpURL = 'https://github.com/aiannacc/Goko-Salvager/'
+                            + 'wiki/User-Settings';
+                $(this).parent().children(".ui-dialog-titlebar")
+                    .append($('<a>').attr('href', helpURL)
+                                    .attr('target', '_blank')
+                                    .css('text-decoration', 'underline')
+                                    .css('color', '#0000cc')
+                        .append('Help'));
+            }
         });
 
         window.settingsController = function ($scope) {
