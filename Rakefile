@@ -40,6 +40,5 @@ end
 
 Dir.glob('tasks/*.rake').each { |r| import r }
 
-# TODO: create a signed .crx for chrome instead of a .zip
 desc 'Build packages for all supported browsers'
 task :default => ['firefox:build', 'chrome:build', 'safari:build']
