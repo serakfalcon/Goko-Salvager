@@ -35,6 +35,18 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                                     .attr('ng-model', 'so.autokick_by_forname')
                                     .addClass('indented'))
                 .append('By player name<br>')
+                .append('Animation Speed:<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.speed_tweak_uniform')
+                                    .attr('ng-change', 'updateSpeeds()')
+                                    .addClass('indented'))
+                .append('More consistent speeds<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.speed_tweak_faster')
+                                    .attr('ng-change', 'updateSpeeds()')
+                                    .attr('ng-disabled', '!so.speed_tweak_uniform')
+                                    .addClass('indented'))
+                .append('Speed up "normal" and "fast" modes<br>')
 
                 .append($('<div>').text('Quick game:'))
                 .append('&nbsp;&nbsp;&nbsp;&nbsp;Name:')
@@ -202,6 +214,17 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                         return pn !== pname;
                     });
             };
+
+            // Speed tweak settings
+            $scope.updateSpeeds = function () {
+                console.log('tweaking animation speeds');
+                GS.tweakAnimationSpeeds();
+            };
+            $scope.$watch('so.speed_tweak_uniform', function () {
+                $scope.so.speed_tweak_faster =
+                    $scope.so.speed_tweak_faster && $scope.so.speed_tweak_uniform;
+            });
+
             $scope.$watch('so.vp_refuse', function () {
                 $scope.so.vp_request = $scope.so.vp_request && !$scope.so.vp_refuse;
             });

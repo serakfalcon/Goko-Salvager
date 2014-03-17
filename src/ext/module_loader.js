@@ -24,6 +24,7 @@
         'vpcalculator',
         'vptoggle',
         'vpcounterui',
+        'speedTweak',
         'alwaysStack',
         'automatchGamePop',
         'automatchOfferPop',
