@@ -59,6 +59,18 @@
                                 .attr('ng-model', 'so.vp_refuse')
                                 .addClass('indented'))
             .append('Always refuse (#vpoff)<br>')
+            .append('Animation Speed:<br>')
+            .append($('<input>').attr('type', 'checkbox')
+                                .attr('ng-model', 'so.speed_tweak_uniform')
+                                .attr('ng-change', 'updateSpeeds()')
+                                .addClass('indented'))
+            .append('More consistent speeds<br>')
+            .append($('<input>').attr('type', 'checkbox')
+                                .attr('ng-model', 'so.speed_tweak_faster')
+                                .attr('ng-change', 'updateSpeeds()')
+                                .attr('ng-disabled', '!so.speed_tweak_uniform')
+                                .addClass('indented'))
+            .append('Speed up "normal" and "fast" modes<br>')
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.always_stack'))
             .append('Stack duplicate cards<br>')
@@ -178,6 +190,7 @@
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('ng-model', 'so.autokick_by_forname')
                                     .addClass('indented'))
+
                 .append('By player name<br>')
 
                 .append($('<div>').text('Quick game:'))
@@ -327,6 +340,16 @@
                         $scope.so.sortkey = 'pname';
                     }
                 }
+            });
+
+            // Speed tweak settings
+            $scope.updateSpeeds = function () {
+                console.log('tweaking animation speeds');
+                GS.tweakAnimationSpeeds();
+            };
+            $scope.$watch('so.speed_tweak_uniform', function () {
+                $scope.so.speed_tweak_faster =
+                    $scope.so.speed_tweak_faster && $scope.so.speed_tweak_uniform;
             });
 
             $scope.$watch('so.vp_refuse', function () {
