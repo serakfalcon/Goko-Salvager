@@ -94,6 +94,14 @@
                 .append($('<span>').text(' ' + data.data.text))
                 .append($('<br>'));
             $('#chatarea').scrollTop(99999999);
+
+            if (GS.get_option('flash_chat')
+                    && speaker !== mtgRoom.conn.connInfo.playerName) {
+                $('#chatarea').css('background', '#dddddd');
+                setTimeout(function () {
+                    $('#chatarea').css('background', 'white');
+                }, 100);
+            }
         };
 
         var playersExited;

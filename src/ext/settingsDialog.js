@@ -108,6 +108,10 @@ if (typeof GS.LSLoader === 'undefined') { GS.LSLoader = {}; }
                                     .attr('ng-model', 'so.sidebar_chat')
                                     .addClass('indented'))
                 .append('Replace Goko chat window<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.flash_chat')
+                                    .addClass('indented'))
+                .append('Flash chat when a message is received<br>')
 
                 .append($('<div>').text('VP Counter'))
                 .append($('<input>').attr('type', 'checkbox')
