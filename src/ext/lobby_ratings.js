@@ -48,21 +48,26 @@
                         // Goko assigns this without querying its Connection,
                         // so we can't intercept the query.  Assign these
                         // players the default Isotropish rating of 0.
-                        var playerId = playerElement.querySelector('.player-list-item')
-                                                    .getAttribute('data-playerid');
-                        var playerName = mtgRoom.playerList
-                                                .findById(playerId)[0]
-                                                .get('playerName');
-                        var msg = { playerId: playerId, playerName: playerName };
-                        GS.WS.waitSendMessage('QUERY_ISOLEVEL', msg, function(resp2) {
-                            var rankDiv = playerElement.querySelector('.rank');
-                            $(rankDiv).append('  Level: ')
-                                      .append($('<span>').text(resp2.isolevel)
-                                                         .addClass('iso-level'));
+                        try {
+                            var playerId = playerElement.querySelector('.player-list-item')
+                                                        .getAttribute('data-playerid');
+                            var playerName = mtgRoom.playerList
+                                                    .findById(playerId)[0]
+                                                    .get('playerName');
+                            var msg = { playerId: playerId, playerName: playerName };
+                            GS.WS.waitSendMessage('QUERY_ISOLEVEL', msg, function(resp2) {
+                                var rankDiv = playerElement.querySelector('.rank');
+                                $(rankDiv).append('  Level: ')
+                                          .append($('<span>').text(resp2.isolevel)
+                                                             .addClass('iso-level'));
 
-                            // Keep the list of players sorted
-                            insertInPlace(playerElement);
-                        });
+                                // Keep the list of players sorted
+                                insertInPlace(playerElement);
+                            });
+                        } catch (e) {
+                            // Players sometimes disappear from the list before
+                            // this code is reached.  Ignore these errors.
+                        }
                     }
 
                     // Don't show censored players on the player list
