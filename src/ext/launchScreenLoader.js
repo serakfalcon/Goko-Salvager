@@ -15,6 +15,8 @@
     ];
     GS.modules.launchScreenLoader.load = function () {
 
+        GS.launchScreenModified = false;
+
         // Set avatar and custom links.  To be run only after Goko finishes
         // loading the Launch Screen.  Otherwise Goko's loading process may
         // override our changes.
@@ -50,6 +52,8 @@
                                   .attr('id', 'userSettingsLink')
                                   .text('User Settings')
                                   .click(showSettings));
+
+            GS.launchScreenModified = true;
         };
 
         // Loop until Goko finishes preparing the launch screen, then make

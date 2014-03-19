@@ -38,6 +38,7 @@
         GS.WS.failCount = 0;
         GS.WS.lastPingTime = new Date();
         GS.WS.callbacks = {};
+        GS.WS.clientInfoReceived = false;
 
         // Attempt to connect to the GokoSalvager server
         GS.WS.connectToGS = function () {
@@ -70,7 +71,9 @@
                         playerId: mtgRoom.conn.connInfo.playerId,
                         gsversion: GS.version
                     };
-                    GS.WS.sendMessage('CLIENT_INFO', info);
+                    GS.WS.sendMessage('CLIENT_INFO', info, function () {
+                        GS.WS.clientInfoReceived = true;
+                    });
                     break;
                 case 'RESPONSE':
                     // Server response to client's request for information.
@@ -84,6 +87,16 @@
                         delete GS.WS.callbacks[m.queryid];
                     }
                     break;
+                case 'UPDATE_ISO_LEVELS':
+                    _.each(m.new_levels, function (isoLevel, playerId) {
+                        GS.isoLevelCache[playerId] = isoLevel;
+                    });
+                    // TODO: update HTML elements for these players, if they
+                    //       happen to be in the same lobby as us
+                    break;
+                case 'UPDATE_AVATAR_INFO':
+                    // TODO: implement
+                    break;
                 default:
                     throw 'Invalid server message type: ' + d.msgtype;
                 }
@@ -91,7 +104,9 @@
         };
 
         GS.WS.isConnReady = function () {
-            return typeof GS.WS.conn !== 'undefined' && GS.WS.conn.readyState === 1;
+            return typeof GS.WS.conn !== 'undefined'
+                && GS.WS.conn.readyState === 1
+                && GS.WS.clientInfoReceived;
         };
 
 
