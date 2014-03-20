@@ -19,6 +19,7 @@ All versions feature automatic updating, but your browser must be configured to 
 
 Main Features
 -------------
+[(Full List & User Settings)](wiki/Features-&-User-Settings)
 * Lobby:
   * [Automatch](wiki/Automatch)
   * [Quick Game](wiki/Features-&-User-Settings#quick-game)
