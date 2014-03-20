@@ -17,6 +17,23 @@ Automatic Updates
 
 All versions feature automatic updating, but your browser must be configured to allow it.  Specifically, Safari has extension updates disabled by default, and the Chrome store version will occasionally disable the updated version if/when the permissions have changed.
 
+Main Features
+-------------
+* Lobby:
+  * [Automatch](wiki/Automatch)
+  * [Quick Game](wiki/Features-&-User-Settings#quick-game)
+  * [Autokick](wiki/Features-&-User-Settings#autokick)
+  * [Pro/Isotropish Ratings](wiki/Features-&-User-Settings#lobby-ratings)
+  * Custom Avatars
+* Game Interface:
+  * [Log Viewer & Chat Sidebar](wiki/Features-&-User-Settings#sidebar)
+  * [VP Counter](wiki/User-Settings#vp-counter)
+  * [Animation Speed Tweaks](wiki/Features-&-User-Settings#animation-speed-tweaks)
+* [Blacklist](wiki/Features-&-User-Settings#blacklist-settings)
+* [Auto-kick](wiki/Features-&-User-Settings#table-settings-autokick-and-vponoff)
+* [Semi-Random Kingdom Generator](wiki/Kingdom-Generator)
+
+
 Contributing
 ------------
 If you'd like to contribute, either fork this project and submit your changes via pull request, or ask [aiannacc](https://github.com/aiannacc) to make you a collaborator. [This](https://github.com/aiannacc/Goko-Salvager) is the project's central repository.
