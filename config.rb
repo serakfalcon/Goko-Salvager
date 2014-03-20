@@ -19,7 +19,6 @@
     :homepage => 'https://github.com/aiannacc/Goko-Salvager/wiki',
     :license => 'MPL 2.0',
     :manifest_version => '2',
-    :safarixtz_url => 'http://goo.gl/1SJmbB',
     :targeturls => [
         'http://play.goko.com/Dominion/gameClient.html',
         'https://play.goko.com/Dominion/gameClient.html',
@@ -29,15 +28,10 @@
         'http://www.playdominion.com/Dominion/gameClient.html'
     ],
     :hostServer => 'www.gokosalvager.com',
-    :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager/',
+    :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager',
     :hostPort => '8888',
     :hostURLBase => '/',
     :extinfo => 'index.html',
-    :extupdate => {
-        :firefox => 'update_firefox.rdf',
-        :chrome => 'update_chrome.xml',
-        :safari => 'update_safari.plist'
-    },
     :firefox_minversion => '19.0',
     :firefox_maxversion => '23.*',
 
