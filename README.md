@@ -12,6 +12,8 @@ Installation
 * Firefox manual install: [download the .xpi file](https://www.gokosalvager.com:8888/firefox-latest-gokosalvager.xpi).  Just click the link to install, probably.  Depending on your Firefox settings, you may need to save the file and then install it manually from the Add-ons dialog, using "Install Add-ons from file."
 * Safari manual install:[download the .safariextz file](https://www.gokosalvager.com:8888/safari-latest-gokosalvager.safariextz), then double-click on it to add it to Safari.
 
+[Beta versions](wiki/Beta-Testers) are also available.  Install to get early access to features still in development, in addition to the regular updates.
+
 Automatic Updates
 -----------------
 
