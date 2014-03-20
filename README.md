@@ -30,7 +30,7 @@ Main Features
   * Custom Avatars
 * Game Interface:
   * [Log Viewer & Chat Sidebar](../../wiki/Features-&-User-Settings#sidebar)
-  * [VP Counter](../../wiki/User-Settings#vp-counter)
+  * [VP Counter](../../wiki/Features-&-User-Settings#vp-counter)
   * [Animation Speed Tweaks](../../wiki/Features-&-User-Settings#animation-speed-tweaks)
 * [Blacklist](../../wiki/Features-&-User-Settings#blacklist-settings)
 * [Auto-kick](../../wiki/Features-&-User-Settings#table-settings-autokick-and-vponoff)
