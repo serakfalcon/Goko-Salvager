@@ -19,7 +19,7 @@ namespace :chrome do
         end
         update_url= '%s%s%s' % [server, props[:hostURLBase], file]
 
-        Rake::Task['chrome:zip'].invoke
+        Rake::Task['chrome:zip'].invoke(title)
         Rake::Task['chrome:crx'].invoke(update_url, title)
     end
 
@@ -63,11 +63,8 @@ namespace :chrome do
     end
 
     # Create a store-deployable (not self-updating) .zip for Chrome
-    task :zip do
-        # Must manually invoke to force 'assemble' to run again with "store"
-        # argument even if it has already been run before without it.  Naming
-        # it as a dependency does not suffice.
-        Rake::Task["chrome:assemble"].execute
+    task :zip, :title do  |task, args|
+        Rake::Task["chrome:assemble"].invoke(nil, args[:title])
         FileUtils.rm_rf 'build/gokosalvager.zip'
         Dir.chdir('build/chrome') { sh 'zip -qr ../gokosalvager.zip *' }
         puts 'Created .zip, for deploying in Chrome Store.'
@@ -76,9 +73,6 @@ namespace :chrome do
     
     # Create a self-updating .crx for Chrome
     task :crx, :update_url, :title do |task, args|
-        # Read properties from common config file
-        props = eval(File.open('config.rb') {|f| f.read })
-
         Rake::Task["chrome:assemble"].invoke(args[:update_url], args[:title])
         sh './crxmake.sh build/chrome ~/.private/chrome_key.pem'
         FileUtils.mv 'chrome.crx', 'build/gokosalvager.crx'
