@@ -23,7 +23,8 @@
             GS.AM.wsMaxFails = 100;
         
             // Use secure websockets
-            GS.AM.server_url = 'wss://andrewiannaccone.com/automatch';
+            // TODO: switch from 8889 back to 443 port after transition
+            GS.AM.server_url = 'wss://gokosalvager.com:8889/automatch';
         
             // Initial state
             automatchInitStarted = false;
@@ -56,6 +57,27 @@
                              rating: {},
                              ratingsDirty: true,
                              sets_owned: null};
+        
+                // Remove broken css in Goko's "Create Game" button
+                $('.room-section-btn-create-table')
+                    .removeClass('room-section-btn-create-table')
+//                    .addClass('room-section-btn-find-table')
+                    .css('margin', '0px 3px 0px 3px')
+                    .click(mtgRoom.views.ClassicRoomSection.onClickCreateTable);
+
+                // Replace the "Play Now" button with an Automatch button
+                $('.room-section-btn-find-table').remove();
+                $('.room-section-header-buttons')
+                    .append($('<li>')
+                        .append($('<button id="automatchButton" />')
+                            .addClass('fs-mtrm-text-border')
+//                            .addClass('room-section-btn-find-table')
+                            .addClass('fs-mtrm-dominion-action-btn')
+                            .css('margin', '0px 3px 0px 3px')
+                            .css('width', '200px')
+                            .click(GS.AM.showSeekPop)
+                            .append('Automatch')));
+
                 fetchOwnRatings(updateAMButton);
                 fetchOwnSets(updateAMButton);
         
@@ -66,15 +88,6 @@
                 GS.AM.appendSeekPopup($('#viewport'));
                 GS.AM.appendOfferPopup($('#viewport'));
                 GS.AM.appendGamePopup($('#viewport'));
-        
-                // Replace the "Play Now" button with an Automatch button
-                $('.room-section-btn-find-table').remove();
-                $('.room-section-header-buttons').append(
-                    $('<button id="automatchButton" />')
-                        .addClass('fs-mtrm-text-border')
-                        .addClass('fs-mtrm-dominion-btn')
-                        .click(GS.AM.showSeekPop)
-                );
         
                 // Disable the butomatch button until the async init calls finish
                 updateAMButton();
@@ -395,7 +408,7 @@
                         || !GS.AM.player.rating.hasOwnProperty('goko_casual_rating')
                         || !GS.AM.player.rating.hasOwnProperty('goko_pro_rating')) {
                     ready = false;
-                    buttonText = 'Automatch: Getting Player Info';
+                    buttonText = 'Automatch: Initializing';
                     buttonColor = 'LightGray';
                 } else if (typeof GS.AM.ws === 'undefined') {
                     ready = false;
@@ -572,8 +585,13 @@
             };
         
             GS.AM.submitSeek = function (seek) {
-                seek.blacklist = _.union(GS.get_option('blacklist'),
-                        GS.get_option('automatch_blacklist'));
+                var blist = GS.getCombinedBlacklist();
+                seek.blacklist = [];
+                _.keys(blist).map(function (pname) {
+                    if (blist[pname].nomatch || blist[pname].noplay) {
+                        seek.blacklist.push(pname);
+                    }
+                });
                 GS.AM.state.seek = seek;
                 GS.AM.ws.sendMessage('SUBMIT_SEEK', {seek: GS.AM.state.seek});
             };
