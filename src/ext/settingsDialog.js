@@ -220,14 +220,14 @@
 
         // Define the dialog sections: miscellaneous settings
         $('#settingsTabs-misc')
-            .append($('<input>').attr('type', 'checkbox')
-                                .attr('ng-model', 'so.generator'))
+            .append($('<input type="checkbox" ng-model="so.generator">'))
             .append('Kingdom Generator<br>')
-            .append($('<input>').attr('type', 'checkbox')
-                                .attr('ng-model', 'so.debug_mode'))
-            .append('Extra logging (for error reports)<br>')
+            .append($('<input type="checkbox" ng-model="so.autozap">'))
+            .append('Adventure Mode Auto-Zap<br>')
             .append($('<input type="checkbox" ng-model="so.show_ads">'))
-            .append('Show Ads on launch screen');
+            .append('Show Ads on launch screen<br>')
+            .append($('<input type="checkbox" ng-model="so.debug_mode">'))
+            .append('Extra logging (for error reports)<br>');
 
         // Verify blacklist when opening Blacklist tab.  Save on close.
         $('#settingsTabs').on("tabsactivate", function (event, ui) {
