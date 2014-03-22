@@ -194,8 +194,12 @@
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('ng-model', 'so.autokick_by_forname')
                                     .addClass('indented'))
-
                 .append('By player name<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.explain_kicks')
+                                    .addClass('indented'))
+                .append('Explain kicks in chat<br>')
+
 
                 .append($('<div>').text('Quick game:'))
                 .append('&nbsp;&nbsp;&nbsp;&nbsp;Name:')

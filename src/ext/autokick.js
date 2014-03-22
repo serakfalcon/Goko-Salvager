@@ -145,7 +145,7 @@
                     shouldExplain = false;
                     break;
                 }
-                if (shouldExplain) {
+                if (shouldExplain && GS.get_option('explain_kicks')) {
                     mtgRoom.conn.chat({text: joiner.get('playerName') + ', you were '
                                              + ' auto-kicked because ' + expl + '.'});
                     self.kickedOpps.push(joiner.get('playerId'));
