@@ -1,5 +1,6 @@
 /*jslint vars:true, nomen:true, forin:true, regexp:true, browser:true, devel:true */
-/*globals _, $, GS, mtgRoom, Dom */
+
+/*globals _, $, GS, mtgRoom, Dom, Audio */
 
 // TODO: Immediately send Turn 2 messages when opponents have all joined the game.
 
@@ -94,6 +95,12 @@
                 .append($('<span>').text(' ' + data.data.text))
                 .append($('<br>'));
             $('#chatarea').scrollTop(99999999);
+
+            if (GS.get_option('chat_noise')
+                    && speaker !== mtgRoom.conn.connInfo.playerName) {
+                var url = 'https://gokosalvager.com:8888/static/audio/Ding.wav';
+                new Audio(url).play();
+            }
 
             if (GS.get_option('flash_chat')
                     && speaker !== mtgRoom.conn.connInfo.playerName) {
