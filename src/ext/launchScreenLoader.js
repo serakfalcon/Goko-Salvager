@@ -17,6 +17,10 @@
 
         GS.launchScreenModified = false;
 
+        this.showAds = function (visible) {
+            $('.fs-upsell-box').css('display', visible ? '' : 'none');
+        };
+
         // Set avatar and custom links.  To be run only after Goko finishes
         // loading the Launch Screen.  Otherwise Goko's loading process may
         // override our changes.
