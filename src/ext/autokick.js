@@ -70,7 +70,12 @@
                         || (maxRating && hisRating > maxRating)) {
                     GS.debug(hisName + 'is outside my rating range... kicking');
                     shouldKick = true;
-                    whyKick = {reason: 'rating', min: minRating, max: maxRating, rating: hisRating};
+                    whyKick = {
+                        reason: 'rating', 
+                        min: minRating,
+                        max: maxRating,
+                        rating: hisRating
+                    };
                 }
             }
 
@@ -111,7 +116,9 @@
                         && typeof room !== 'undefined'
                         && room.get('name').indexOf('Private') !== 0) {
                     console.info('Opp joined', joiner, room);
-                    GS.notifyUser('Opponent joined', new Audio('sounds/startTurn.ogg'));
+                    var msg = 'Opponent joined: ' + joiner.get('playerName')
+                                   + ' [Pro ' + hisRating + ']';
+                    GS.notifyUser(msg, new Audio('sounds/startTurn.ogg'));
                 }
             }
         };
