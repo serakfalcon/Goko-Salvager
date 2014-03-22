@@ -53,6 +53,10 @@
                                   .text('User Settings')
                                   .click(showSettings));
 
+            if (!GS.get_option('show_ads')) {
+                $('.fs-upsell-box').css('display', 'none');
+            }
+
             GS.launchScreenModified = true;
         };
 
