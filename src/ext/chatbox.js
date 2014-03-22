@@ -126,6 +126,11 @@
         // Listen to VP toggle events in room chat and when the game starts
         mtgRoom.conn.bind('gameServerHello', function (msg) {
             if (GS.get_option('sidebar_chat')) {
+
+                // Clear any extraneous messages
+                $('#chatarea').empty();
+                $('#chatline').empty();
+
                 // Stop listening to the old game client
                 if (typeof gameClient !== 'undefined' && gameClient !== null) {
                     gameClient.unbind('incomingMessage:gameSetup', onGameSetup);
