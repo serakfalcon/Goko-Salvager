@@ -57,6 +57,8 @@
                 }
             }
 
+            console.info('Deciding whether to kick', joiner);
+
             // Kick players whose ratings are too high or too low for me
             if (GS.get_option('autokick_by_rating') && tablename !== null) {
 
@@ -104,8 +106,11 @@
                 });
                 explainKick(joiner, whyKick);
             } else {
-                if (!joiner.get('isBot')) {
-                    // TODO: make this work on Safari too
+                var room = mtgRoom.roomList.findByRoomId(mtgRoom.currentRoomId);
+                if (!joiner.get('isBot')
+                        && typeof room !== 'undefined'
+                        && room.get('name').indexOf('Private') !== 0) {
+                    console.info('Opp joined', joiner, room);
                     GS.notifyUser('Opponent joined', new Audio('sounds/startTurn.ogg'));
                 }
             }
