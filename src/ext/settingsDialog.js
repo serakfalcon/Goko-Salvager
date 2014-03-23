@@ -228,8 +228,6 @@
             .append('Kingdom Generator<br>')
             .append($('<input type="checkbox" ng-model="so.autozap">'))
             .append('Adventure Mode Auto-Zap<br>')
-            .append($('<input type="checkbox" ng-model="so.show_ads">'))
-            .append('Show Ads on launch screen<br>')
             .append($('<input type="checkbox" ng-model="so.debug_mode">'))
             .append('Extra logging (for error reports)<br>');
 
