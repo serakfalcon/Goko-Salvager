@@ -50,6 +50,10 @@
                                 .attr('ng-model', 'so.sidebar_chat')
                                 .addClass('indented'))
             .append('Replace Goko chat window<br>')
+            .append($('<input type="checkbox" ng-model="so.flash_chat" class="indented">'))
+            .append('Visual chat alert<br>')
+            .append($('<input type="checkbox" ng-model="so.chat_noise" class="indented">'))
+            .append('Audio chat alert<br>')
             .append($('<div>').text('VP Counter'))
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('ng-model', 'so.vp_request')
@@ -190,8 +194,12 @@
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('ng-model', 'so.autokick_by_forname')
                                     .addClass('indented'))
-
                 .append('By player name<br>')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('ng-model', 'so.explain_kicks')
+                                    .addClass('indented'))
+                .append('Explain kicks in chat<br>')
+
 
                 .append($('<div>').text('Quick game:'))
                 .append('&nbsp;&nbsp;&nbsp;&nbsp;Name:')
@@ -216,11 +224,11 @@
 
         // Define the dialog sections: miscellaneous settings
         $('#settingsTabs-misc')
-            .append($('<input>').attr('type', 'checkbox')
-                                .attr('ng-model', 'so.generator'))
+            .append($('<input type="checkbox" ng-model="so.generator">'))
             .append('Kingdom Generator<br>')
-            .append($('<input>').attr('type', 'checkbox')
-                                .attr('ng-model', 'so.debug_mode'))
+            .append($('<input type="checkbox" ng-model="so.autozap">'))
+            .append('Adventure Mode Auto-Zap<br>')
+            .append($('<input type="checkbox" ng-model="so.debug_mode">'))
             .append('Extra logging (for error reports)<br>');
 
         // Verify blacklist when opening Blacklist tab.  Save on close.
@@ -350,6 +358,10 @@
             $scope.$watch('so.speed_tweak_uniform', function () {
                 $scope.so.speed_tweak_faster =
                     $scope.so.speed_tweak_faster && $scope.so.speed_tweak_uniform;
+            });
+
+            $scope.$watch('so.show_ads', function () {
+                GS.modules.launchScreenLoader.showAds($scope.so.show_ads);
             });
 
             $scope.$watch('so.vp_refuse', function () {
