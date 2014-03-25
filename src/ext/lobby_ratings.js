@@ -156,7 +156,7 @@
             {
             case('pname'):
                 return element.querySelector('.fs-mtrm-player-name>strong').innerHTML;
-            case('pro'):
+            case('rating'):
                 var rankSpan = element.querySelector('.player-rank>span');
                 return rankSpan ? parseInt(-rankSpan.innerHTML, 10) : 1;
             case('iso'):
