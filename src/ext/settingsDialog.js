@@ -354,10 +354,6 @@
                     $scope.so.speed_tweak_faster && $scope.so.speed_tweak_uniform;
             });
 
-            $scope.$watch('so.show_ads', function () {
-                GS.modules.launchScreenLoader.showAds($scope.so.show_ads);
-            });
-
             $scope.$watch('so.vp_refuse', function () {
                 $scope.so.vp_request = $scope.so.vp_request && !$scope.so.vp_refuse;
             });
