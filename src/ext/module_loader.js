@@ -14,6 +14,7 @@
         'blacklist',
         'blacklistSync',
         'settingsDialog',       // Depends on blacklist, blacklistSync
+        'launchScreenLoader',   // Depends on avatars, settingsDialog modules
         //'eventLogger',
         'notifications',
         'lobbyRatings',
@@ -28,7 +29,6 @@
         'automatchSeekPop',
         'automatch',
         'quickGame',
-        'launchScreenLoader',   // Depends on avatars, settingsDialog modules
         'sidebar',              
         'logviewer',            // Depends on sidebar
         'vpcalculator',         // Depends on sidebar
