@@ -28,6 +28,11 @@
         var insertInPlace, getSortablePlayerObjectFromElement,
             updateIsoRating, updateIsoRating2, modifyPlayerListElement;
 
+        // One-time option conversion
+        if (GS.get_option('sortkey') === 'pro') {
+            GS.set_option('sortkey', 'rating');
+        }
+
         // Cache all Isotropish ratings
         var noIsoCacheWarned = false;
         var queuedRequests = [];
