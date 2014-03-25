@@ -277,7 +277,7 @@
         window.settingsController = function ($scope) {
             $scope.sortkeys = [
                 {name: 'pname', text: 'Username'},
-                {name: 'pro', text: 'Pro Rating'},
+                {name: 'rating', text: 'Pro/Casual Rating'},
                 {name: 'iso', text: 'Isotropish Rating'}
             ];
             $scope.quick_game_types = [
@@ -329,8 +329,6 @@
             $scope.$watch('so.sortkey', function () {
                 if ($scope.so.sortkey === 'iso') {
                     $scope.so.isoranks = true;
-                } else if ($scope.so.sortkey === 'pro') {
-                    $scope.so.proranks = true;
                 }
             });
 
@@ -342,11 +340,7 @@
 
             $scope.$watch('so.isoranks', function () {
                 if (!$scope.so.isoranks && $scope.so.sortkey === 'iso') {
-                    if ($scope.so.proranks) {
-                        $scope.so.sortkey = 'pro';
-                    } else {
-                        $scope.so.sortkey = 'pname';
-                    }
+                    $scope.so.sortkey = 'rating';
                 }
             });
 
