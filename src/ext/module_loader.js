@@ -68,8 +68,6 @@
                         console.log(missing);
                     }
                     if (failCount === 120) {
-                        alert('Goko Salvager could not load. Module ' + mod.name
-                            + ' could not find its Goko object dependencies.');
                         console.log('Goko Salvager could not load. Module ' + mod.name
                                   + ' could not find its Goko object dependencies.');
                     }
