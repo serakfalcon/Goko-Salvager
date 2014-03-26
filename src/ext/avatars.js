@@ -80,17 +80,19 @@
             // launch screen, while players with no custom avatar will receive
             // a single 404/CORS error.
             //
-            if (mtgRoom.currentRoomId === null && userdata.which <= MEDIUM) {
-                gsAvatarLoader(userdata, callback);
-            } else if (userdata.which > MEDIUM) {
+            if (userdata.which > MEDIUM) {
                 gokoAvatarLoader(userdata, callback);
             } else if (typeof GS.hasAvatar === 'undefined') {
-                if (!GS.noAvatarCacheWarned) {
-                    console.log('The avatar cache from ' + GS.WS.domain
-                              + ' is not yet loaded.  Using retrobox for now');
-                    GS.noAvatarCacheWarned = true;
+                if (mtgRoom.currentRoomId === null && userdata.which <= MEDIUM) {
+                    gsAvatarLoader(userdata, callback);
+                } else {
+                    if (!GS.noAvatarCacheWarned) {
+                        console.log('The avatar cache from ' + GS.WS.domain
+                                  + ' is not yet loaded.  Using retrobox for now');
+                        GS.noAvatarCacheWarned = true;
+                    }
+                    retroboxAvatarLoader(userdata, callback);
                 }
-                retroboxAvatarLoader(userdata, callback);
             } else if (typeof GS.hasAvatar[userdata.player.id] !== 'undefined') {
                 if (GS.hasAvatar[userdata.player.id]) {
                     gsAvatarLoader(userdata, callback);
