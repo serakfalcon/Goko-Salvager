@@ -686,9 +686,17 @@
                 GS.debug('Reading rating range requirement');
         
                 // TODO: use casual rating for casual/unrated games?
-                var range = GS.parseRange(tName, GS.AM.player.rating.goko_pro_rating);
-                var minRating = range[0];
-                var maxRating = range[1];
+                var range = GS.parseProRange(tName);
+                var minRating = null;
+                var maxRating = null;
+                if (range.hasOwnProperty('difference')) {
+                    minRating = GS.AM.player.rating.goko_pro_rating - range.difference;
+                    maxRating = GS.AM.player.rating.goko_pro_rating + range.difference;
+                } else if (range.hasOwnProperty('min')) {
+                    minRating = range.min;
+                }else if (range.hasOwnProperty('max')) {
+                    maxRating = range.max;
+                }
         
                 // Do not automatch if looking for a particular opponent
                 var m;

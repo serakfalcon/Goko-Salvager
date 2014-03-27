@@ -4,8 +4,7 @@
 (function () {
     "use strict";
 
-    var parseNum, parseIsoRange, parseProRange, parseForName, KickCriterion,
-        RangeKickCriterion, NameKickCriterion, BlacklistKickCriterion;
+    var KickCriterion, RangeKickCriterion, NameKickCriterion, BlacklistKickCriterion;
 
     var mod = GS.modules.autokick = new GS.Module('autokick');
     mod.dependencies = [
@@ -41,14 +40,14 @@
 
                 // Isotropish kick criteria
                 var isoCrit = new RangeKickCriterion('isotropish.com rating level',
-                                    parseIsoRange(tableName), myIso, oppIso);
+                                    GS.parseIsoRange(tableName), myIso, oppIso);
                 isoCrit.apply = GS.get_option('autokick_by_level')
                                 && typeof oppIso !== 'undefined'
                                 && oppIso !== null;
 
                 // Goko Pro kick criteria
                 var proCrit = new RangeKickCriterion('Pro rating',
-                                    parseProRange(tableName), myPro, oppPro);
+                                    GS.parseProRange(tableName), myPro, oppPro);
                 proCrit.apply = GS.get_option('autokick_by_rating');
 
                 // Player name kick criteria
@@ -80,7 +79,7 @@
                         kick(table, opp, blCrit.whyKick());
                     } else {
                         var msg = opp.get('playerName') + ' joined '
-                                + ' [Pro ' + proCache[oppId]
+                                + ' [Pro ' + proCache[oppId].ratingPro
                                 + ', Iso ' + oppIso + ']';
                         GS.notifyUser(msg, new Audio('sounds/startTurn.ogg'));
                     }
@@ -106,44 +105,6 @@
                 self.kickedOpps.push(oppId);
             }
         };
-    };
-
-    // Parse numbers like 303 and 4.23k
-    // Fail noisily if unparseable strings get here
-    parseNum = function (str) {
-        var m = str.match(/^([0-9.]+)([kK]?)$/);
-        return Math.floor(parseFloat(m[1]) * (m[2] !== '' ? 1000 : 1));
-    };
-
-    // Parse Goko Pro rating ranges that can be used in game titles
-    // Valid forms are like X+, Y-, X-Y, +/-R,
-    //   where X,Y,R are numbers like 4000 or 4k or 4.00k
-    // Only the first expression encountered will be parsed
-    // Precedence: +/- > range > min thresh > max thresh
-    parseProRange = function (tablename) {
-        var m, range = {};
-
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\+(?!\S)/)) !== null) {
-            range.min = parseNum(m[2]);
-        }
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\-(?!\S)/)) !== null) {
-            range.max = parseNum(m[2]);
-        }
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)(?!\S)/)) !== null) {
-            range.min = parseNum(m[2]);
-            range.max = parseNum(m[5]);
-        }
-        if ((m = tablename.match(/^(.* |)\+\/\-(\d+(.\d+)?([kK])?)(?!\S)/)) !== null) {
-            range.difference = parseNum(m[2]);
-        }
-        return range;
-    };
-
-    // For Isotropish ranges, valid forms must have an "L" in front.
-    // The regex syntax is otherwise identical
-    parseIsoRange = function (tablename) {
-        var m = tablename.match(/L(\S*)/);
-        return m === null ? parseProRange('') : parseProRange(m[1]);
     };
 
     KickCriterion = function () {
