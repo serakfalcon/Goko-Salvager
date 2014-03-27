@@ -45,42 +45,6 @@
         };
     };
 
-    // Parse numbers like 303 and 4.23k
-    GS.parseNum = function (str) {
-        try {
-            var m = str.match(/^([0-9.]+)([kK]?)$/);
-            return Math.floor(parseFloat(m[1]) * (m[2] !== '' ? 1000 : 1));
-        } catch (e) {
-            // Fail silently if unparseable strings get here
-            return null;
-        }
-    };
-
-    // Parse titles like X+, Y-, X-Y, and +/-Z
-    // Precedence: +/- > range > min thresh > max thresh
-    GS.parseRange = function (tablename, myRating) {
-        var m, minRating = null, maxRating = null;
-
-        if ((m = tablename.match(/(\d+(.\d+)?([kK])?)-/)) !== null) {
-            minRating = null;
-            maxRating = this.parseNum(m[1]);
-        }
-        if ((m = tablename.match(/(\d+(.\d+)?([kK])?)\+/)) !== null) {
-            minRating = this.parseNum(m[1]);
-            maxRating = null;
-        }
-        if ((m = tablename.match(/(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)/)) !== null) {
-            minRating = this.parseNum(m[1]);
-            maxRating = this.parseNum(m[4]);
-        }
-        if ((m = tablename.match(/\+\/-(\d+(.\d+)?([kK])?)/)) !== null) {
-            minRating = myRating - this.parseNum(m[1]);
-            maxRating = myRating + this.parseNum(m[1]);
-        }
-
-        return [minRating, maxRating];
-    };
-
     GS.getTableName = function () {
         try {
             return JSON.parse(mtgRoom.getCurrentTable().get('settings')).name;

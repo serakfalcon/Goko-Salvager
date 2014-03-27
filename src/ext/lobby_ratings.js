@@ -37,7 +37,7 @@
         var noIsoCacheWarned = false;
         var queuedRequests = [];
         GS.WS.waitSendMessage('QUERY_ISO_TABLE', {}, function (resp) {
-            console.log('Loaded isotropish level cache from ' + GS.WS.domain);
+
             GS.isoLevelCache = resp.isolevel;
 
             // Resolve queued ratings requests
