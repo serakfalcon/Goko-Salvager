@@ -267,11 +267,17 @@
         });
 
         window.settingsController = function ($scope) {
+
             $scope.sortkeys = [
                 {name: 'pname', text: 'Username'},
                 {name: 'rating', text: 'Pro/Casual Rating'},
                 {name: 'iso', text: 'Isotropish Rating'}
             ];
+
+            if (!_.contains(['pname', 'rating', 'iso'], GS.get_option('sortkey'))) {
+                GS.set_option('sortkey', 'rating');
+            }
+
             $scope.quick_game_types = [
                 {name: 'pro'},
                 {name: 'casual'},
