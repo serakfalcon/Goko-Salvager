@@ -147,6 +147,7 @@
                 // Also shut down automatch
                 GS.AM.gokoconn.bind(GS.AM.GAME_START, function () {
                     GS.AM.gameStarted();
+
                     GS.AM.state = {seek: null, offer: null, game: null};
 
                     // Disable auto-reconnect and disconnect from automatch server
@@ -642,6 +643,11 @@
                 if (GS.AM.state.game !== null) {
                     msg = {matchid: GS.AM.state.game.matchid};
                 }
+                if (GS.AM.state.game !== null) {
+                    GS.AM.vpcounter = GS.AM.state.game.vpcounter;
+                } else {
+                    GS.AM.vpcounter = null;
+                }
                 GS.AM.ws.sendMessage('GAME_STARTED', msg);
                 GS.AM.state = {seek: null, offer: null, game: null};
             };
@@ -706,12 +712,19 @@
                 var gokoRange = GS.parseProRange(tName);
                 var isoRange = GS.parseIsoRange(tName);
 
+                var vpcounter = null;
+                if (tName.toLowerCase().indexOf('#vpon') >= 0) {
+                    vpcounter = true;
+                } else if (tName.toLowerCase().indexOf('#vpoff') >= 0) {
+                    vpcounter = false;
+                }
+
                 // Do not automatch if looking for a particular opponent
                 var m;
                 if ((m = tName.toLowerCase().match(/for\s*\S*/)) !== null) {
                     GS.debug('Table is for a specific opp; no automatch');
                 } else {
-                    var np, rs, rGoko, rIso;
+                    var np, rs, vp, rGoko, rIso;
 
                     np = {rclass: 'NumPlayers', props: {}};
                     np.props.min_players = pCount;
@@ -720,13 +733,16 @@
                     rs = {rclass: 'RatingSystem', props: {}};
                     rs.props.rating_system = rSystem;
 
+                    vp = {rclass: 'VPCounter', props: {}};
+                    vp.props.vpcounter = vpcounter;
+
                     rGoko = rangeToRequirement(gokoRange, rSystem);
                     rIso = rangeToRequirement(isoRange, 'isotropish');
 
                     // Send seek request
                     var seek = {
                         player: GS.AM.player,
-                        requirements: [np, rs, rGoko, rIso]
+                        requirements: [np, rs, vp, rGoko, rIso]
                     };
                     GS.debug(seek);
 
@@ -745,7 +761,7 @@
              */
 
             createAutomatchGame = function (callback) {
-                var oppnames, ratingSystem, listenJoin, listenCreate;
+                var oppnames, ratingSystem, vpcounter, listenJoin, listenCreate;
 
                 oppnames = GS.AM.state.game.seeks.map(function (seek) {
                     return seek.player.pname;
@@ -753,6 +769,8 @@
                     return pname !== GS.AM.player.pname;
                 });
                 ratingSystem = GS.AM.state.game.rating_system;
+
+                vpcounter = GS.AM.state.game.vpcounter;
 
                 // Handle join requests automatically
                 enableAutoAccept(oppnames);
@@ -787,7 +805,7 @@
 
                 // 1. Create a new game table; listen for its creation
                 GS.AM.gokoconn.bind(GS.AM.TABLE_STATE, listenCreate);
-                createTable(oppnames, ratingSystem);
+                createTable(oppnames, ratingSystem, vpcounter);
             };
 
             disableAutoAccept = function () {
@@ -822,7 +840,7 @@
                 };
             };
 
-            createTable = function (opps, ratingSystem) {
+            createTable = function (opps, ratingSystem, vpcounter) {
                 // Leave current table first, if any
                 if (GS.AM.zch.hasOwnProperty('currentTable')
                         && GS.AM.zch.currentTable !== null) {
@@ -839,6 +857,9 @@
                     // Use cached settings if available
                     tSettings = GS.AM.tableSettings;
                     tSettings.name = 'For ' + opps.join(', ');
+                    if (vpcounter !== null) {
+                        tSettings.name += ' ' + (vpcounter ? '#VPON' : '#VPOFF');
+                    }
                     tOpts = {settings: JSON.stringify(tSettings),
                              isLock: false,
                              isRequestJoin: true,

@@ -17,6 +17,7 @@
                 '  <ul id="plist"> </ul>',
                 '  Sets: <label id="offersets" /><br>',
                 '  Rating: <label id="offerrating" /><br>',
+                '  VP Counter: <label id="offervpc" /><br>',
                 //'  Room: <label id="offerroom" /><br>',
                 '  ',
                 '  <p id="offerwaitinfo" />',
@@ -101,6 +102,9 @@
                 default:
                     $('#offersets').text(hostsets.length + ' sets');
                 }
+
+                $('#offervpc').text(GS.AM.state.offer.vpcounter === null
+                        ? "Not specified" : (GS.AM.state.offer.vpcounter ? 'On' : 'Off'));
 
                 $('#offerrating').text(GS.AM.state.offer.rating_system);
 

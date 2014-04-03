@@ -95,6 +95,14 @@
                 GS.showRoomChat('The VP Counter is ON because all the other '
                               + 'players are bots.');
                 GS.showRoomChat('Say "#vphelp" for more info.');
+            } else if (GS.AM.vpcounter !== null) {
+                this.vpon = GS.AM.vpcounter;
+                this.locked = true;
+                this.whyLocked = 'it was specified using Automatch';
+                GS.showRoomChat('The VP Counter is '
+                        + (this.vpon ? 'on' : 'off')
+                        + ' and LOCKED because ' + this.whyLocked);
+                GS.showRoomChat('Say "#vphelp" for more info.');
 
             } else if (this.gameTitle.match(/#vpoff/i)) {
                 // #vpoff in table name disables and locks
