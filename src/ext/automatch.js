@@ -74,6 +74,7 @@
                             .css('margin', '0px 3px 0px 3px')
                             .css('width', '200px')
                             .click(GS.AM.showSeekPop)));
+                updateAMButton();
 
                 fetchOwnRatings(updateAMButton);
                 fetchOwnSets(updateAMButton);
@@ -873,7 +874,6 @@
             };
 
             GS.debug('Automatch script loaded.');
-            GS.debug('Initializing automatch.');
             initAutomatch();
         };
 
@@ -886,8 +886,9 @@
                     var conn = mtgRoom.conn;
                     var zch = mtgRoom.helpers.ZoneClassicHelper;
                     if (typeof conn !== 'undefined' && typeof zch !== 'undefined') {
-                        loadAutomatchModule();
                         alreadyLoaded = true;
+                        console.log('Not already loaded Automatch');
+                        loadAutomatchModule();
                     }
                 } catch (e) {}
             }
