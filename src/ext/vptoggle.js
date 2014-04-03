@@ -79,6 +79,9 @@
 
         init: function () {
             this.alreadyResponded = false;
+            this.amLocked = false;  // If locked becasue of automatch settings,
+                                    // we'll need to account for cross-version
+                                    // incompatibilities
             
             if (this.isMultiplayer()) {
                 if (GS.get_option('greeting').length > 0) {
@@ -98,6 +101,7 @@
             } else if (GS.AM.vpcounter !== null) {
                 this.vpon = GS.AM.vpcounter;
                 this.locked = true;
+                this.amLocked = true;
                 this.whyLocked = 'it was specified using Automatch';
                 GS.showRoomChat('The VP Counter is '
                         + (this.vpon ? 'on' : 'off')
@@ -275,7 +279,11 @@
 
         handleOppVPON: function (speaker) {
             this.players[speaker].request = true;
-            if (this.locked && !this.vpon) {
+            if (this.locked && !this.vpon && this.amLocked) {
+                GS.sendRoomChat('#vpoff');
+            } else if (this.locked && this.vpon && this.amLocked) {
+                GS.sendRoomChat('#vpon');
+            } else if (this.locked && !this.vpon) {
                 GS.sendRoomChat('Sorry. My VP counter is locked to OFF '
                               + 'because ' + this.whyLocked + '. ');
             } else {
@@ -303,7 +311,12 @@
 
         handleOppVPOFF: function (speaker) {
             this.players[speaker].request = false;
-            if (this.locked && this.vpon) {
+            if (this.locked && !this.vpon && this.amLocked) {
+                // Do nothing.  AM user keeps his #vpon setting.
+                GS.debug('AM user keeps his automatch settings');
+            } else if (this.locked && this.vpon && this.amLocked) {
+                GS.sendRoomChat('#vpon');
+            } else if (this.locked && this.vpon) {
                 GS.sendRoomChat('Sorry. My VP counter is locked to ON '
                               + 'because ' + this.whyLocked + '. ');
             } else {
