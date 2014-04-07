@@ -279,10 +279,12 @@
 
         handleOppVPON: function (speaker) {
             this.players[speaker].request = true;
-            if (this.locked && !this.vpon && this.amLocked) {
+            if (this.locked && !this.vpon && this.amLocked && !this.alreadyResponded) {
                 GS.sendRoomChat('#vpoff');
-            } else if (this.locked && this.vpon && this.amLocked) {
+                this.alreadyResponded = true;
+            } else if (this.locked && this.vpon && this.amLocked && !this.alreadyResponded) {
                 GS.sendRoomChat('#vpon');
+                this.alreadyResponded = true;
             } else if (this.locked && !this.vpon) {
                 GS.sendRoomChat('Sorry. My VP counter is locked to OFF '
                               + 'because ' + this.whyLocked + '. ');
@@ -314,8 +316,9 @@
             if (this.locked && !this.vpon && this.amLocked) {
                 // Do nothing.  AM user keeps his #vpon setting.
                 GS.debug('AM user keeps his automatch settings');
-            } else if (this.locked && this.vpon && this.amLocked) {
+            } else if (this.locked && this.vpon && this.amLocked && !this.alreadyResponded) {
                 GS.sendRoomChat('#vpon');
+                this.alreadyResponded = true;
             } else if (this.locked && this.vpon) {
                 GS.sendRoomChat('Sorry. My VP counter is locked to ON '
                               + 'because ' + this.whyLocked + '. ');
@@ -335,7 +338,8 @@
 
             // Announce VP counter at the start of our Turn 2.
             if (turnNumber === 2 && playerName === this.myName
-                    && this.isMultiplayer() && this.reqcount() === 0) {
+                    && this.isMultiplayer() && this.reqcount() === 0
+                    && !this.amLocked) {
                 if (this.always_request && !this.locked) {
                     GS.sendRoomChat('#vpon');
                 } else if (this.vpon && this.locked) {
