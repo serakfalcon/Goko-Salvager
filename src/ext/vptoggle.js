@@ -98,7 +98,9 @@
                 GS.showRoomChat('The VP Counter is ON because all the other '
                               + 'players are bots.');
                 GS.showRoomChat('Say "#vphelp" for more info.');
-            } else if (GS.AM.vpcounter !== null) {
+            } else if (typeof GS.AM !== 'undefined'
+                    && typeof GS.AM.vpcounter !== 'undefined'
+                    && GS.AM.vpcounter !== null) {   // Needless caution
                 this.vpon = GS.AM.vpcounter;
                 this.locked = true;
                 this.amLocked = true;
