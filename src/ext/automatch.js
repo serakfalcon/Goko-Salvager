@@ -13,7 +13,7 @@
                 fetchOwnSets, handleDisconnect,
                 connectToAutomatchServer, confirmReceipt, confirmSeek, offerMatch,
                 rescindOffer, announceGame, unannounceGame, joinAutomatchGame,
-                createAutomatchGame, enableButtonWhenAutomatchReady,
+                createAutomatchGame, enableButtonWhenAutomatchReady, showChat,
                 handleLostAutomatchConnection, enableAutoAccept, disableAutoAccept,
                 gameReady, attemptAutomatchInit, testPop, sendAutoAutomatchSeekRequest;
 
@@ -24,7 +24,11 @@
 
             // Use secure websockets
             // TODO: switch from 8889 back to 443 port after transition
-            GS.AM.server_url = 'wss://gokosalvager.com:8889/automatch';
+            if (GS.get_option('testmode')) {
+                GS.AM.server_url = 'wss://gokosalvager.com:7889/automatch';
+            } else {
+                GS.AM.server_url = 'wss://gokosalvager.com:8889/automatch';
+            }
 
             // Initial state
             automatchInitStarted = false;
@@ -376,6 +380,9 @@
                     case 'UNANNOUNCE_GAME':
                         unannounceGame(msg.message);
                         break;
+                    case 'ANNOUNCE_CHAT':
+                        showChat(msg.message);
+                        break;
                     default:
                         throw 'Received unknown message type: ' + msg.msgtype;
                     }
@@ -495,12 +502,19 @@
                 GS.notifyUser('Automatch found', new Audio('sounds/startTurn.ogg'));
             };
 
+            showChat = function (msg) {
+                GS.AM.showOfferChat(msg.speaker, msg.text);
+            };
+
             rescindOffer = function (msg) {
                 GS.AM.state.offer = null;
                 GS.AM.tableSettings = null;
                 // TODO: handle this in a more UI-consistent way
                 GS.AM.showOfferPop(false);
-                GS.notifyUser('Automatch offer was rescinded:\n' + msg.reason);
+    
+                var chatText = $('#amChatArea').val();
+                GS.notifyUser('Automatch offer was rescinded:\n' + msg.reason
+                        + (chatText ? '  ' + chatText : ''));
             };
 
             announceGame = function (msg) {
@@ -606,6 +620,15 @@
                 }
                 GS.AM.tableSettings = null;
             };
+
+            GS.AM.sendChat = function (text) {
+                var msg = {
+                    text: text,
+                    matchid: GS.AM.state.offer.matchid
+                };
+                GS.AM.ws.sendMessage('SUBMIT_CHAT', msg);
+            };
+
 
             GS.AM.acceptOffer = function (aoCallback) {
                 var msg = {matchid: GS.AM.state.offer.matchid};
