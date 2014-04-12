@@ -404,7 +404,8 @@
     ];
     GS.modules.vptoggle.load = function () {
 
-        var onGameSetup, onRoomChat, onAddLog, checkGameOver;
+        var onGameSetup, onFirstAddLog, onRoomChat, onAddLog, checkGameOver,
+            firstLogReceived;
 
         // Update each player's VP total and tell angular to redraw
         var updateTable = function () {
@@ -426,11 +427,19 @@
                     return pinfo.hasOwnProperty('bot') && pinfo.bot;
                 })
             );
+            firstLogReceived = false;
+        };
+
+        onFirstAddLog = function () {
             GS.vp.toggle.init();
             updateTable();
         };
 
         onAddLog = function (data) {
+            if (!firstLogReceived) {
+                onFirstAddLog();
+                firstLogReceived = true;
+            }
             if (typeof data.text === 'undefined') { return; }
 
             var m = data.text.match(/^-+ (.*): turn ([0-9]*)/);
