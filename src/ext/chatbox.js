@@ -98,7 +98,7 @@
 
             if (GS.get_option('chat_noise')
                     && speaker !== mtgRoom.conn.connInfo.playerName) {
-                var url = 'https://gokosalvager.com:8888/static/audio/Ding.wav';
+                var url = 'https://gokosalvager.com/static/audio/Ding.wav';
                 new Audio(url).play();
             }
 
