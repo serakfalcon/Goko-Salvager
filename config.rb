@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.5.1.4',
+    :version => '2.5.1.5',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
@@ -29,7 +29,7 @@
     ],
     :hostServer => 'www.gokosalvager.com',
     :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager',
-    :hostPort => '8888',
+    :hostPort => '443',
     :hostURLBase => '/',
     :extinfo => 'index.html',
     :firefox_minversion => '19.0',
