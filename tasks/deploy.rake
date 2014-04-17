@@ -89,7 +89,7 @@ task :upload_build, :beta do |task, args|
     puts
     puts "* Copying extension files to server"
     type.each do |b,t|
-        sh 'scp -q build/gokosalvager.%s %s:%s' % [t[:ext], props[:hostServer], scpDir]
+        sh 'scp -q build/gokosalvager.%s %s' % [t[:ext], props[:hostServer], scpDir]
     end
 end
 
@@ -148,7 +148,7 @@ task :create_update_links, :beta do |task,args|
         end
 
         # Update target
-        updom = 'https://%s:%s' % [props[:hostServer], props[:hostPort]]
+        updom = 'https://%s' % [props[:hostServer]]
         if args[:beta] == "true" then
             upfile = 'v%s/forbetas/gokosalvager.%s' % [props[:version], t[:ext]]
         else
