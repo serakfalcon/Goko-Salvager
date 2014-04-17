@@ -2,8 +2,6 @@
 
 namespace :firefox do
 
-    #<em:updateURL>https://<%= config[:hostServer] %>:<%= config[:hostPort] %><%= config[:hostURLBase] %><%= config[:extupdate][:firefox] %></em:updateURL>
-
     # Assemble content and generate config files for Firefox Add-on
     task :assemble, :update_url, :title do |task, args|
 
@@ -57,7 +55,7 @@ namespace :firefox do
     task :build, :forbetas do |task, args|
         # Create update url
         props = eval(File.open('config.rb') {|f| f.read })
-        server = 'https://%s:%s' % [props[:hostServer], props[:hostPort]]
+        server = 'https://%s' % [props[:hostServer]]
         if args[:forbetas] == 'true' then
             file = 'update_firefox_forbetas.rdf'
             title = "%s (beta tester version)" % props[:title]

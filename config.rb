@@ -29,7 +29,6 @@
     ],
     :hostServer => 'www.gokosalvager.com',
     :hostDir => '/home/ai/code/goko-dominion-tools/web/static/gokosalvager',
-    :hostPort => '443',
     :hostURLBase => '/',
     :extinfo => 'index.html',
     :firefox_minversion => '19.0',

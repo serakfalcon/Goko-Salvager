@@ -9,7 +9,7 @@ namespace :chrome do
         props = eval(File.open('config.rb') {|f| f.read })
 
         # Create update URL
-        server = 'https://%s:%s' % [props[:hostServer], props[:hostPort]]
+        server = 'https://%s' % [props[:hostServer]]
         if args[:forbetas] == 'true' then
             file = 'update_chrome_forbetas.xml'
             title = "%s (beta tester version)" % props[:title]
@@ -73,7 +73,8 @@ namespace :chrome do
     
     # Create a self-updating .crx for Chrome
     task :crx, :update_url, :title do |task, args|
-        Rake::Task["chrome:assemble"].invoke(args[:update_url], args[:title])
+        Rake::Task['chrome:assemble'].reenable
+        Rake::Task['chrome:assemble'].invoke(args[:update_url], args[:title])
         sh './crxmake.sh build/chrome ~/.private/chrome_key.pem'
         FileUtils.mv 'chrome.crx', 'build/gokosalvager.crx'
         puts 'Created signed .crx, for manual installation.'
