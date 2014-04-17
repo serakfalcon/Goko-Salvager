@@ -85,7 +85,7 @@ namespace :safari do
     desc 'Create a signed .extz for Safari.'
     task :build, :forbetas do |task, args|
         props = eval(File.open('config.rb') {|f| f.read })
-        server = 'https://%s:%s' % [props[:hostServer], props[:hostPort]]
+        server = 'https://%s' % [props[:hostServer]]
         if args[:forbetas] == 'true' then
             upfile = 'update_safari_forbetas.plist'
             sofile = 'v%s/forbetas/gokosalvager.safariextz' % [props[:version]]
