@@ -89,7 +89,7 @@ task :upload_build, :beta do |task, args|
     puts
     puts "* Copying extension files to server"
     type.each do |b,t|
-        sh 'scp -q build/gokosalvager.%s %s' % [t[:ext], props[:hostServer], scpDir]
+        sh 'scp -q build/gokosalvager.%s %s:%s' % [t[:ext], props[:hostServer], scpDir]
     end
 end
 
@@ -148,7 +148,7 @@ task :create_update_links, :beta do |task,args|
         end
 
         # Update target
-        updom = 'https://%s:%s' % [props[:hostServer]]
+        updom = 'https://%s' % [props[:hostServer]]
         if args[:beta] == "true" then
             upfile = 'v%s/forbetas/gokosalvager.%s' % [props[:version], t[:ext]]
         else
@@ -160,8 +160,11 @@ task :create_update_links, :beta do |task,args|
         upfile = fill_template 'update/%s.erb' % [fname_in], props
         File.open('build/update/%s' % [fname_out], 'w') {|f| f.write upfile }
 
+        puts 'SCP:'
+        puts props[:hostServer]
+        puts props[:hostDir]
+
         # Copy update file to deploy server
-        sh 'scp -q build/update/%s %s:%s' %
-           [fname_out, props[:hostServer], props[:hostDir]]
+        sh 'scp -q build/update/%s %s:%s' % [fname_out, props[:hostServer], props[:hostDir]]
     end
 end
