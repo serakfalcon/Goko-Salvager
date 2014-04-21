@@ -30,7 +30,7 @@ namespace :firefox do
         FileUtils.rm 'build/firefox/install.rdf.erb'
 
         # prepare templates.js
-        sh 'grunt jst'
+        sh 'grunt templates'
 
         # Copy js, css, and png files
         FileUtils.cp_r Dir.glob('src/lib/*.js'), 'build/firefox/content/'

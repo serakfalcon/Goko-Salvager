@@ -13,9 +13,22 @@ module.exports = function(grunt) {
           'src/ext/templates.js': 'src/templates/**/*.html'
         }
       }
+    },
+
+    wrap: {
+      templates: {
+        src: 'src/ext/templates.js',
+        dest: 'src/ext/templates.js',
+        options: {
+          wrapper: ['(function () {', '}());']
+        }
+      }
     }
 
   });
 
   grunt.loadNpmTasks('grunt-contrib-jst');
+  grunt.loadNpmTasks('grunt-wrap');
+
+  grunt.registerTask('templates', ['jst', 'wrap']);
 };

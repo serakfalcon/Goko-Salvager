@@ -49,7 +49,7 @@ namespace :chrome do
         File.open('build/chrome/loadAll.js', 'w') {|f| f.write man_json }
 
         # prepare templates.js
-        sh 'grunt jst'
+        sh 'grunt templates'
 
         # Copy js, css, and png files
         FileUtils.cp_r Dir.glob('src/lib/*.js'), 'build/chrome/'

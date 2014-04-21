@@ -54,7 +54,7 @@ namespace :safari do
         FileUtils.cp_r 'src/config/safari/Settings.plist', build_dir
 
         # prepare templates.js
-        sh 'grunt jst'
+        sh 'grunt templates'
 
         # Copy js, css, and png content
         # TODO: How to specify the Safari extension icon?
