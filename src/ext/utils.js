@@ -130,15 +130,12 @@
 
         if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\+/)) !== null) {
             range.min = GS.parseNum(m[2]);
-        }
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)/)) !== null) {
+        } else if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)/)) !== null) {
             range.min = GS.parseNum(m[2]);
             range.max = GS.parseNum(m[5]);
-        }
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\-/)) !== null) {
+        } else if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\-/)) !== null) {
             range.max = GS.parseNum(m[2]);
-        }
-        if ((m = tablename.match(/^(.* |)\+\/\-(\d+(.\d+)?([kK])?)/)) !== null) {
+        } else if ((m = tablename.match(/^(.* |)\+\/\-(\d+(.\d+)?([kK])?)/)) !== null) {
             range.difference = GS.parseNum(m[2]);
         }
         return range;
