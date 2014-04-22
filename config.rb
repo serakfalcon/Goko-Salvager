@@ -1,7 +1,7 @@
 {
     # Info for extension configuration files (package.json, manifest.json, etc)
     :name => 'gokosalvager',
-    :version => '2.5.4.0',
+    :version => '2.5.4.1',
     :title => 'Goko Dominion Salvager',
     :desc => 'Enhance your Online Dominion experience',
     :author => 'The unofficial forum.dominionstrategy dev team',
