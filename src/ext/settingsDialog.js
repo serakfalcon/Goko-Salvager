@@ -52,6 +52,10 @@
                                 .attr('ng-model', 'so.sidebar_chat')
                                 .addClass('indented'))
             .append('<label for="settings_sidebar_chat">Replace Goko chat window</label><br />')
+            .append($('<input type="checkbox" ng-model="so.flash_chat" id="settings_flash_chat" class="indented">'))
+            .append('<label for="settings_flash_chat">Visual chat alert</label><br />')
+            .append($('<input type="checkbox" ng-model="so.chat_noise" id="settings_chat_noise" class="indented">'))
+            .append('<label for="settings_chat_noise">Audio chat alert</label><br />')
             .append($('<div>').text('VP Counter'))
             .append($('<input>').attr('type', 'checkbox')
                                 .attr('id', 'settings_vp_request')
@@ -199,13 +203,25 @@
                                     .attr('id', 'settings_autokick_by_rating')
                                     .attr('ng-model', 'so.autokick_by_rating')
                                     .addClass('indented'))
-                .append('<label for="settings_autokick_by_rating">By rating range</label><br />')
+
+                .append('<label for="settings_autokick_by_rating">By Goko Pro rating</label><br />')
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('id', 'settings_autokick_by_level')
+                                    .attr('ng-model', 'so.autokick_by_level')
+                                    .addClass('indented'))
+                .append('<label for="settings_autokick_by_level">By TrueSkill (Isotropish) level</label><br />')
                 .append($('<input>').attr('type', 'checkbox')
                                     .attr('id', 'settings_autokick_by_forname')
                                     .attr('ng-model', 'so.autokick_by_forname')
                                     .addClass('indented'))
-
                 .append('<label for="settings_autokick_by_forname">By player name</label><br />')
+
+                .append($('<input>').attr('type', 'checkbox')
+                                    .attr('id', 'settings_explain_kicks')
+                                    .attr('ng-model', 'so.explain_kicks')
+                                    .addClass('indented'))
+                .append('<label for="settings_explain_kicks">Explain kicks in chat</label><br />')
+
 
                 .append($('<div>').text('Quick game:'))
                 .append('&nbsp;&nbsp;&nbsp;&nbsp;Name:')
@@ -234,13 +250,11 @@
 
         // Define the dialog sections: miscellaneous settings
         $('#settingsTabs-misc')
-            .append($('<input>').attr('type', 'checkbox')
-                                .attr('id', 'settings_generator')
-                                .attr('ng-model', 'so.generator'))
+            .append($('<input type="checkbox" id="settings_generator" ng-model="so.generator">'))
             .append('<label for="settings_generator">Kingdom Generator</label><br />')
-            .append($('<input>').attr('type', 'checkbox')
-                                .attr('id', 'settings_debug_mode')
-                                .attr('ng-model', 'so.debug_mode'))
+            .append($('<input type="checkbox" id="settings_autozap" ng-model="so.autozap">'))
+            .append('<label for="settings_autozap">Adventure Mode Auto-Zap</label><br />')
+            .append($('<input type="checkbox" id="settings_debug_mode" ng-model="so.debug_mode">'))
             .append('<label for="settings_debug_mode">Extra logging (for error reports)</label><br />');
 
         // Verify blacklist when opening Blacklist tab.  Save on close.
