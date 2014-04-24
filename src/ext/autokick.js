@@ -15,6 +15,7 @@
         var kick, kickOrNotify, self = this;
         this.myProRating = null;
         this.kickedOpps = [];
+        this.explainedOpps = [];
 
         GS.alsoDo(FS.ZoneClassicHelper, 'onPlayerJoinTable', null, function (table, join) {
             if (this.isLocalOwner(table) && !join.get('player').get('isBot')) {
@@ -94,16 +95,26 @@
                 playerAddress: joiner.get('playerAddress')
             });
 
-            // Explain kick
-            console.info('kicking', self.kickedOpps, joiner);
             var oppId = joiner.get('playerAddress').slice(30, 54);
+            GS.debug(GS.get_option('explain_kicks'));
+            GS.debug(_.contains(self.kickedOpps, oppId));
+            GS.debug(!_.contains(self.explainedOpps, oppId));
+            GS.debug(joiner.get('playerName').toLowerCase().indexOf('guest') !== 0);
+            GS.debug(whyKick !== null);
+            GS.debug(whyKick);
+           
+            // Explain kick if a non-guest tries to join twice
             if (GS.get_option('explain_kicks')
-                    && !_.contains(self.kickedOpps, oppId)
+                    && _.contains(self.kickedOpps, oppId)
+                    && !_.contains(self.explainedOpps, oppId)
+                    && (joiner.get('playerName').toLowerCase().indexOf('guest') !== 0)
                     && whyKick !== null) {
                 var text = joiner.get('playerName') + ', ' + whyKick;
                 mtgRoom.conn.chat({text: text});
-                self.kickedOpps.push(oppId);
+                self.explainedOpps.push(oppId);
             }
+
+            self.kickedOpps.push(oppId);
         };
     };
 
