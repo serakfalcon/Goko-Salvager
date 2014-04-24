@@ -17,7 +17,7 @@
         this.kickedOpps = [];
 
         GS.alsoDo(FS.ZoneClassicHelper, 'onPlayerJoinTable', null, function (table, join) {
-            if (this.isLocalOwner(table)) {
+            if (this.isLocalOwner(table) && !join.get('player').get('isBot')) {
                 var tableName = JSON.parse(table.get('settings')).name;
                 var opp = join.get('player');
                 var myId = mtgRoom.localPlayer.getId();
