@@ -128,17 +128,14 @@
     GS.parseProRange = function (tablename) {
         var m, range = {};
 
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\+(?!\S)/)) !== null) {
+        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\+/)) !== null) {
             range.min = GS.parseNum(m[2]);
-        }
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\-(?!\S)/)) !== null) {
-            range.max = GS.parseNum(m[2]);
-        }
-        if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)(?!\S)/)) !== null) {
+        } else if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)-(\d+(.\d+)?([kK])?)/)) !== null) {
             range.min = GS.parseNum(m[2]);
             range.max = GS.parseNum(m[5]);
-        }
-        if ((m = tablename.match(/^(.* |)\+\/\-(\d+(.\d+)?([kK])?)(?!\S)/)) !== null) {
+        } else if ((m = tablename.match(/^(.* |)(\d+(.\d+)?([kK])?)\-/)) !== null) {
+            range.max = GS.parseNum(m[2]);
+        } else if ((m = tablename.match(/^(.* |)\+\/\-(\d+(.\d+)?([kK])?)/)) !== null) {
             range.difference = GS.parseNum(m[2]);
         }
         return range;
