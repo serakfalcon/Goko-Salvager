@@ -33,9 +33,13 @@
                 var oppPro = proCache[oppId].ratingPro;
                 var myPro = proCache[myId].ratingPro;
                 var myIso = null, oppIso = null;
-                if (GS.isoLevelCache !== 'undefined') {
-                    myIso = GS.isoLevelCache[myId];
-                    oppIso = GS.isoLevelCache[oppId];
+                if (GS.isoLevelCache !== undefined) {
+                    if (GS.isoLevelCache.hasOwnProperty(myId)) {
+                        myIso = GS.isoLevelCache[myId];
+                    }
+                    if (GS.isoLevelCache.hasOwnProperty(oppId)) {
+                        oppIso = GS.isoLevelCache[oppId];
+                    }
                 }
                 console.info('Ratings', myPro, oppPro, myIso, oppIso);
 
