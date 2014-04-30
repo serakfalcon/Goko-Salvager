@@ -124,9 +124,15 @@
                 newCallback = function (resp) {
                     callback(resp);
 
+                    var isoLevel = '?';
+                    if (GS.isoLevelCache !== undefined
+                            && GS.isoLevelCache.hasOwnProperty(opts.playerId)) {
+                        isoLevel = GS.isoLevelCache[opts.playerId];
+                    }
+
                     // insert iso level right after Goko Pro rating
                     opts.$el.closest('div').find('.vp-rating-pro').closest('p')
-                        .after(GS.template('popup-iso-level', { level: GS.isoLevelCache[opts.playerId] }));
+                        .after(GS.template('popup-iso-level', { level: isoLevel }));
                 };
             }
 
@@ -170,15 +176,21 @@
         };
 
         getSortablePlayerObjectFromElement = function (element) {
+            var rankSpan, isoSpan;
             switch (GS.get_option('sortkey'))
             {
             case('pname'):
                 return element.querySelector('.fs-mtrm-player-name>strong').innerHTML;
             case('rating'):
-                var rankSpan = element.querySelector('.player-rank>span');
+                rankSpan = element.querySelector('.player-rank>span');
                 return rankSpan ? parseInt(-rankSpan.innerHTML, 10) : 1;
             case('iso'):
-                var isoSpan = element.querySelector('.iso-level');
+                // Sort by pro rating if Iso level cache is unavailable
+                if (GS.isoLevelCache === undefined) {
+                    rankSpan = element.querySelector('.player-rank>span');
+                    return rankSpan ? parseInt(-rankSpan.innerHTML, 10) : 1;
+                }
+                isoSpan = element.querySelector('.iso-level');
                 return isoSpan ? parseFloat(-isoSpan.innerHTML, 10) : 1;
             default:
                 throw 'Invalid sort key: ' + GS.get_option('sortkey');
