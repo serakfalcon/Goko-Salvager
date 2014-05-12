@@ -14,6 +14,11 @@ Installation
 
 [Beta versions](../../wiki/Beta-Testers) are also available.  Install to get early access to features still in development, in addition to the regular updates.
 
+Reporting Bugs
+--------------
+
+Please follow [these instructions](../../wiki/Support#reporting-bugs).
+
 Automatic Updates
 -----------------
 
