@@ -2,8 +2,8 @@
 
 namespace :firefox do
 
-    desc 'Assemble content and generate config files for Firefox Add-on'
-    task :dev do
+    # Assemble content and generate config files for Firefox Add-on
+    task :assemble, :update_url, :title do |task, args|
 
         # Prepare a blank Firefox Add-on project
         FileUtils.rm_rf 'build/firefox/'
@@ -16,6 +16,8 @@ namespace :firefox do
 
         # Read properties from common config file
         props = eval(File.open('config.rb') {|f| f.read })
+        props[:update_url] = args[:update_url]
+        props[:title] = args[:title]
 
         # Build main loader script dynamically
         main_js = fill_template 'src/config/firefox/content/main.js.erb', props
@@ -26,6 +28,9 @@ namespace :firefox do
         inst_rdf = fill_template 'src/config/firefox/install.rdf.erb', props
         File.open('build/firefox/install.rdf', 'w') {|f| f.write inst_rdf }
         FileUtils.rm 'build/firefox/install.rdf.erb'
+
+        # prepare templates.js
+        sh 'grunt templates'
 
         # Copy js, css, and png files
         FileUtils.cp_r Dir.glob('src/lib/*.js'), 'build/firefox/content/'
@@ -38,11 +43,11 @@ namespace :firefox do
         init_json = fill_template 'src/ext/init.js.erb', props
         File.open('build/firefox/content/init.js', 'w') {|f| f.write init_json }
 
-        puts 'Firefox Add-On is ready to test/build'
+        puts 'Assembled Firefox files'
     end
 
-    desc 'Test the Firefox extension'
-    # Note: ~/.mozilla/firefox/test should link to your testing profile dir
+    # Test the Firefox extension from the command line
+    # NOTE: ~/.mozilla/firefox/test should link to your testing profile dir
     task :test => [:dev] do
         sh 'cfx -v run --pkgdir=build/firefox/ --binary-args \
             "-url https://play.goko.com/Dominion/gameClient.html" \
@@ -50,7 +55,23 @@ namespace :firefox do
     end
 
     desc 'Create the Firefox extension .xpi'
-    task :build => [:dev] do
-        Dir.chdir('build/firefox') { sh 'zip ../gokosalvager.xpi -r *' }
+    task :build, :forbetas do |task, args|
+        # Create update url
+        props = eval(File.open('config.rb') {|f| f.read })
+        server = 'https://%s' % [props[:hostServer]]
+        if args[:forbetas] == 'true' then
+            file = 'update_firefox_forbetas.rdf'
+            title = "%s (beta tester version)" % props[:title]
+        else
+            file = 'update_firefox.rdf'
+            title = "%s" % props[:title]
+        end
+        update_url= '%s%s%s' % [server, props[:hostURLBase], file]
+
+        Rake::Task['firefox:assemble'].invoke(update_url, title)
+        Dir.chdir('build/firefox') { sh 'zip ../gokosalvager.xpi -qr *' }
+
+        puts 'Built Firefox .xpi'
+        puts
     end
 end

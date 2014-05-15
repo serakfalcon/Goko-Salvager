@@ -16,8 +16,7 @@
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion><%= config[:firefox_minversion] %></em:minVersion>
                 <em:maxVersion><%= config[:firefox_maxversion] %></em:maxVersion>
-                <em:updateLink>https://<%= config[:hostServer] %>:<%= config[:hostPort] %><%= config[:hostURLBase] %>v<%= config[:version] %>/gokosalvager.xpi</em:updateLink>
-                <em:updateInfoURL>https://<%= config[:hostServer] %>:<%= config[:hostPort] %><%= config[:hostURLBase] %>v<%= config[:version] %>/updateinfo.html</em:updateInfoURL>
+                <em:updateLink><%= config[:update_url] %></em:updateLink>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>
